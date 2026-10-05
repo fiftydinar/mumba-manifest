@@ -42,3 +42,8 @@ for name in device-mumba mumba-refresh-defaults settings-provider-refresh-defaul
     exit 1
   fi
 done
+
+# The messaging app contains Serbian translations in Cyrillic only. Generate
+# the matching Latin-script resource qualifier when the device locale is sr-Latn.
+python3 "$SELF_DIR/tools/generate_sr_latin_resources.py" \
+  "$PWD/packages/apps/Messaging/res"

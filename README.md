@@ -128,7 +128,7 @@ upstream base SHAs are from the resolved `lineage-23.2` manifest
 | `frameworks/opt/telephony` | [`fiftydinar/android_frameworks_opt_telephony`](https://github.com/fiftydinar/android_frameworks_opt_telephony) | `LineageOS/android_frameworks_opt_telephony` | `566e62daf4e93be6f934001bc76d60aba087b4d6` | `566e62daf4e93be6f934001bc76d60aba087b4d6` |
 | `packages/apps/Settings` | [`fiftydinar/android_packages_apps_Settings`](https://github.com/fiftydinar/android_packages_apps_Settings) | `LineageOS/android_packages_apps_Settings` | `8d8f6486b274bcf0aa6e5d0cbba52c0b05ae5c65` | `8d8f6486b274bcf0aa6e5d0cbba52c0b05ae5c65` |
 | `packages/apps/Dialer` | [`fiftydinar/android_packages_apps_Dialer`](https://github.com/fiftydinar/android_packages_apps_Dialer) | `LineageOS/android_packages_apps_Dialer` | `6da8042323a97d5b3cba1fd975709cc42f29916f` | `6da8042323a97d5b3cba1fd975709cc42f29916f` |
-| `packages/apps/Messaging` | [`fiftydinar/android_packages_apps_Messaging`](https://github.com/fiftydinar/android_packages_apps_Messaging) | `LineageOS/android_packages_apps_Messaging` | `6d131ed8e7249b0ece41169e17d8d0162beae7e0` | `0453fff8d190a6670ffebad7e0c95ae1de583e20` |
+| `packages/apps/Messaging` | [`fiftydinar/android_packages_apps_Messaging`](https://github.com/fiftydinar/android_packages_apps_Messaging) | `LineageOS/android_packages_apps_Messaging` | `6d131ed8e7249b0ece41169e17d8d0162beae7e0` | `d8feea90e13da21fa279e72982cc0bae49600f35` |
 | `hardware/qcom-caf/common` | [`fiftydinar/android_hardware_qcom-caf_common`](https://github.com/fiftydinar/android_hardware_qcom-caf_common) | `LineageOS/android_hardware_qcom-caf_common` | `1805784d14b386fce6127f2f06b5a16a3e9b94ed` | `1805784d14b386fce6127f2f06b5a16a3e9b94ed` |
 | `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `6a42341357a56903eea27a74fdb161a26402dcc3` | `6a42341357a56903eea27a74fdb161a26402dcc3` |
 
@@ -162,7 +162,9 @@ messages without a verification keyword are ignored. The keyword set covers all
 70 language codes shipped by Messaging (including both Serbian and Chinese
 scripts); detection accepts Unicode decimal digits and grouped three-digit codes.
 The action labels and clipboard feedback are also translated in all 77
-language/region resource sets bundled with Messaging.
+language/region resource sets bundled with Messaging. Since upstream has Serbian
+Cyrillic resources but no `sr-Latn` set, `apply_port.sh` generates the Latin
+variant from those strings for devices set to `sr-Latn-RS`.
 
 From the initialized build tree, run the detector/dispatch host tests and device
 intent/clipboard-payload tests with:

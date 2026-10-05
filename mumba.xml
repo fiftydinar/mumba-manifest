@@ -84,7 +84,7 @@
   <project name="android_packages_apps_Messaging"
            path="packages/apps/Messaging"
            remote="mine"
-           revision="0453fff8d190a6670ffebad7e0c95ae1de583e20" />
+           revision="d8feea90e13da21fa279e72982cc0bae49600f35" />
 
   <remove-project name="LineageOS/android_hardware_qcom-caf_common" />
   <project name="android_hardware_qcom-caf_common"
