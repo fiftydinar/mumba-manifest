@@ -20,7 +20,7 @@
   <project name="vendor_motorola_mumba_latest"
            path="vendor/motorola/mumba"
            remote="mine"
-           revision="8bcc9d41ca36b5e2ae93d592226eac163225ade9" />
+           revision="3d41a357a60816d19321e74714f8bb6dfc024b43" />
 
   <!-- Motorola hardware HAL/overlay -->
   <project name="android_hardware_motorola"

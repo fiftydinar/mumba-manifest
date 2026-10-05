@@ -134,9 +134,9 @@ Not ported (deliberately): the SurfaceFlinger big-cluster cpuset (battery trade-
   back to the (missing) generic `chipone_firmware.bin`. `touch-kbuild.patch`
   forces `-DCTS_TP_MODULE_EN`, letting `cts_parse_tp_module()` match the active
   DRM panel name (`boe_..._mumbai`) and load `boe_chipone_firmware.bin`.
-- `vendor/motorola/mumba`: added `vendor/firmware/boe_chipone_firmware.bin` and
-  `csot_chipone_firmware.bin` (both listed in `proprietary-files.txt`, but absent
-  from the vendor blob tree).
+- `vendor/motorola/mumba`: the BOE/CSOT firmware blobs are present in the pinned
+  vendor source under `proprietary/vendor/firmware/`. `vendor-mumba.patch` adds
+  the `PRODUCT_COPY_FILES` mappings that install them in `/vendor/firmware`.
 
 ## Adaptive refresh rate
 
@@ -303,8 +303,9 @@ limit and the kernel audit backlog was 64.
 - A Jiiov-first diagnostic boot still failed Jiiov, then FPC succeeded. The
   selector is restored to FPC-first. `last_vendor_id` is logged but does not
   control fallback order when current `vendor_id=none`.
-- The rebuilt vendor image now includes Lunaris's matching `snapdragon_services`
-  binary and init rc. After flashing slot A, init reports the service running;
+- The rebuilt vendor image includes Lunaris's matching `snapdragon_services`
+  binary and init rc; both are now stored in the pinned public vendor fork.
+  After flashing slot A, init reports the service running;
   `ISnapdragonServices/default` and the QTI perf AIDL service are both registered.
   The installed blob hashes match the extracted source files. Fingerprint remains
   healthy after this boot: sensor ID 1, two enrolled prints, zero HAL deaths.

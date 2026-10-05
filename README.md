@@ -87,7 +87,7 @@ trust.
 | Path | Repository | Purpose |
 |---|---|---|
 | `device/motorola/mumba` | [fiftydinar/android_device_motorola_mumba](https://github.com/fiftydinar/android_device_motorola_mumba) | forked ZaraKinYu device tree; builds the kernel from source |
-| `vendor/motorola/mumba` | [fiftydinar/vendor_motorola_mumba_latest](https://github.com/fiftydinar/vendor_motorola_mumba_latest) | forked lostsignal vendor tree; proprietary blobs |
+| `vendor/motorola/mumba` | [fiftydinar/vendor_motorola_mumba_latest](https://github.com/fiftydinar/vendor_motorola_mumba_latest) | forked lostsignal vendor tree; proprietary blobs and device firmware |
 | `hardware/motorola` | [fiftydinar/android_hardware_motorola](https://github.com/fiftydinar/android_hardware_motorola) | forked Motorola HAL |
 | `kernel/motorola/sm6435` | [fiftydinar/android_kernel_motorola_sm6435](https://github.com/fiftydinar/android_kernel_motorola_sm6435) | forked kernel source (Kbuild) |
 | `kernel/motorola/sm6435-modules` | [fiftydinar/android_kernel_motorola_sm6435-modules](https://github.com/fiftydinar/android_kernel_motorola_sm6435-modules) | forked external modules |
@@ -96,6 +96,16 @@ trust.
 | `prebuilts/openeuicc-deps` | [fiftydinar/android_prebuilts_openeuicc-deps](https://github.com/fiftydinar/android_prebuilts_openeuicc-deps) | GitHub mirror of OpenEUICC prebuilt libraries |
 | `packages/apps/Messaging` | [fiftydinar/android_packages_apps_Messaging](https://github.com/fiftydinar/android_packages_apps_Messaging) | fork with notification read and verification-code copy actions |
 | `hardware/qcom-caf/common/libqti-perfd-client` | [fiftydinar/android_hardware_qcom-caf_common](https://github.com/fiftydinar/android_hardware_qcom-caf_common) | forked LineageOS CAF stub; QTI perf API compatibility |
+
+The BOE and CSOT touchscreen firmware blobs are in the vendor fork's
+[`lineage-23.2` branch](https://github.com/fiftydinar/vendor_motorola_mumba_latest/tree/lineage-23.2/proprietary/vendor/firmware):
+[`boe_chipone_firmware.bin`](https://github.com/fiftydinar/vendor_motorola_mumba_latest/blob/lineage-23.2/proprietary/vendor/firmware/boe_chipone_firmware.bin)
+and
+[`csot_chipone_firmware.bin`](https://github.com/fiftydinar/vendor_motorola_mumba_latest/blob/lineage-23.2/proprietary/vendor/firmware/csot_chipone_firmware.bin).
+`vendor-mumba.patch` adds the mappings that copy them into `/vendor/firmware`.
+The additional Snapdragon Services executable and init rc are on the
+[`mumba-vendor-service-blobs` branch](https://github.com/fiftydinar/vendor_motorola_mumba_latest/tree/mumba-vendor-service-blobs/proprietary/vendor)
+and are included by the vendor commit pinned in `mumba.xml`.
 
 Everything else (framework, etc.) comes from the **official LineageOS** manifest.
 
@@ -106,7 +116,7 @@ The following revisions are pinned in `mumba.xml`:
 | Path | GitHub copy | Original upstream | Upstream source commit | `mumba.xml` pin |
 |---|---|---|---|---|
 | `device/motorola/mumba` | [`fiftydinar/android_device_motorola_mumba`](https://github.com/fiftydinar/android_device_motorola_mumba) | `ZaraKinYu-Playground/android_device_motorola_mumba` | `c87184155fc8482f4dd469aa67b0ab98049cb735` | `c87184155fc8482f4dd469aa67b0ab98049cb735` |
-| `vendor/motorola/mumba` | [`fiftydinar/vendor_motorola_mumba_latest`](https://github.com/fiftydinar/vendor_motorola_mumba_latest) | `lostsignal-502/vendor_motorola_mumba_latest` | `8bcc9d41ca36b5e2ae93d592226eac163225ade9` | `8bcc9d41ca36b5e2ae93d592226eac163225ade9` |
+| `vendor/motorola/mumba` | [`fiftydinar/vendor_motorola_mumba_latest`](https://github.com/fiftydinar/vendor_motorola_mumba_latest) | `lostsignal-502/vendor_motorola_mumba_latest` | `8bcc9d41ca36b5e2ae93d592226eac163225ade9` | `3d41a357a60816d19321e74714f8bb6dfc024b43` |
 | `hardware/motorola` | [`fiftydinar/android_hardware_motorola`](https://github.com/fiftydinar/android_hardware_motorola) | `lostsignal-502/android_hardware_motorola` | `8cee9a14b9bd59b1d4eeab69d838569a0935a106` | `8cee9a14b9bd59b1d4eeab69d838569a0935a106` |
 | `kernel/motorola/sm6435` | [`fiftydinar/android_kernel_motorola_sm6435`](https://github.com/fiftydinar/android_kernel_motorola_sm6435) | `ZaraKinYu-Playground/android_kernel_motorola_sm6435` | `2df509385d9c1df4c65a01cfda0302e7de52fc75` | `2df509385d9c1df4c65a01cfda0302e7de52fc75` |
 | `kernel/motorola/sm6435-modules` | [`fiftydinar/android_kernel_motorola_sm6435-modules`](https://github.com/fiftydinar/android_kernel_motorola_sm6435-modules) | `ZaraKinYu-Playground/android_kernel_motorola_sm6435-modules` | `0659ac7d22557e405529e00e2b5fdace57964636` | `0659ac7d22557e405529e00e2b5fdace57964636` |
