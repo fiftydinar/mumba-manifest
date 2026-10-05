@@ -259,7 +259,13 @@ INTERACTION node looper started; jank went from 0.69% (4 missed deadlines) to
 
 ## SELinux audit and current boot findings
 
-The device remains **Permissive** (`androidboot.selinux=permissive`) for debugging.
+The `eng` and `userdebug` variants remain **Permissive**
+(`androidboot.selinux=permissive`) for debugging. The `user` release variant
+omits that argument and boots with SELinux enforcing by default; enforcing-mode
+boot and hardware validation have not yet been completed. Debug variants also
+set AVB flags `3` (disable verification/hashtree); the `user` variant omits
+those debug flags so AVB verification stays enabled and can be re-signed with
+the owner's AVB keys.
 An earlier boot lost over 1,500 audit records because logd applied a 5/sec rate
 limit and the kernel audit backlog was 64.
 

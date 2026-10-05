@@ -1,5 +1,5 @@
 diff --git a/BoardConfig.mk b/BoardConfig.mk
-index 9dea7e6..6b42171 100644
+index 9dea7e6..86cd418 100644
 --- a/BoardConfig.mk
 +++ b/BoardConfig.mk
 @@ -58,7 +58,13 @@ TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/config.fs
@@ -17,18 +17,27 @@ index 9dea7e6..6b42171 100644
  
  # Init Boot
  BOARD_INIT_BOOT_HEADER_VERSION := 4
-@@ -71,7 +77,9 @@ BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
- 
+@@ -71,13 +77,18 @@ BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
+
  # Kernel
  BOARD_KERNEL_CMDLINE += \
 -    console=ttynull \
 +    console=ttyMSM0,115200n8 \
-+    androidboot.selinux=permissive \
 +    audit_backlog_limit=4096 \
      nosoftlockup \
      printk.devkmsg=on \
      firmware_class.path=/vendor/firmware_mnt/image \
-@@ -155,6 +162,7 @@ TARGET_KERNEL_EXT_MODULES += \
+     qcom_geni_serial.con_enabled=0 \
+     sysctl.kernel.firmware_config.force_sysfs_fallback=1
+ 
++ifneq ($(filter eng userdebug,$(TARGET_BUILD_VARIANT)),)
++BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
++endif
++
+ BOARD_BOOTCONFIG += \
+     androidboot.hardware=qcom \
+     androidboot.load_modules_parallel=true \
+@@ -155,6 +166,7 @@ TARGET_KERNEL_EXT_MODULES += \
      motorola/drivers/moto_mm \
      motorola/drivers/moto_sched \
      motorola/drivers/watchdogtest \
@@ -36,7 +45,7 @@ index 9dea7e6..6b42171 100644
      motorola/drivers/misc/sx937x \
      motorola/drivers/misc/utag \
      motorola/drivers/misc/mmi_sys_temp \
-@@ -166,7 +174,6 @@ TARGET_KERNEL_EXT_MODULES += \
+@@ -166,7 +178,6 @@ TARGET_KERNEL_EXT_MODULES += \
      motorola/drivers/backlight/ktd3136 \
      motorola/drivers/backlight/aw99703 \
      motorola/drivers/nfc/st21nfc \
@@ -44,7 +53,7 @@ index 9dea7e6..6b42171 100644
      motorola/drivers/ese/st54x \
      motorola/drivers/ese/st54spi_gpio \
      motorola/drivers/input/misc/fpc_fps_mmi \
-@@ -175,6 +182,10 @@ TARGET_KERNEL_EXT_MODULES += \
+@@ -175,6 +186,10 @@ TARGET_KERNEL_EXT_MODULES += \
      motorola/drivers/input/misc/anc_fps_mmi \
      motorola/drivers/wlan_antenna
  
@@ -55,14 +64,20 @@ index 9dea7e6..6b42171 100644
  # Metadata
  BOARD_USES_METADATA_PARTITION := true
 
-@@ -237,6 +248,7 @@ ENABLE_VENDOR_RIL_SERVICE := true
+@@ -237,10 +252,13 @@ ENABLE_VENDOR_RIL_SERVICE := true
  include device/lineage/sepolicy/libperfmgr/sepolicy.mk
  include device/qcom/sepolicy_vndr/SEPolicy.mk
  include hardware/motorola/sepolicy/qti/SEPolicy.mk
 +BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor
-
+ 
  # Verified Boot
  BOARD_AVB_ENABLE := true
++ifneq ($(filter eng userdebug,$(TARGET_BUILD_VARIANT)),)
+ BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
++endif
+ BOARD_AVB_ROLLBACK_INDEX := 22
+ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := 22
+ BOARD_AVB_VBMETA_SYSTEM := system system_ext product pvmfw
 
 diff --git a/sepolicy/vendor/hal_vibrator_default.te b/sepolicy/vendor/hal_vibrator_default.te
 new file mode 100644

@@ -6,7 +6,9 @@ with the **kernel built from source**.
 This repository contains:
 - `mumba.xml` - local manifest (device tree, vendor, hardware, kernel source/modules/devicetrees,
   OpenEUICC LPA) with **pinned revisions** (commit SHA) for reproducible builds.
-- `build.sh` - one-command build.
+- `build.sh` - userdebug build; `SYNC=false` reuses the synced source tree.
+- `build_release.sh` + `sign_release.sh` - isolated `user` build and locally
+  signed target-files/OTA release.
 - `apply_port.sh` + `port/` - fifteen local patches for device fixes, audio and
   touchscreen compatibility, adaptive refresh rates, OpenEUICC/eSIM, and Dialer
   auto call recording, applied on top of a fresh `repo sync`.
@@ -36,6 +38,49 @@ mka bacon -j$(nproc)
 ```
 
 Output: `out/target/product/mumba/lineage-23.2-*-mumba.zip`
+
+## Separate signed user release
+
+`build_release.sh` uses a separate source tree (`$HOME/Documenti/lineage-mumba-release`)
+and output directory, so it leaves the normal userdebug checkout and artifacts
+alone. It builds `lineage_mumba-bp4a-user` and creates a target-files package.
+For subsequent builds in that tree, `SYNC=false bash build_release.sh` skips
+`repo sync`; patch application is safe to repeat. The normal debug build can
+likewise be rebuilt without syncing using `SYNC=false bash build.sh`.
+
+Create personal signing keys outside both source/output trees and this
+repository. For example:
+
+```bash
+SRC="$HOME/Documenti/lineage-mumba-release"
+KEYS="$HOME/.android-certs/mumba"
+umask 077
+mkdir -m 700 -p "$KEYS"
+chmod 700 "$KEYS"
+for key in releasekey platform shared media networkstack sdk_sandbox bluetooth nfc; do
+  "$SRC/development/tools/make_key" "$KEYS/$key" "/CN=Mumba Release/"
+done
+openssl genrsa -out "$KEYS/avb-vbmeta-rsa4096.pem" 4096
+openssl genrsa -out "$KEYS/avb-vbmeta-system-rsa2048.pem" 2048
+openssl genrsa -out "$KEYS/apex-payload-rsa4096.pem" 4096
+```
+
+Then build and sign:
+
+```bash
+bash build_release.sh
+SRC="$HOME/Documenti/lineage-mumba-release" bash sign_release.sh "$KEYS"
+```
+
+`sign_release.sh` preserves the unsigned target-files package and writes a
+signed target-files ZIP, signed full OTA, and SHA-256 checksums under
+`out/target/product/mumba/release-signed/`. It expects the key names shown
+above; it remaps the platform/default APK keys, replaces APEX payload keys, and
+signs vbmeta with the personal AVB keys. Keep the same key set for future OTA
+updates. The script refuses to overwrite a non-empty output directory or use
+keys inside the repo/source tree. These are personal ROM/AVB keys, not Motorola
+OEM keys, so they do not enable relocking the bootloader or OEM Verified Boot
+trust.
 
 ## Components
 
@@ -107,7 +152,8 @@ Do not fork `LineageOS/android` directly: its `fetch=".."` would break every rem
 
 ## Notes
 - Build uses test-keys -> the first flash is a **clean flash**.
-- The userdebug build is SELinux permissive.
+- The userdebug build is SELinux permissive; the separate `user` release omits
+  that boot argument, uses enforcing mode, and leaves AVB verification enabled.
 - `flash_all.sh` runs `fastboot -w` and erases userdata. Set `IMG_DIR` to the
   build output directory, e.g. `IMG_DIR="/path/to/lineage-mumba/out/target/product/mumba" bash flash_all.sh`.
 - ccache speeds up rebuilds.

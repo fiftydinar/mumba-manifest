@@ -32,6 +32,13 @@ for name in device-mumba mumba-refresh-defaults settings-provider-refresh-defaul
   if [ ! -d "$tree" ]; then
     echo "missing $tree (run repo sync first)"; exit 1
   fi
-  git -C "$tree" apply --whitespace=nowarn "$patch"
-  echo "applied $patch -> $tree"
+  if git -C "$tree" apply --check --whitespace=nowarn "$patch" >/dev/null 2>&1; then
+    git -C "$tree" apply --whitespace=nowarn "$patch"
+    echo "applied $patch -> $tree"
+  elif git -C "$tree" apply --reverse --check --whitespace=nowarn "$patch" >/dev/null 2>&1; then
+    echo "already applied: $patch -> $tree"
+  else
+    echo "cannot apply (or detect as already applied): $patch -> $tree"
+    exit 1
+  fi
 done
