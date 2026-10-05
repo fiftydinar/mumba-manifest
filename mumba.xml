@@ -80,6 +80,12 @@
            remote="mine"
            revision="6da8042323a97d5b3cba1fd975709cc42f29916f" />
 
+  <remove-project name="LineageOS/android_packages_apps_Messaging" />
+  <project name="android_packages_apps_Messaging"
+           path="packages/apps/Messaging"
+           remote="mine"
+           revision="319ccebce12a4918e82c5fa94dcb1dd74ff453ce" />
+
   <remove-project name="LineageOS/android_hardware_qcom-caf_common" />
   <project name="android_hardware_qcom-caf_common"
            path="hardware/qcom-caf/common"
