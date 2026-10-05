@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  mumba (Motorola Moto G57 Power / G100s): LineageOS 23.2, kernel built from source.
+  Use this as a local_manifest on top of the official LineageOS manifest.
+  Copy this file to .repo/local_manifests/mumba.xml
+
+  Source projects and patched LineageOS projects are mirrored/forked under
+  github.com/fiftydinar. Revisions are pinned to exact source commits.
+-->
+<manifest>
+  <remote name="mine" fetch="https://github.com/fiftydinar" />
+
+  <!-- device tree: builds the kernel from source (TARGET_KERNEL_SOURCE) -->
+  <project name="android_device_motorola_mumba"
+           path="device/motorola/mumba"
+           remote="mine"
+           revision="c87184155fc8482f4dd469aa67b0ab98049cb735" />
+
+  <!-- vendor blobs -->
+  <project name="vendor_motorola_mumba_latest"
+           path="vendor/motorola/mumba"
+           remote="mine"
+           revision="8bcc9d41ca36b5e2ae93d592226eac163225ade9" />
+
+  <!-- Motorola hardware HAL/overlay -->
+  <project name="android_hardware_motorola"
+           path="hardware/motorola"
+           remote="mine"
+           revision="8cee9a14b9bd59b1d4eeab69d838569a0935a106" />
+
+  <!-- kernel source -->
+  <project name="android_kernel_motorola_sm6435"
+           path="kernel/motorola/sm6435"
+           remote="mine"
+           revision="2df509385d9c1df4c65a01cfda0302e7de52fc75" />
+
+  <project name="android_kernel_motorola_sm6435-modules"
+           path="kernel/motorola/sm6435-modules"
+           remote="mine"
+           revision="0659ac7d22557e405529e00e2b5fdace57964636" />
+
+  <project name="android_kernel_motorola_sm6435-devicetrees"
+           path="kernel/motorola/sm6435-devicetrees"
+           remote="mine"
+           revision="2c0587b0d4d90e0b3b00f87c9430360ea15ebdb6" />
+
+  <!-- GitHub mirrors of the original OpenEUICC Gitea projects. -->
+  <project name="OpenEUICC"
+           path="packages/apps/OpenEUICC"
+           remote="mine"
+           revision="4130828243a2fb07aa1c07fc5813aa218ea912bf"
+           sync-s="true" />
+  <project name="android_prebuilts_openeuicc-deps"
+           path="prebuilts/openeuicc-deps"
+           remote="mine"
+           revision="540216793010cabc49782bd01844cd8dd28a4c7c" />
+
+  <!-- Local patch targets are pinned to their source commits and use public GitHub forks. -->
+  <remove-project name="LineageOS/android_frameworks_base" />
+  <project name="android_frameworks_base"
+           path="frameworks/base"
+           remote="mine"
+           revision="1c45e31a86be95f51a94ffd1a5014c3fb2019112" />
+
+  <remove-project name="LineageOS/android_frameworks_opt_telephony" />
+  <project name="android_frameworks_opt_telephony"
+           path="frameworks/opt/telephony"
+           remote="mine"
+           revision="566e62daf4e93be6f934001bc76d60aba087b4d6" />
+
+  <remove-project name="LineageOS/android_packages_apps_Settings" />
+  <project name="android_packages_apps_Settings"
+           path="packages/apps/Settings"
+           remote="mine"
+           revision="8d8f6486b274bcf0aa6e5d0cbba52c0b05ae5c65" />
+
+  <remove-project name="LineageOS/android_packages_apps_Dialer" />
+  <project name="android_packages_apps_Dialer"
+           path="packages/apps/Dialer"
+           remote="mine"
+           revision="6da8042323a97d5b3cba1fd975709cc42f29916f" />
+
+  <remove-project name="LineageOS/android_hardware_qcom-caf_common" />
+  <project name="android_hardware_qcom-caf_common"
+           path="hardware/qcom-caf/common"
+           remote="mine"
+           revision="1805784d14b386fce6127f2f06b5a16a3e9b94ed" />
+
+  <!-- Keep the other CAF audio trees from the resolved LineageOS manifest. -->
+  <remove-project name="LineageOS/android_hardware_qcom_audio-ar" />
+  <project name="android_hardware_qcom_audio-ar"
+           path="hardware/qcom-caf/sm8450/audio/primary-hal"
+           remote="mine"
+           revision="9f4dec53710a32af11cfffd89256daf7de2a9dee" />
+  <project name="android_hardware_qcom_audio-ar"
+           path="hardware/qcom-caf/sm8450-6.6/audio/primary-hal"
+           remote="mine"
+           revision="6a42341357a56903eea27a74fdb161a26402dcc3" />
+  <project name="android_hardware_qcom_audio-ar"
+           path="hardware/qcom-caf/sm8550/audio/primary-hal"
+           remote="mine"
+           revision="aa1495561e9ca90e80c5a2b898a67f75406dc874" />
+  <project name="android_hardware_qcom_audio-ar"
+           path="hardware/qcom-caf/sm8650/audio/primary-hal"
+           remote="mine"
+           revision="2aa541f626ecc029fce24f3882aaee84c11fb161" />
+  <project name="android_hardware_qcom_audio-ar"
+           path="hardware/qcom-caf/sm8750/audio/primary-hal"
+           remote="mine"
+           revision="443dec4613a7e5dbc997eb2d7b087f0f07ae5258" />
+</manifest>

@@ -1,0 +1,19 @@
+diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
+index ea7562e..2efb0fc 100644
+--- a/app/src/main/AndroidManifest.xml
++++ b/app/src/main/AndroidManifest.xml
+@@ -26,13 +26,7 @@
+         tools:targetApi="tiramisu">
+         <activity
+             android:name=".ui.PrivilegedMainActivity"
+-            android:exported="true">
+-            <intent-filter>
+-                <action android:name="android.intent.action.MAIN" />
+-
+-                <category android:name="android.intent.category.LAUNCHER" />
+-            </intent-filter>
+-        </activity>
++            android:exported="false" />
+ 
+         <service
+             android:name=".service.OpenEuiccService"

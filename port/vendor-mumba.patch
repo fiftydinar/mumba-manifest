@@ -1,0 +1,680 @@
+diff --git a/Android.bp b/Android.bp
+index 1d6dc46..5203827 100644
+--- a/Android.bp
++++ b/Android.bp
+@@ -5137,6 +5137,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "com.qti.chi.override",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -7892,6 +7893,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "libaodoptfeature",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -7929,6 +7931,7 @@ cc_prebuilt_library_shared {
+     strip: {
+         none: true,
+     },
++    check_elf_files: false,
+     target: {
+         android_arm64: {
+             srcs: [
+@@ -7946,7 +7949,6 @@ cc_prebuilt_library_shared {
+                 "libutils",
+                 "libtinyxml2-v34",
+                 "libthermalclient",
+-                "liblmthermallistner",
+                 "libqti-qesdk-secure",
+                 "libbase",
+                 "libbinder_ndk",
+@@ -8691,6 +8693,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "libcamerapoweroptfeature",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -10238,6 +10241,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "libgamepoweroptfeature",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -11146,6 +11150,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "liblearningmodule",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -11345,6 +11350,7 @@ cc_prebuilt_library_shared {
+     strip: {
+         none: true,
+     },
++    check_elf_files: false,
+     target: {
+         android_arm64: {
+             srcs: [
+@@ -11360,7 +11366,6 @@ cc_prebuilt_library_shared {
+                 "libutils",
+                 "liblearningmodule",
+                 "android.hardware.thermal-V1-ndk",
+-                "liblmthermallistner",
+                 "libc++",
+                 "libc",
+                 "libm",
+@@ -13878,6 +13883,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "libpsmoptfeature",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -13943,6 +13949,7 @@ cc_prebuilt_library_shared {
+     strip: {
+         none: true,
+     },
++    check_elf_files: false,
+     target: {
+         android_arm64: {
+             srcs: [
+@@ -13951,7 +13958,6 @@ cc_prebuilt_library_shared {
+         },
+     },
+     compile_multilib: "64",
+-    check_elf_files: false,
+     prefer: true,
+     soc_specific: true,
+ }
+@@ -16290,39 +16296,11 @@ cc_prebuilt_library_shared {
+     soc_specific: true,
+ }
+ 
+-cc_prebuilt_library_shared {
+-    name: "libqti-perfd-client",
+-    owner: "motorola",
+-    strip: {
+-        none: true,
+-    },
+-    target: {
+-        android_arm64: {
+-            srcs: [
+-                "proprietary/vendor/lib64/libqti-perfd-client.so",
+-            ],
+-            shared_libs: [
+-                "libcutils",
+-                "libutils",
+-                "liblog",
+-                "vendor.qti.hardware.perf2-V1-ndk",
+-                "libbase",
+-                "libbinder_ndk",
+-                "libc++",
+-                "libc",
+-                "libm",
+-                "libdl",
+-            ],
+-        },
+-    },
+-    compile_multilib: "64",
+-    prefer: true,
+-    soc_specific: true,
+-}
+ 
+ cc_prebuilt_library_shared {
+     name: "libqti-perfd",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -16347,7 +16325,6 @@ cc_prebuilt_library_shared {
+                 "libperfioctl",
+                 "libbinder_ndk",
+                 "vendor.qti.hardware.display.config-V5-ndk",
+-                "libqti-perfd-client",
+                 "libc++",
+                 "libc",
+                 "libm",
+@@ -17176,6 +17153,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "libsdmextension",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -18751,6 +18729,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "libvideooptfeature",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -25037,6 +25016,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "libwfdmmsrc_system",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -25047,7 +25027,6 @@ cc_prebuilt_library_shared {
+             ],
+             shared_libs: [
+                 "libgui_shim",
+-                "libaudiobase",
+                 "libbinder",
+                 "libmmosal",
+                 "liblog",
+@@ -25156,6 +25135,7 @@ cc_prebuilt_library_shared {
+ cc_prebuilt_library_shared {
+     name: "libwfdservice",
+     owner: "motorola",
++    check_elf_files: false,
+     strip: {
+         none: true,
+     },
+@@ -25165,7 +25145,6 @@ cc_prebuilt_library_shared {
+                 "proprietary/system_ext/lib64/libwfdservice.so",
+             ],
+             shared_libs: [
+-                "libaudiobase",
+                 "liblog",
+                 "libutils",
+                 "libcutils",
+@@ -25181,7 +25160,6 @@ cc_prebuilt_library_shared {
+                 "libaudioclient",
+                 "libaudiofoundation",
+                 "audioclient-types-aidl-cpp",
+-                "android.media.audio.common.types-V5-cpp",
+                 "libwfdmmsrc_system",
+                 "libwfdavenhancements",
+                 "libhidlbase",
+@@ -27908,6 +27886,7 @@ cc_prebuilt_binary {
+ cc_prebuilt_binary {
+     name: "vendor.qti.hardware.perf2-hal-service",
+     owner: "motorola",
++    check_elf_files: false,
+     target: {
+         android_arm64: {
+             srcs: [
+@@ -27928,7 +27907,6 @@ cc_prebuilt_binary {
+                 "libqti-perfd",
+                 "libqti-util",
+                 "libavservices_minijail",
+-                "libqti-perfd-client",
+                 "android.hardware.thermal-V1-ndk",
+                 "libqti-s3tf",
+                 "libsqlite",
+@@ -28805,6 +28783,7 @@ cc_prebuilt_binary {
+ cc_prebuilt_binary {
+     name: "poweropt-service",
+     owner: "motorola",
++    check_elf_files: false,
+     target: {
+         android_arm64: {
+             srcs: [
+@@ -28973,9 +28952,40 @@ cc_prebuilt_binary {
+     soc_specific: true,
+ }
+ 
++cc_prebuilt_binary {
++    name: "snapdragon_services",
++    owner: "motorola",
++    target: {
++        android_arm64: {
++            srcs: [
++                "proprietary/vendor/bin/snapdragon_services",
++            ],
++            shared_libs: [
++                "vendor.qti.snapdragonServices-V1-ndk",
++                "libbinder_ndk",
++                "libbase",
++                "libcutils",
++                "liblog",
++                "libutils",
++                "libc++",
++                "libc",
++                "libm",
++                "libdl",
++            ],
++        },
++    },
++    compile_multilib: "64",
++    strip: {
++        none: true,
++    },
++    prefer: true,
++    soc_specific: true,
++}
++
+ cc_prebuilt_binary {
+     name: "qguard",
+     owner: "motorola",
++    check_elf_files: false,
+     target: {
+         android_arm64: {
+             srcs: [
+@@ -29248,6 +29228,7 @@ cc_prebuilt_binary {
+ cc_prebuilt_binary {
+     name: "qsap_qapeservice",
+     owner: "motorola",
++    check_elf_files: false,
+     target: {
+         android_arm64: {
+             srcs: [
+@@ -29257,7 +29238,6 @@ cc_prebuilt_binary {
+                 "liblog",
+                 "libqesdk2_0",
+                 "libjsoncpp",
+-                "libqti-perfd-client",
+                 "libavservices_minijail",
+                 "libc++",
+                 "libc",
+diff --git a/mumba-vendor.mk b/mumba-vendor.mk
+index 70b2491..8f5650b 100644
+--- a/mumba-vendor.mk
++++ b/mumba-vendor.mk
+@@ -3356,6 +3356,9 @@ PRODUCT_COPY_FILES += \
+     vendor/motorola/mumba/proprietary/vendor/etc/audio/sku_parrotlite/resourcemanager_parrot_qrd.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_parrotlite/resourcemanager_parrot_qrd.xml \
+     vendor/motorola/mumba/proprietary/vendor/etc/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.xml \
+     vendor/motorola/mumba/proprietary/vendor/etc/audio_ext_spkr.conf:$(TARGET_COPY_OUT_VENDOR)/etc/audio_ext_spkr.conf \
++    vendor/motorola/mumba/proprietary/vendor/etc/audio_policy_volumes.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_volumes.xml \
++    vendor/motorola/mumba/proprietary/vendor/etc/default_volume_tables.xml:$(TARGET_COPY_OUT_VENDOR)/etc/default_volume_tables.xml \
++    vendor/motorola/mumba/proprietary/vendor/etc/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/r_submix_audio_policy_configuration.xml \
+     vendor/motorola/mumba/proprietary/vendor/etc/bluetooth_qti_hearing_aid_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_qti_hearing_aid_audio_policy_configuration.xml \
+     vendor/motorola/mumba/proprietary/vendor/etc/bstconfig/bstai_hdr:$(TARGET_COPY_OUT_VENDOR)/etc/bstconfig/bstai_hdr \
+     vendor/motorola/mumba/proprietary/vendor/etc/bstconfig/hdrcfg.cfg:$(TARGET_COPY_OUT_VENDOR)/etc/bstconfig/hdrcfg.cfg \
+@@ -3440,8 +3443,6 @@ PRODUCT_COPY_FILES += \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/dataqti.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/dataqti.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/fingerprint-fpc.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/fingerprint-fpc.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/hw/init.mmi.charge_only.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.mmi.charge_only.rc \
+-    vendor/motorola/mumba/proprietary/vendor/etc/init/hw/init.mmi.chipset.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.mmi.chipset.rc \
+-    vendor/motorola/mumba/proprietary/vendor/etc/init/hw/init.mmi.overlay.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.mmi.overlay.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/hw/init.mmi.services.override.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.mmi.services.override.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/hw/init.qti.kernel.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qti.kernel.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/hw/init.qti.kernel.target.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qti.kernel.target.rc \
+@@ -3465,6 +3466,7 @@ PRODUCT_COPY_FILES += \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/qcrilNrd.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/qcrilNrd.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/qdcmss.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/qdcmss.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/qesdk-manager.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/qesdk-manager.rc \
++    vendor/motorola/mumba/proprietary/vendor/etc/init/snapdragon_services.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/snapdragon_services.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/qguard.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/qguard.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/qmipriod.debug.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/qmipriod.debug.rc \
+     vendor/motorola/mumba/proprietary/vendor/etc/init/qmipriod.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/qmipriod.rc \
+@@ -3725,6 +3726,8 @@ PRODUCT_COPY_FILES += \
+     vendor/motorola/mumba/proprietary/vendor/etc/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
+     vendor/motorola/mumba/proprietary/vendor/etc/xtwifi.conf:$(TARGET_COPY_OUT_VENDOR)/etc/xtwifi.conf \
+     vendor/motorola/mumba/proprietary/vendor/firmware/CAMERA_ICP.b00:$(TARGET_COPY_OUT_VENDOR)/firmware/CAMERA_ICP.b00 \
++    vendor/motorola/mumba/proprietary/vendor/firmware/boe_chipone_firmware.bin:$(TARGET_COPY_OUT_VENDOR)/firmware/boe_chipone_firmware.bin \
++    vendor/motorola/mumba/proprietary/vendor/firmware/csot_chipone_firmware.bin:$(TARGET_COPY_OUT_VENDOR)/firmware/csot_chipone_firmware.bin \
+     vendor/motorola/mumba/proprietary/vendor/firmware/CAMERA_ICP.b01:$(TARGET_COPY_OUT_VENDOR)/firmware/CAMERA_ICP.b01 \
+     vendor/motorola/mumba/proprietary/vendor/firmware/CAMERA_ICP.b02:$(TARGET_COPY_OUT_VENDOR)/firmware/CAMERA_ICP.b02 \
+     vendor/motorola/mumba/proprietary/vendor/firmware/CAMERA_ICP.b03:$(TARGET_COPY_OUT_VENDOR)/firmware/CAMERA_ICP.b03 \
+@@ -4896,6 +4900,7 @@ PRODUCT_PACKAGES += \
+     qcc-vendor \
+     qdcmss \
+     qesdk-manager \
++    snapdragon_services \
+     qguard \
+     qmi_motext_hook \
+     qmipriod \
+diff --git a/proprietary/vendor/etc/audio_policy_volumes.xml b/proprietary/vendor/etc/audio_policy_volumes.xml
+new file mode 100644
+index 0000000..c4ddefb
+--- /dev/null
++++ b/proprietary/vendor/etc/audio_policy_volumes.xml
+@@ -0,0 +1,180 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!-- Volume section defines a volume curve for a given use case and device category.
++It contains a list of points of this curve expressing the attenuation in Millibels for a given
++volume index from 0 to 100.
++<volume stream=”AUDIO_STREAM_MUSIC” deviceCategory=””>
++<point>0,-9600</point>
++<point>100,0</point>
++</volume>
++-->
++<volumes>
++    <volume stream="AUDIO_STREAM_VOICE_CALL" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                             ref="DEFAULT_VOICE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_VOICE_CALL" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                             ref="DEFAULT_VOICE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_VOICE_CALL" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                             ref="DEFAULT_VOICE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_VOICE_CALL" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                             ref="DEFAULT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_VOICE_CALL" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                             ref="DEFAULT_NON_MUTABLE_HEARING_AID_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_SYSTEM" deviceCategory="DEVICE_CATEGORY_HEADSET">
++        <point>1,-3000</point>
++        <point>33,-2600</point>
++        <point>66,-2200</point>
++        <point>100,-1800</point>
++    </volume>
++    <volume stream="AUDIO_STREAM_SYSTEM" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                         ref="DEFAULT_SYSTEM_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_SYSTEM" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                         ref="DEFAULT_SYSTEM_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_SYSTEM" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                         ref="DEFAULT_DEVICE_CATEGORY_EXT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_SYSTEM" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                         ref="DEFAULT_HEARING_AID_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_RING" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                       ref="DEFAULT_DEVICE_CATEGORY_HEADSET_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_RING" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                       ref="SONIFICATION_CATEGORY_SPEAKER_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_RING" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                       ref="DEFAULT_DEVICE_CATEGORY_EARPIECE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_RING" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                       ref="SONIFICATION_CATEGORY_EXT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_RING" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                       ref="DEFAULT_HEARING_AID_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_MUSIC" deviceCategory="DEVICE_CATEGORY_HEADSET">
++        <point>1,-5000</point>
++        <point>6,-4700</point>
++        <point>12,-4400</point>
++        <point>18,-4100</point>
++        <point>24,-3800</point>
++        <point>30,-3500</point>
++        <point>36,-3200</point>
++        <point>42,-2900</point>
++        <point>49,-2600</point>
++        <point>56,-2300</point>
++        <point>63,-2000</point>
++        <point>70,-1600</point>
++        <point>77,-1200</point>
++        <point>85,-800</point>
++        <point>93,-400</point>
++        <point>100,0</point>
++    </volume>
++    <volume stream="AUDIO_STREAM_MUSIC" deviceCategory="DEVICE_CATEGORY_SPEAKER">
++            <point>1,-6515</point>
++            <point>13,-5075</point>
++            <point>20,-4425</point>
++            <point>26,-3930</point>
++            <point>33,-3501</point>
++            <point>40,-3165</point>
++            <point>46,-2821</point>
++            <point>53,-2455</point>
++            <point>60,-2335</point>
++            <point>66,-2101</point>
++            <point>73,-1870</point>
++            <point>80,-1680</point>
++            <point>86,-1278</point>
++            <point>93,-766</point>
++            <point>100,0</point>
++    </volume>
++    <volume stream="AUDIO_STREAM_MUSIC" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                        ref="DEFAULT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_MUSIC" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                        ref="DEFAULT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_MUSIC" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                        ref="DEFAULT_HEARING_AID_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ALARM" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                        ref="DEFAULT_DEVICE_CATEGORY_HEADSET_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ALARM" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                        ref="SONIFICATION_CATEGORY_SPEAKER_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ALARM" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                        ref="DEFAULT_DEVICE_CATEGORY_EARPIECE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ALARM" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                        ref="SONIFICATION_CATEGORY_EXT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ALARM" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                        ref="DEFAULT_NON_MUTABLE_HEARING_AID_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_NOTIFICATION" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                               ref="DEFAULT_DEVICE_CATEGORY_HEADSET_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_NOTIFICATION" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                               ref="NOTIFICATION_CATEGORY_SPEAKER_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_NOTIFICATION" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                               ref="DEFAULT_DEVICE_CATEGORY_EARPIECE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_NOTIFICATION" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                               ref="SONIFICATION_CATEGORY_EXT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_NOTIFICATION" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                               ref="DEFAULT_DEVICE_CATEGORY_HEADSET_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_BLUETOOTH_SCO" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                                ref="DEFAULT_VOICE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_BLUETOOTH_SCO" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                                ref="DEFAULT_VOICE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_BLUETOOTH_SCO" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                                ref="DEFAULT_VOICE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_BLUETOOTH_SCO" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                                ref="DEFAULT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_BLUETOOTH_SCO" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                                ref="DEFAULT_HEARING_AID_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ENFORCED_AUDIBLE" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                                   ref="DEFAULT_SYSTEM_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ENFORCED_AUDIBLE" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                                   ref="DEFAULT_SYSTEM_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ENFORCED_AUDIBLE" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                                   ref="DEFAULT_SYSTEM_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ENFORCED_AUDIBLE" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                                   ref="SONIFICATION_CATEGORY_EXT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ENFORCED_AUDIBLE" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                                   ref="DEFAULT_HEARING_AID_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_DTMF" deviceCategory="DEVICE_CATEGORY_HEADSET">
++        <point>1,-3000</point>
++        <point>33,-2600</point>
++        <point>66,-2200</point>
++        <point>100,-1800</point>
++    </volume>
++    <volume stream="AUDIO_STREAM_DTMF" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                       ref="DEFAULT_SYSTEM_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_DTMF" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                       ref="DEFAULT_SYSTEM_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_DTMF" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                       ref="DEFAULT_DEVICE_CATEGORY_EXT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_DTMF" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                       ref="DEFAULT_HEARING_AID_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_TTS" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                      ref="SILENT_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_TTS" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                      ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_TTS" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                      ref="SILENT_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_TTS" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                      ref="SILENT_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_TTS" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                      ref="SILENT_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ACCESSIBILITY" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                                ref="DEFAULT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ACCESSIBILITY" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                                ref="DEFAULT_DEVICE_CATEGORY_SPEAKER_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ACCESSIBILITY" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                                ref="DEFAULT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ACCESSIBILITY" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                                ref="DEFAULT_MEDIA_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_ACCESSIBILITY" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                                ref="DEFAULT_NON_MUTABLE_HEARING_AID_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_REROUTING" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                            ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_REROUTING" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                            ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_REROUTING" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                            ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_REROUTING" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                            ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_REROUTING" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                            ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_PATCH" deviceCategory="DEVICE_CATEGORY_HEADSET"
++                                        ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_PATCH" deviceCategory="DEVICE_CATEGORY_SPEAKER"
++                                        ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_PATCH" deviceCategory="DEVICE_CATEGORY_EARPIECE"
++                                        ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_PATCH" deviceCategory="DEVICE_CATEGORY_EXT_MEDIA"
++                                        ref="FULL_SCALE_VOLUME_CURVE"/>
++    <volume stream="AUDIO_STREAM_PATCH" deviceCategory="DEVICE_CATEGORY_HEARING_AID"
++                                        ref="FULL_SCALE_VOLUME_CURVE"/>
++</volumes>
+diff --git a/proprietary/vendor/etc/default_volume_tables.xml b/proprietary/vendor/etc/default_volume_tables.xml
+new file mode 100644
+index 0000000..612e109
+--- /dev/null
++++ b/proprietary/vendor/etc/default_volume_tables.xml
+@@ -0,0 +1,101 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!-- Default Volume Tables included by Audio Policy Configuration file -->
++<!-- Full Default Volume table for all device category -->
++<volumes>
++    <reference name="FULL_SCALE_VOLUME_CURVE">
++    <!-- Full Scale reference Volume Curve -->
++        <point>0,0</point>
++        <point>100,0</point>
++    </reference>
++    <reference name="SILENT_VOLUME_CURVE">
++        <point>0,-9600</point>
++        <point>100,-9600</point>
++    </reference>
++    <reference name="SONIFICATION_CATEGORY_EXT_MEDIA_VOLUME_CURVE">
++    <!-- Ext Media Sonification reference Volume Curve -->
++        <point>1,-4800</point>
++        <point>20,-4000</point>
++        <point>60,-2100</point>
++        <point>100,-1000</point>
++    </reference>
++    <reference name="SONIFICATION_CATEGORY_SPEAKER_VOLUME_CURVE">
++    <!-- Speaker Sonification reference Volume Curve -->
++        <point>1,-4050</point>
++        <point>33,-2950</point>
++        <point>50,-2350</point>
++        <point>66,-1800</point>
++        <point>83,-1200</point>
++        <point>100,0</point>
++    </reference>
++    <reference name="NOTIFICATION_CATEGORY_SPEAKER_VOLUME_CURVE">
++    <!-- Speaker Sonification reference Volume Curve -->
++        <point>1,-5300</point>
++        <point>33,-2990</point>
++        <point>66,-1800</point>
++        <point>100,0</point>
++    </reference>
++    <reference name="DEFAULT_SYSTEM_VOLUME_CURVE">
++    <!-- Default System reference Volume Curve -->
++        <point>1,-3800</point>
++        <point>33,-3300</point>
++        <point>66,-2800</point>
++        <point>100,-1300</point>
++    </reference>
++    <reference name="DEFAULT_MEDIA_VOLUME_CURVE">
++    <!-- Default Media reference Volume Curve -->
++        <point>1,-4800</point>
++        <point>34,-3200</point>
++        <point>67,-1600</point>
++        <point>100,0</point>
++    </reference>
++    <reference name="DEFAULT_VOICE_VOLUME_CURVE">
++    <!-- Default Voice reference Volume Curve -->
++        <point>0,-2100</point>
++        <point>33,-1400</point>
++        <point>66,-700</point>
++        <point>100,0</point>
++    </reference>
++    <reference name="DEFAULT_DEVICE_CATEGORY_HEADSET_VOLUME_CURVE">
++    <!--Default Volume Curve -->
++        <point>1,-4950</point>
++        <point>33,-3350</point>
++        <point>66,-1700</point>
++        <point>100,0</point>
++    </reference>
++    <reference name="DEFAULT_DEVICE_CATEGORY_SPEAKER_VOLUME_CURVE">
++    <!-- Default is Speaker Media Volume Curve -->
++        <point>1,-5800</point>
++        <point>33,-3000</point>
++        <point>66,-1400</point>
++        <point>100,0</point>
++    </reference>
++    <reference name="DEFAULT_DEVICE_CATEGORY_EARPIECE_VOLUME_CURVE">
++    <!--Default Volume Curve -->
++        <point>1,-4950</point>
++        <point>33,-3350</point>
++        <point>66,-1700</point>
++        <point>100,0</point>
++    </reference>
++    <reference name="DEFAULT_DEVICE_CATEGORY_EXT_MEDIA_VOLUME_CURVE">
++    <!-- Default is Ext Media System Volume Curve -->
++        <point>1,-5800</point>
++        <point>20,-4000</point>
++        <point>60,-2100</point>
++        <point>100,-1000</point>
++    </reference>
++    <reference name="DEFAULT_HEARING_AID_VOLUME_CURVE">
++    <!-- Default Hearing Aid Volume Curve -->
++        <point>1,-12700</point>
++        <point>20,-8000</point>
++        <point>60,-4000</point>
++        <point>100,0</point>
++    </reference>
++    <reference name="DEFAULT_NON_MUTABLE_HEARING_AID_VOLUME_CURVE">
++    <!-- Default non-mutable Hearing Aid Volume Curve -->
++    <!--     based on DEFAULT_HEARING_AID_VOLUME_CURVE -->
++        <point>0,-12700</point>
++        <point>20,-8000</point>
++        <point>60,-4000</point>
++        <point>100,0</point>
++    </reference>
++</volumes>
+diff --git a/proprietary/vendor/etc/r_submix_audio_policy_configuration.xml b/proprietary/vendor/etc/r_submix_audio_policy_configuration.xml
+new file mode 100644
+index 0000000..dc2a5ec
+--- /dev/null
++++ b/proprietary/vendor/etc/r_submix_audio_policy_configuration.xml
+@@ -0,0 +1,47 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!-- Copyright (C) 2015 The Android Open Source Project
++
++     Licensed under the Apache License, Version 2.0 (the "License");
++     you may not use this file except in compliance with the License.
++     You may obtain a copy of the License at
++
++          http://www.apache.org/licenses/LICENSE-2.0
++
++     Unless required by applicable law or agreed to in writing, software
++     distributed under the License is distributed on an "AS IS" BASIS,
++     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++     See the License for the specific language governing permissions and
++     limitations under the License.
++-->
++<!-- Remote Submix Audio Policy Configuration file -->
++<module name="r_submix" halVersion="2.0">
++    <attachedDevices>
++        <item>Remote Submix In</item>
++    </attachedDevices>
++    <mixPorts>
++        <mixPort name="r_submix output" role="source">
++            <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                     samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++        </mixPort>
++        <mixPort name="r_submix input" role="sink">
++           <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                    samplingRates="48000" channelMasks="AUDIO_CHANNEL_IN_STEREO"/>
++        </mixPort>
++   </mixPorts>
++   <devicePorts>
++       <devicePort tagName="Remote Submix Out" type="AUDIO_DEVICE_OUT_REMOTE_SUBMIX"  role="sink">
++           <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                    samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++       </devicePort>
++       <devicePort tagName="Remote Submix In" type="AUDIO_DEVICE_IN_REMOTE_SUBMIX"  role="source">
++           <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                    samplingRates="48000" channelMasks="AUDIO_CHANNEL_IN_STEREO"/>
++        </devicePort>
++    </devicePorts>
++    <routes>
++        <route type="mix" sink="Remote Submix Out"
++               sources="r_submix output"/>
++        <route type="mix" sink="r_submix input"
++               sources="Remote Submix In"/>
++    </routes>
++</module>

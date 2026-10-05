@@ -1,0 +1,31 @@
+diff --git a/qcom/display/display/parrot-sde-display-mumba-common-base.dtsi b/qcom/display/display/parrot-sde-display-mumba-common-base.dtsi
+index 586e2552..d7221557 100644
+--- a/qcom/display/display/parrot-sde-display-mumba-common-base.dtsi
++++ b/qcom/display/display/parrot-sde-display-mumba-common-base.dtsi
+@@ -211,7 +211,7 @@
+ 
+ 	qcom,dsi-select-clocks = "pll_byte_clk0", "pll_dsi_clk0";
+ 
+-	qcom,dsi-supported-dfps-list = <120 90 60 30>;
++	qcom,dsi-supported-dfps-list = <120 100 96 90 80 60 50 48 40 30 25 24>;
+ 	qcom,mdss-dsi-pan-enable-dynamic-fps;
+ 	qcom,mdss-dsi-pan-fps-update = "dfps_immediate_porch_mode_vfp";
+ 
+@@ -277,7 +277,7 @@
+ 
+ 	qcom,dsi-select-clocks = "pll_byte_clk0", "pll_dsi_clk0";
+ 
+-	qcom,dsi-supported-dfps-list = <120 90 60 30>;
++	qcom,dsi-supported-dfps-list = <120 100 96 90 80 60 50 48 40 30 25 24>;
+ 	qcom,mdss-dsi-pan-enable-dynamic-fps;
+ 	qcom,mdss-dsi-pan-fps-update = "dfps_immediate_porch_mode_vfp";
+ 
+@@ -342,7 +342,7 @@
+ 
+ 	qcom,dsi-select-clocks = "pll_byte_clk0", "pll_dsi_clk0";
+ 
+-	qcom,dsi-supported-dfps-list = <120 90 60 30>;
++	qcom,dsi-supported-dfps-list = <120 100 96 90 80 60 50 48 40 30 25 24>;
+ 	qcom,mdss-dsi-pan-enable-dynamic-fps;
+ 	qcom,mdss-dsi-pan-fps-update = "dfps_immediate_porch_mode_vfp";
+ 

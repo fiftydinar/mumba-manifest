@@ -1,0 +1,113 @@
+diff --git a/motorola/drivers/input/touchscreen/chipone_tddi_v3_mmi/Kbuild b/motorola/drivers/input/touchscreen/chipone_tddi_v3_mmi/Kbuild
+index 6b278eba13..340d3f9a10 100644
+--- a/motorola/drivers/input/touchscreen/chipone_tddi_v3_mmi/Kbuild
++++ b/motorola/drivers/input/touchscreen/chipone_tddi_v3_mmi/Kbuild
+@@ -45,6 +45,20 @@ ifneq ($(filter m y,$(CTS_MULTI_TP_MODULE_EN)),)
+ 	EXTRA_CFLAGS += -DCTS_TP_MODULE_EN
+ endif
+ 
++# mumba's chipone panel is identified from the active DRM panel name so the
++# correct per-panel firmware (boe_/csot_chipone_firmware.bin) is loaded.
++EXTRA_CFLAGS += -DCTS_TP_MODULE_EN
++
++# Expose the double-tap-to-wake "gesture" sysfs node (the Android.mk
++# KERNEL_CFLAGS path does not reach EXTRA_CFLAGS).
++EXTRA_CFLAGS += -DCONFIG_BOARD_USES_DOUBLE_TAP_CTRL
++
++# Double-tap gesture wakeup: CHIPONE_SENSOR_EN provides gesture_wakelock and the
++# PM-resume-aware IRQ path; TOUCHSCREEN_PM_BRL_SPI makes the IRQ handler hold a
++# wakelock and wait for PM resume before reporting the gesture key.
++EXTRA_CFLAGS += -DCHIPONE_SENSOR_EN
++EXTRA_CFLAGS += -DTOUCHSCREEN_PM_BRL_SPI
++
+ ifneq ($(filter m y,$(CONFIG_CHIPONE_CHECK_DEVICE_BOOTMODE)),)
+ 	EXTRA_CFLAGS += -DCTS_CHECK_DEVICE_BOOTMODE
+ endif
+diff --git a/motorola/drivers/input/touchscreen/chipone_tddi_v3_mmi/cts_platform.c b/motorola/drivers/input/touchscreen/chipone_tddi_v3_mmi/cts_platform.c
+index 50f8afc3bb..b1ba6719e6 100644
+--- a/motorola/drivers/input/touchscreen/chipone_tddi_v3_mmi/cts_platform.c
++++ b/motorola/drivers/input/touchscreen/chipone_tddi_v3_mmi/cts_platform.c
+@@ -7,9 +7,6 @@
+ #include "cts_sysfs.h"
+ #include "cts_tcs.h"
+ extern struct chipone_ts_data *g_cts_data;
+-#ifdef CHIPONE_SENSOR_EN
+-static struct wakeup_source *gesture_wakelock;
+-#endif
+ 
+ #ifdef CFG_CTS_FW_LOG_REDIRECT
+ size_t cts_plat_get_max_fw_log_size(struct cts_platform_data *pdata)
+@@ -1519,6 +1516,10 @@ int cts_plat_process_gesture_info(struct cts_platform_data *pdata,
+         struct cts_device_gesture_info *gesture_info)
+ {
+     int i;
++#ifdef CHIPONE_SENSOR_EN
++    struct chipone_ts_data *cts_data =
++            container_of(pdata->cts_dev, struct chipone_ts_data, cts_dev);
++#endif
+ 
+     cts_info("Process gesture, id=0x%02x", gesture_info->gesture_id);
+ 
+@@ -1527,18 +1528,21 @@ int cts_plat_process_gesture_info(struct cts_platform_data *pdata,
+         if (gesture_info->gesture_id == pdata->gesture_keymap[i][0]) {
+             cts_info("Report key[%u]", pdata->gesture_keymap[i][1]);
+ #ifdef CHIPONE_SENSOR_EN
+-		PM_WAKEUP_EVENT(gesture_wakelock, 5000);
++		PM_WAKEUP_EVENT(cts_data->gesture_wakelock, 5000);
+ 		input_report_key(g_cts_data->sensor_pdata->input_sensor_dev, pdata->gesture_keymap[i][1], 1);
+ 		input_sync(g_cts_data->sensor_pdata->input_sensor_dev);
+ 		input_report_key(g_cts_data->sensor_pdata->input_sensor_dev, pdata->gesture_keymap[i][1], 0);
+ 		input_sync(g_cts_data->sensor_pdata->input_sensor_dev);
+-#else
+-	    input_report_key(pdata->ts_input_dev, pdata->gesture_keymap[i][1], 1);
++#endif
++            /* Also dispatch the wake key on the primary touchscreen input.
++             * The auxiliary sensor input can be consumed by the sensors HAL,
++             * while Android's keylayout/wakeup handling is attached to this
++             * input device (chipone-tddi).
++             */
++            input_report_key(pdata->ts_input_dev, pdata->gesture_keymap[i][1], 1);
+             input_sync(pdata->ts_input_dev);
+-
+             input_report_key(pdata->ts_input_dev, pdata->gesture_keymap[i][1], 0);
+             input_sync(pdata->ts_input_dev);
+-#endif
+             return 0;
+         }
+     }
+diff --git a/motorola/drivers/input/touchscreen/ilitek_v4_mmi/Kbuild b/motorola/drivers/input/touchscreen/ilitek_v4_mmi/Kbuild
+index 6984619aa5..6caca7a912 100644
+--- a/motorola/drivers/input/touchscreen/ilitek_v4_mmi/Kbuild
++++ b/motorola/drivers/input/touchscreen/ilitek_v4_mmi/Kbuild
+@@ -18,6 +18,12 @@ ifneq ($(filter m y, $(CONFIG_BOARD_USES_DOUBLE_TAP_CTRL)),)
+ 	EXTRA_CFLAGS += -DILI_PRIMARY_NODE
+ endif
+ 
++# mumba: force the double-tap gesture path (the Android.mk KBUILD_OPTIONS path
++# does not reach EXTRA_CFLAGS); registers BTN_TRIGGER_HAPPY6 on the "double-tap"
++# input device.
++EXTRA_CFLAGS += -DILI_DOUBLE_TAP_CTRL
++EXTRA_CFLAGS += -DILI_PRIMARY_NODE
++
+ ifneq ($(filter m y, $(CONFIG_ILI_DEBUG_INFO)),)
+         EXTRA_CFLAGS += -DILI_DEBUG_INFO
+ endif
+diff --git a/motorola/drivers/input/misc/fpc_fps_mmi/Kbuild b/motorola/drivers/input/misc/fpc_fps_mmi/Kbuild
+index db06349f6e..9f290a2fbc 100644
+--- a/motorola/drivers/input/misc/fpc_fps_mmi/Kbuild
++++ b/motorola/drivers/input/misc/fpc_fps_mmi/Kbuild
+@@ -11,10 +11,11 @@ $(warning define SUPPORT_PIN_CTRL)
+ EXTRA_CFLAGS += -DSUPPORT_PIN_CTRL
+ endif
+ 
+-ifneq ($(filter m y,$(CONFIG_INPUT_MISC_FPC1020_SAVE_TO_CLASS_DEVICE)),)
+-	EXTRA_CFLAGS += -DCONFIG_INPUT_MISC_FPC1020_SAVE_TO_CLASS_DEVICE
+-endif
++# The FPC HAL selector polls /sys/class/fingerprint/fpc1020/irq to decide when
++# the sensor driver is ready. Android's external-module path does not pass the
++# BOARD_HAS_MULTI_FPS Kbuild option, so enable the class device here.
++EXTRA_CFLAGS += -DCONFIG_INPUT_MISC_FPC1020_SAVE_TO_CLASS_DEVICE
+ 
+ fpc1020_mmi-y += fpc1020_tee.o
+ 
+ obj-m += fpc1020_mmi.o

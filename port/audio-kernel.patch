@@ -1,0 +1,20 @@
+diff --git a/qcom/opensource/audio-kernel/config/waipioauto.conf b/qcom/opensource/audio-kernel/config/waipioauto.conf
+index 92cd4f578f..821cf4423b 100644
+--- a/qcom/opensource/audio-kernel/config/waipioauto.conf
++++ b/qcom/opensource/audio-kernel/config/waipioauto.conf
+@@ -36,4 +36,4 @@ export CONFIG_SND_SOC_SWR_DMIC=m
+ export CONFIG_SND_SWR_HAPTICS=m
+ export CONFIG_SND_SOC_MSM_STUB=m
+ export CONFIG_SND_SOC_MSM_HDMI_CODEC_RX=m
+-export CONFIG_SND_SOC_AW882XX=m
++export CONFIG_SND_SOC_FS181X=m
+diff --git a/qcom/opensource/audio-kernel/config/waipioautoconf.h b/qcom/opensource/audio-kernel/config/waipioautoconf.h
+index e99d69a42c..e2b0ab2e1e 100644
+--- a/qcom/opensource/audio-kernel/config/waipioautoconf.h
++++ b/qcom/opensource/audio-kernel/config/waipioautoconf.h
+@@ -41,4 +41,4 @@
+ #define CONFIG_SND_SWR_HAPTICS 1
+ #define CONFIG_SND_SOC_MSM_STUB 1
+ #define CONFIG_SND_SOC_MSM_HDMI_CODEC_RX 1
+-#define CONFIG_SND_SOC_AW882XX 1
++#define CONFIG_SND_SOC_FS181X 1

@@ -1,0 +1,36 @@
+diff --git a/libqti-perfd-client/client.c b/libqti-perfd-client/client.c
+index 6bc7630..1a95093 100644
+--- a/libqti-perfd-client/client.c
++++ b/libqti-perfd-client/client.c
+@@ -4,6 +4,9 @@
+  * SPDX-License-Identifier: Apache-2.0
+  */
+ 
++#include <stddef.h>
++#include <string.h>
++
+ void perf_event(int arg1, char* arg2, int arg3, int* arg4) {}
+ 
+ int perf_get_feedback(int arg1, char* arg2) {
+@@ -31,8 +34,21 @@ int perf_lock_rel(int handle) {
+     return handle ?: 233;
+ }
+ 
++void perf_lock_rel_flush(void) {}
++
+ int perf_lock_use_profile(int handle, int profile) {
+     return handle ?: 233;
+ }
+ 
+ void perf_wait_get_prop(char* arg1, char* arg2) {}
++
++int perf_get_prop_extn(const char* name, char* value, size_t size, const char* def) {
++    if (value == NULL || size == 0) {
++        return -1;
++    }
++    if (def != NULL) {
++        strncpy(value, def, size - 1);
++    }
++    value[size - 1] = '\0';
++    return 0;
++}

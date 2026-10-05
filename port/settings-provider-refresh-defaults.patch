@@ -1,0 +1,39 @@
+diff --git a/packages/SettingsProvider/res/values/defaults.xml b/packages/SettingsProvider/res/values/defaults.xml
+index ce8de5e8d525..cbd60e6130df 100644
+--- a/packages/SettingsProvider/res/values/defaults.xml
++++ b/packages/SettingsProvider/res/values/defaults.xml
+@@ -96,6 +96,10 @@
+     <!-- Default for Settings.System.VIBRATE_IN_SILENT -->
+     <bool name="def_vibrate_in_silent">true</bool>
+ 
++    <!-- Optional initial display refresh-rate settings. Zero leaves framework defaults intact. -->
++    <integer name="def_min_refresh_rate">0</integer>
++    <integer name="def_peak_refresh_rate">0</integer>
++
+     <!-- Default for Settings.Secure.SYNC_PARENT_SOUNDS -->
+     <bool name="def_sync_parent_sounds">true</bool>
+ 
+diff --git a/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java b/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+index a3eab5da1100..c7f68a0ed7fc 100644
+--- a/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
++++ b/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+@@ -2101,6 +2101,19 @@ class DatabaseHelper extends SQLiteOpenHelper {
+             stmt = db.compileStatement("INSERT OR IGNORE INTO system(name,value)"
+                     + " VALUES(?,?);");
+ 
++            // Devices can seed refresh-rate settings for a clean install. Keep these optional
++            // so products without an override retain the framework's existing fallback values.
++            final int defaultMinRefreshRate = mContext.getResources().getInteger(
++                    R.integer.def_min_refresh_rate);
++            if (defaultMinRefreshRate > 0) {
++                loadSetting(stmt, Settings.System.MIN_REFRESH_RATE, defaultMinRefreshRate);
++            }
++            final int defaultPeakRefreshRate = mContext.getResources().getInteger(
++                    R.integer.def_peak_refresh_rate);
++            if (defaultPeakRefreshRate > 0) {
++                loadSetting(stmt, Settings.System.PEAK_REFRESH_RATE, defaultPeakRefreshRate);
++            }
++
+             loadBooleanSetting(stmt, Settings.System.DIM_SCREEN,
+                     R.bool.def_dim_screen);
+             loadIntegerSetting(stmt, Settings.System.SCREEN_OFF_TIMEOUT,

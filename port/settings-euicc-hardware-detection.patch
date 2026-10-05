@@ -1,0 +1,44 @@
+diff --git a/src/com/android/settings/network/telephony/euicc/EuiccRepository.kt b/src/com/android/settings/network/telephony/euicc/EuiccRepository.kt
+index c66c3402359..c9bbaed520b 100644
+--- a/src/com/android/settings/network/telephony/euicc/EuiccRepository.kt
++++ b/src/com/android/settings/network/telephony/euicc/EuiccRepository.kt
+@@ -67,2 +67,6 @@ constructor(
+         }
++        if (telephonyManager?.uiccCardsInfo?.any { it.isEuicc } != true) {
++            Log.i(TAG, "showEuiccSettings: no eUICC hardware detected.")
++            return false
++        }
+         if (euiccManager == null || !euiccManager.isEnabled) {
+diff --git a/tests/spa_unit/src/com/android/settings/network/telephony/euicc/EuiccRepositoryTest.kt b/tests/spa_unit/src/com/android/settings/network/telephony/euicc/EuiccRepositoryTest.kt
+index 3aee997c74a..b68b67422f3 100644
+--- a/tests/spa_unit/src/com/android/settings/network/telephony/euicc/EuiccRepositoryTest.kt
++++ b/tests/spa_unit/src/com/android/settings/network/telephony/euicc/EuiccRepositoryTest.kt
+@@ -20,2 +20,3 @@ import android.content.Context
+ import android.telephony.TelephonyManager
++import android.telephony.UiccCardInfo
+ import android.telephony.euicc.EuiccManager
+@@ -38,2 +39,5 @@ class EuiccRepositoryTest {
+     private val mockEuiccManager = mock<EuiccManager> { on { isEnabled } doReturn true }
++    private val mockEuiccCardInfo = mock<UiccCardInfo> { on { isEuicc } doReturn true }
++    private val mockPhysicalCardInfo0 = mock<UiccCardInfo> { on { isEuicc } doReturn false }
++    private val mockPhysicalCardInfo1 = mock<UiccCardInfo> { on { isEuicc } doReturn false }
+ 
+@@ -43,2 +47,3 @@ class EuiccRepositoryTest {
+             on { getNetworkCountryIso(any()) } doReturn COUNTRY_CODE
++            on { uiccCardsInfo } doReturn listOf(mockEuiccCardInfo)
+         }
+@@ -143,2 +148,14 @@ class EuiccRepositoryTest {
+ 
++    @Test
++    fun showEuiccSettings_twoPhysicalSims_returnFalse() {
++        euiccProvisioned = true
++        mockTelephonyManager.stub {
++            on { uiccCardsInfo } doReturn listOf(mockPhysicalCardInfo0, mockPhysicalCardInfo1)
++        }
++
++        val showEuiccSettings = repository.showEuiccSettings()
++
++        assertThat(showEuiccSettings).isFalse()
++    }
++
+     @Test

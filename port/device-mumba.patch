@@ -1,0 +1,932 @@
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index 9dea7e6..6b42171 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -58,7 +58,13 @@ TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/config.fs
+ BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+ BOARD_USES_QCOM_MERGE_DTBS_SCRIPT := true
+ TARGET_NEEDS_DTBOIMAGE := true
+-TARGET_MERGE_DTBS_WILDCARD ?= parrot-moto-base*
++# Ship only the generic base DTBs (2, like stock). The mumba-specific
++# conversions are carried by the dtbo overlays instead.
++TARGET_MERGE_DTBS_WILDCARD ?= parrot-moto-base-nfc*
++# Only ship the mumba board overlays in dtbo.img (matches stock: 2 entries).
++# Without this, the default "*" pulls in montague/ravelin techpack overlays and
++# the bootloader can select the wrong DT, breaking audio bring-up.
++TARGET_MERGE_DTBOS_WILDCARD ?= parrot-mumba*
+ 
+ # Init Boot
+ BOARD_INIT_BOOT_HEADER_VERSION := 4
+@@ -71,7 +77,9 @@ BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
+ 
+ # Kernel
+ BOARD_KERNEL_CMDLINE += \
+-    console=ttynull \
++    console=ttyMSM0,115200n8 \
++    androidboot.selinux=permissive \
++    audit_backlog_limit=4096 \
+     nosoftlockup \
+     printk.devkmsg=on \
+     firmware_class.path=/vendor/firmware_mnt/image \
+@@ -155,6 +162,7 @@ TARGET_KERNEL_EXT_MODULES += \
+     motorola/drivers/moto_mm \
+     motorola/drivers/moto_sched \
+     motorola/drivers/watchdogtest \
++    motorola/drivers/sensors \
+     motorola/drivers/misc/sx937x \
+     motorola/drivers/misc/utag \
+     motorola/drivers/misc/mmi_sys_temp \
+@@ -166,7 +174,6 @@ TARGET_KERNEL_EXT_MODULES += \
+     motorola/drivers/backlight/ktd3136 \
+     motorola/drivers/backlight/aw99703 \
+     motorola/drivers/nfc/st21nfc \
+-    motorola/drivers/sensors \
+     motorola/drivers/ese/st54x \
+     motorola/drivers/ese/st54spi_gpio \
+     motorola/drivers/input/misc/fpc_fps_mmi \
+@@ -175,6 +182,10 @@ TARGET_KERNEL_EXT_MODULES += \
+     motorola/drivers/input/misc/anc_fps_mmi \
+     motorola/drivers/wlan_antenna
+ 
++# Touch: expose the double-tap-to-wake gesture node from the chipone driver
++BOARD_USES_DOUBLE_TAP := true
++BOARD_USES_DOUBLE_TAP_CTRL := true
++
+ # Metadata
+ BOARD_USES_METADATA_PARTITION := true
+
+@@ -237,6 +248,7 @@ ENABLE_VENDOR_RIL_SERVICE := true
+ include device/lineage/sepolicy/libperfmgr/sepolicy.mk
+ include device/qcom/sepolicy_vndr/SEPolicy.mk
+ include hardware/motorola/sepolicy/qti/SEPolicy.mk
++BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor
+
+ # Verified Boot
+ BOARD_AVB_ENABLE := true
+
+diff --git a/sepolicy/vendor/hal_vibrator_default.te b/sepolicy/vendor/hal_vibrator_default.te
+new file mode 100644
+index 0000000..a82bba0
+--- /dev/null
++++ b/sepolicy/vendor/hal_vibrator_default.te
+@@ -0,0 +1 @@
++hal_client_domain(hal_vibrator_default, hal_audio)
+
+diff --git a/sepolicy/vendor/service_contexts b/sepolicy/vendor/service_contexts
+new file mode 100644
+index 0000000..b71e8a9
+--- /dev/null
++++ b/sepolicy/vendor/service_contexts
+@@ -0,0 +1,2 @@
++com.motorola.hardware.camera.postprocess.IPostProcService/default u:object_r:vendor_hal_postproc_service:s0
++com.motorola.hardware.biometric.fingerprint.IMotoCaptiveSensorTest/default u:object_r:hal_fingerprint_service:s0
+
+diff --git a/sepolicy/vendor/location.te b/sepolicy/vendor/location.te
+new file mode 100644
+index 0000000..6984053
+--- /dev/null
++++ b/sepolicy/vendor/location.te
+@@ -0,0 +1,14 @@
++# The QTI location launcher uses binder for QMS and platform services,
++# QRTR for modem communication, and network access for XTRA/LOWI assistance.
++binder_use(vendor_location)
++binder_call(vendor_location, system_server)
++binder_call(vendor_location, vendor_cnd)
++binder_call(vendor_location, vendor_qms)
++
++allow vendor_location vendor_qms_service:service_manager find;
++allow vendor_location fwk_sensor_hwservice:hwservice_manager find;
++allow vendor_location vendor_hal_gnss_qti:unix_dgram_socket sendto;
++allow vendor_location self:qipcrtr_socket create_socket_perms_no_ioctl;
++allow vendor_location self:netlink_route_socket { create bind read };
++allowxperm vendor_location self:udp_socket ioctl lowi_server_ioctls;
++net_domain(vendor_location)
+
+diff --git a/sepolicy/vendor/hal_gnss_qti.te b/sepolicy/vendor/hal_gnss_qti.te
+new file mode 100644
+index 0000000..3b1ee9a
+--- /dev/null
++++ b/sepolicy/vendor/hal_gnss_qti.te
+@@ -0,0 +1,2 @@
++# GNSS uses the framework sensor manager for its sensor-assisted location path.
++allow vendor_hal_gnss_qti fwk_sensor_service:service_manager find;
+
+diff --git a/camera/Android.bp b/camera/Android.bp
+new file mode 100644
+index 0000000..c18ace5
+--- /dev/null
++++ b/camera/Android.bp
+@@ -0,0 +1,13 @@
++//
++// SPDX-FileCopyrightText: 2023 ArrowOS
++// SPDX-FileCopyrightText: 2024 LibreMobileOS Foundation
++// SPDX-License-Identifier: Apache-2.0
++//
++
++cc_library_static {
++    name: "libcameraservice_extension.mumba",
++    srcs: ["CameraProviderExtension.cpp"],
++    include_dirs: [
++        "frameworks/av/services/camera/libcameraservice/common"
++    ],
++}
+diff --git a/camera/CameraProviderExtension.cpp b/camera/CameraProviderExtension.cpp
+new file mode 100644
+index 0000000..3891406
+--- /dev/null
++++ b/camera/CameraProviderExtension.cpp
+@@ -0,0 +1,88 @@
++/*
++ * Copyright (C) 2024 LibreMobileOS Foundation
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++#include "CameraProviderExtension.h"
++
++#include <fstream>
++
++#define TORCH_BRIGHTNESS "brightness"
++#define TORCH_MAX_BRIGHTNESS "max_brightness"
++#define TOGGLE_SWITCH "/sys/devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-05/c42d000.qcom,spmi:qcom,pm6150l@5:qcom,leds@d300/leds/led:switch_2/brightness"
++
++static std::string kTorchLedPaths[] = {
++        "/sys/devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-05/c42d000.qcom,spmi:qcom,pm6150l@5:qcom,leds@d300/leds/led:torch_0",
++        "/sys/devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-05/c42d000.qcom,spmi:qcom,pm6150l@5:qcom,leds@d300/leds/led:torch_1",
++};
++
++/**
++ * Write value to path and close file.
++ */
++template <typename T>
++static void set(const std::string& path, const T& value) {
++    std::ofstream file(path);
++    file << value;
++}
++
++
++/**
++ * Read value from the path and close file.
++ */
++template <typename T>
++static T get(const std::string& path, const T& def) {
++    std::ifstream file(path);
++    T result;
++
++    file >> result;
++    return file.fail() ? def : result;
++}
++
++bool supportsTorchStrengthControlExt() {
++    return true;
++}
++
++bool supportsSetTorchModeExt() {
++    return false;
++}
++
++int32_t getTorchDefaultStrengthLevelExt() {
++    return 80;
++}
++
++int32_t getTorchMaxStrengthLevelExt() {
++    // 200 (out of 500) is a sane max brightness
++    return 200;
++}
++
++int32_t getTorchStrengthLevelExt() {
++    // We write same value in the both LEDs,
++    // so get from one.
++    auto node = kTorchLedPaths[0] + "/" + TORCH_BRIGHTNESS;
++    return get(node, 0);
++}
++
++void setTorchStrengthLevelExt(int32_t torchStrength, bool enabled) {
++    // Always drop the switch first. If the torch was already on and only the
++    // strength changed, this forces a fresh edge so the new brightness value
++    // actually gets re-latched by the flash IC, instead of only updating the
++    // cached sysfs value with no physical effect.
++    set(TOGGLE_SWITCH, 0);
++
++    // On torch off, framework passes the default level with enabled=false.
++    // Leaving the torch LEDs at a non-zero brightness keeps them armed in the
++    // flash driver, which blocks the camera HAL from firing flash later.
++    for (auto& path : kTorchLedPaths) {
++        auto node = path + "/" + TORCH_BRIGHTNESS;
++        set(node, enabled ? torchStrength : 0);
++    }
++
++    if (enabled)
++        set(TOGGLE_SWITCH, 225);
++}
++
++void setTorchModeExt(bool enabled) {
++    int32_t strength = getTorchDefaultStrengthLevelExt();
++    setTorchStrengthLevelExt(enabled ? strength : 0, enabled);
++}
+diff --git a/configs/vintf/compatibility_matrix.device.xml b/configs/vintf/compatibility_matrix.device.xml
+index 151182e..bb1b9b5 100644
+--- a/configs/vintf/compatibility_matrix.device.xml
++++ b/configs/vintf/compatibility_matrix.device.xml
+@@ -54,11 +54,4 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="aidl">
+-        <name>vendor.dolby.dms</name>
+-        <interface>
+-            <name>IDms</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+ </compatibility-matrix>
+diff --git a/configs/power/powerhint.json b/configs/power/powerhint.json
+index 811c840..347e307 100644
+--- a/configs/power/powerhint.json
++++ b/configs/power/powerhint.json
+@@ -214,24 +214,6 @@
+       ],
+       "ResetOnInit": true
+     },
+-    {
+-      "Name": "GPUForceRailOn",
+-      "Path": "/sys/class/kgsl/kgsl-3d0/force_rail_on",
+-      "Values": [
+-        "1",
+-        "0"
+-      ],
+-      "ResetOnInit": true
+-    },
+-    {
+-      "Name": "GPUForceClkOn",
+-      "Path": "/sys/class/kgsl/kgsl-3d0/force_clk_on",
+-      "Values": [
+-        "1",
+-        "0"
+-      ],
+-      "ResetOnInit": true
+-    },
+     {
+       "Name": "GPUIdleTimer",
+       "Path": "/sys/class/kgsl/kgsl-3d0/idle_timer",
+@@ -286,7 +268,6 @@
+       "Name": "L3MinFreq",
+       "Path": "/sys/devices/system/cpu/bus_dcvs/L3/boost_freq",
+       "Values": [
+-        "1440000",
+         "1420800",
+         "1382400",
+         "1248000",
+@@ -504,19 +485,7 @@
+       "PowerHint": "LAUNCH",
+       "Node": "L3MinFreq",
+       "Duration": 3000,
+-      "Value": "1440000"
+-    },
+-    {
+-      "PowerHint": "LAUNCH",
+-      "Node": "GPUForceClkOn",
+-      "Duration": 3000,
+-      "Value": "1"
+-    },
+-    {
+-      "PowerHint": "LAUNCH",
+-      "Node": "GPUForceRailOn",
+-      "Duration": 3000,
+-      "Value": "1"
++      "Value": "1420800"
+     },
+     {
+       "PowerHint": "LAUNCH",
+diff --git a/device.mk b/device.mk
+diff --git a/device.mk b/device.mk
+index 2fa61c0..0b5ac3d 100644
+--- a/device.mk
++++ b/device.mk
+@@ -5,6 +5,9 @@
+ 
+ PRODUCT_CHECK_PREBUILT_MAX_PAGE_SIZE := false
+ 
++# Debug (userdebug): insecure ADB so logcat is available during boot
++WITH_ADB_INSECURE := true
++
+ # Add common definitions for Qualcomm
+ $(call inherit-product, hardware/qcom-caf/common/common.mk)
+ 
+@@ -123,6 +126,9 @@ PRODUCT_COPY_FILES += \
+     frameworks/native/data/etc/android.hardware.camera.full.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.full.xml \
+     frameworks/native/data/etc/android.hardware.camera.raw.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.raw.xml
+ 
++# Camera extension (ported from A17)
++$(call soong_config_set,libcameraservice,ext_lib,//$(LOCAL_PATH):libcameraservice_extension.mumba)
++
+ # Dalvik
+ $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
+ 
+@@ -143,7 +149,8 @@ PRODUCT_COPY_FILES += \
+ 
+ # eUICC
+ PRODUCT_PACKAGES += \
+-    MotoEuicc
++    MotoEuicc \
++    OpenEUICC
+ 
+ # DRM
+ PRODUCT_PACKAGES += \
+@@ -219,6 +226,9 @@ $(call soong_config_set,lineage_health,charging_control_charging_enabled,0)
+ $(call soong_config_set,lineage_health,charging_control_charging_path,/sys/class/power_supply/battery/device/force_charging_disable)
+ $(call soong_config_set,lineage_health_bool,charging_control_supports_bypass,false)
+ 
++# Double tap to wake: device-specific power mode extension (setting -> HAL -> sysfs)
++$(call soong_config_set,power_libperfmgr,mode_extension_lib,//$(LOCAL_PATH)/power_ext:libpower_ext_mumba)
++
+ # Moto hardware
+ PRODUCT_PACKAGES += \
+     MotoActions \
+@@ -232,7 +242,16 @@ PRODUCT_PACKAGES += \
+     WifiResMumba \
+     FrameworksResMumba \
+     SettingsResMumba \
+-    TelephonyResMumba
++    TelephonyResMumba \
++    EuiccOverlayMumba \
++    DeviceAsWebcamResMumba
++
++# Double tap to wake (input mapping; toggle wired via device settings)
++PRODUCT_COPY_FILES += \
++    $(LOCAL_PATH)/idc/double-tap.idc:$(TARGET_COPY_OUT_VENDOR)/usr/idc/chipone-tddi.idc \
++    $(LOCAL_PATH)/keylayout/double-tap.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/chipone-tddi.kl \
++    $(LOCAL_PATH)/idc/double-tap.idc:$(TARGET_COPY_OUT_VENDOR)/usr/idc/double-tap.idc \
++    $(LOCAL_PATH)/keylayout/double-tap.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/double-tap.kl
+ 
+ PRODUCT_PACKAGES += \
+     NcmTetheringOverlay
+diff --git a/idc/double-tap.idc b/idc/double-tap.idc
+new file mode 100644
+index 0000000..52c28bd
+--- /dev/null
++++ b/idc/double-tap.idc
+@@ -0,0 +1,2 @@
++device.internal = 1
++device.wake = 1
+diff --git a/init/init.mmi.overlay.rc b/init/init.mmi.overlay.rc
+index 2f580cb..757ba92 100644
+--- a/init/init.mmi.overlay.rc
++++ b/init/init.mmi.overlay.rc
+@@ -142,6 +142,17 @@ on boot
+     chown system system /sys/class/touchscreen/primary/hardware_status
+     chmod 0660 /sys/class/touchscreen/primary/hardware_status
+ 
++    # Double tap to wake: the chipone driver exposes the gesture node under the
++    # panel name (ICNL9922C on mumba); allow the power HAL to control it.
++    chown system system /sys/class/touchscreen/ICNL9922C/gesture
++    chmod 0660 /sys/class/touchscreen/ICNL9922C/gesture
++    chown system system /sys/class/touchscreen/primary/gesture
++    chmod 0660 /sys/class/touchscreen/primary/gesture
++    # gesture_en enables the gesture wakeup state (otherwise the panel suspends
++    # into "sleep" and double-tap never wakes it).
++    chown system system /sys/devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a8c000.spi/spi_master/spi1/spi1.0/misc/gesture_en
++    chmod 0660 /sys/devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a8c000.spi/spi_master/spi1/spi1.0/misc/gesture_en
++
+     # change permission for capsensor
+     chown system system /sys/class/capsense/reset
+     chown system system /sys/class/capsense/int_state
+diff --git a/init/init.mmi.rc b/init/init.mmi.rc
+index a22a6d3..887f91d 100644
+--- a/init/init.mmi.rc
++++ b/init/init.mmi.rc
+@@ -70,7 +70,6 @@ on early-init
+ on fs
+     insmod /vendor/lib/modules/cci_intf.ko
+     mkdir /mnt/vendor/persist/fps 0770 system system
+-    exec_start vendor.ident-fps-sh
+ 
+ on fs && property:ro.vendor.hw.modem_version=*
+     # Super modem detection
+@@ -580,13 +579,6 @@ service vendor.oem-super-image-detector-sh /vendor/bin/init.oem.hw.sh -M
+     oneshot
+     disabled
+ 
+-service vendor.ident-fps-sh /vendor/bin/init.oem.fingerprint.sh
+-    class core
+-    user root
+-    group drmrpc system
+-    oneshot
+-    disabled
+-
+ service vendor.hal-fps-sh /vendor/bin/init.oem.fingerprint2.sh
+     class late_start
+     user root
+ 
+diff --git a/init/init.qcom.rc b/init/init.qcom.rc
+index 5819383..85d0653 100644
+--- a/init/init.qcom.rc
++++ b/init/init.qcom.rc
+@@ -253,6 +253,9 @@ on boot
+ 
+ # msm specific files that need to be created on /data
+ on post-fs-data
++    # Start libperfmgr's node looper after vendor data and sysfs are ready.
++    setprop vendor.powerhal.init 1
++
+     mkdir /data/vendor/misc 01771 system system
+ 
+     # Create directory used for dump collection
+@@ -523,15 +526,25 @@ on property:sys.boot_completed=1
+     chown media audio /sys/kernel/aud_dev/state
+     write /sys/devices/virtual/cvp/cvp/boot 1
+ 
++# Powerhal
++    chown system system /sys/devices/system/cpu/cpufreq/policy0/walt/up_rate_limit_us
++    chown system system /sys/devices/system/cpu/cpufreq/policy0/walt/down_rate_limit_us
++    chown system system /sys/devices/system/cpu/cpufreq/policy4/walt/up_rate_limit_us
++    chown system system /sys/devices/system/cpu/cpufreq/policy4/walt/down_rate_limit_us
++    chown system system /sys/devices/system/cpu/bus_dcvs/L3/boost_freq
++
++    chmod 0664 /sys/devices/system/cpu/cpufreq/policy0/walt/up_rate_limit_us
++    chmod 0664 /sys/devices/system/cpu/cpufreq/policy0/walt/down_rate_limit_us
++    chmod 0664 /sys/devices/system/cpu/cpufreq/policy4/walt/up_rate_limit_us
++    chmod 0664 /sys/devices/system/cpu/cpufreq/policy4/walt/down_rate_limit_us
++    chmod 0664 /sys/devices/system/cpu/bus_dcvs/L3/boost_freq
++
+ on property:persist.vendor.radio.atfwd.start=false
+     stop vendor.atfwd
+ 
+ on property:vendor.radio.atfwd.start=false
+     stop vendor.atfwd
+ 
+-    # Enable PowerHAL hint processing
+-    setprop vendor.powerhal.init 1
+-
+ # corefile limit
+ on property:persist.debug.trace=1
+     mkdir /data/core 0777 root root
+diff --git a/init/ueventd.qcom.rc b/init/ueventd.qcom.rc
+index ecb1fb3..9bd0009 100644
+--- a/init/ueventd.qcom.rc
++++ b/init/ueventd.qcom.rc
+@@ -649,9 +649,15 @@ subsystem mem_buf_vm
+ # Additional sensors
+ /sys/class/touchscreen/*    double_tap_enabled                                                0664    system  system
+ /sys/class/touchscreen/*    double_tap_pressed                                                0664    system  system
++/sys/class/touchscreen/*    gesture                                                           0660    system  system
+ /sys/class/touchscreen/*    udfps_enabled                                                     0664    system  system
+ /sys/class/touchscreen/*    udfps_pressed                                                     0664    system  system
+ /sys/devices/platform/soc/*.spi/spi_master/spi0/spi0.*/touchscreen/*    double_tap_enabled    0664    system  system
+ /sys/devices/platform/soc/*.spi/spi_master/spi0/spi0.*/touchscreen/*    double_tap_pressed    0664    system  system
+ /sys/devices/platform/soc/*.spi/spi_master/spi0/spi0.*/touchscreen/*    udfps_enabled         0664    system  system
+-/sys/devices/platform/soc/*.spi/spi_master/spi0/spi0.*/touchscreen/*    udfps_pressed         0664    system  system
+\ No newline at end of file
++/sys/devices/platform/soc/*.spi/spi_master/spi0/spi0.*/touchscreen/*    udfps_pressed         0664    system  system
++
++# Torch control
++/sys/devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-05/c42d000.qcom,spmi:qcom,pm6150l@5:qcom,leds@d300/leds/led:torch_0 brightness 0660 cameraserver camera
++/sys/devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-05/c42d000.qcom,spmi:qcom,pm6150l@5:qcom,leds@d300/leds/led:torch_1 brightness 0660 cameraserver camera
++/sys/devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-05/c42d000.qcom,spmi:qcom,pm6150l@5:qcom,leds@d300/leds/led:switch_2 brightness 0660 cameraserver camera
+\ No newline at end of file
+diff --git a/keylayout/double-tap.kl b/keylayout/double-tap.kl
+new file mode 100644
+index 0000000..00bee53
+--- /dev/null
++++ b/keylayout/double-tap.kl
+@@ -0,0 +1,7 @@
++#
++# Double tap to wake
++#
++
++# Triggers wakeup on BTN_TRIGGER_HAPPY6
++key 709   WAKEUP          WAKE
++key 706   WAKEUP          WAKE
+diff --git a/lineage_mumba.mk b/lineage_mumba.mk
+index 9b6ee1d..7040c55 100644
+--- a/lineage_mumba.mk
++++ b/lineage_mumba.mk
+@@ -22,8 +22,8 @@ PRODUCT_MODEL := G57 Power
+ PRODUCT_GMS_CLIENTID_BASE := android-motorola
+ 
+ PRODUCT_BUILD_PROP_OVERRIDES += \
+-    BuildDesc="mumba_g-user 16 W1WAA36M.48-12-ST12.1 83f8c release-keys" \
+-    BuildFingerprint=motorola/mumba_g/mumba:16/W1WAA36M.48-12-ST12.1/83f8c:user/release-keys \
++    BuildDesc="mumba_g-user 16 W1WAAS36.48-12-23-9 83f8c test-keys" \
++    BuildFingerprint=motorola/mumba_g/mumba:16/W1WAAS36.48-12-23-9/83f8c:user/test-keys \
+     DeviceName=mumba_g \
+     DeviceProduct=mumba_g \
+     SystemDevice=mumba \
+diff --git a/modules.load.vendor_dlkm b/modules.load.vendor_dlkm
+index 293122f..1eba6e6 100644
+--- a/modules.load.vendor_dlkm
++++ b/modules.load.vendor_dlkm
+@@ -196,6 +196,8 @@ wcd938x_dlkm.ko
+ wcd938x_slave_dlkm.ko
+ wcd937x_dlkm.ko
+ wcd937x_slave_dlkm.ko
++fs1815_dlkm.ko
++fs1815_mngr_dlkm.ko
+ hdmi_dlkm.ko
+ qcedev-mod_dlkm.ko
+ qcrypto-msm_dlkm.ko
+@@ -237,6 +239,8 @@ wcd938x_dlkm.ko
+ wcd938x_slave_dlkm.ko
+ wcd937x_dlkm.ko
+ wcd937x_slave_dlkm.ko
++fs1815_dlkm.ko
++fs1815_mngr_dlkm.ko
+ hdmi_dlkm.ko
+ btpower.ko
+ radio-i2c-rtc6226-qca.ko
+diff --git a/overlay/DeviceAsWebcamMumba/Android.bp b/overlay/DeviceAsWebcamMumba/Android.bp
+new file mode 100644
+index 0000000..1693cc3
+--- /dev/null
++++ b/overlay/DeviceAsWebcamMumba/Android.bp
+@@ -0,0 +1,9 @@
++//
++// Copyright (C) 2022 The LineageOS Project
++// SPDX-License-Identifier: Apache-2.0
++//
++
++runtime_resource_overlay {
++    name: "DeviceAsWebcamResMumba",
++    device_specific: true,
++}
+diff --git a/overlay/DeviceAsWebcamMumba/AndroidManifest.xml b/overlay/DeviceAsWebcamMumba/AndroidManifest.xml
+new file mode 100644
+index 0000000..288cfa9
+--- /dev/null
++++ b/overlay/DeviceAsWebcamMumba/AndroidManifest.xml
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     Copyright (C) 2022 The LineageOS Project
++     SPDX-License-Identifier: Apache-2.0
++-->
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.android.DeviceAsWebcam.overlay.mumba">
++
++    <overlay
++        android:isStatic="true"
++        android:priority="300"
++        android:targetPackage="com.android.DeviceAsWebcam" />
++</manifest>
+diff --git a/overlay/DeviceAsWebcamMumba/res/raw/ignored_v4l2_nodes.json b/overlay/DeviceAsWebcamMumba/res/raw/ignored_v4l2_nodes.json
+new file mode 100644
+index 0000000..0537a29
+--- /dev/null
++++ b/overlay/DeviceAsWebcamMumba/res/raw/ignored_v4l2_nodes.json
+@@ -0,0 +1,7 @@
++[
++    "/dev/video0",
++    "/dev/video1",
++    "/dev/video32",
++    "/dev/video33"
++]
++
+diff --git a/overlay/EuiccOverlayMumba/Android.bp b/overlay/EuiccOverlayMumba/Android.bp
+new file mode 100644
+index 0000000..a463f5a
+--- /dev/null
++++ b/overlay/EuiccOverlayMumba/Android.bp
+@@ -0,0 +1,9 @@
++//
++// SPDX-FileCopyrightText: The LineageOS Project
++// SPDX-License-Identifier: Apache-2.0
++//
++
++runtime_resource_overlay {
++    name: "EuiccOverlayMumba",
++    product_specific: true,
++}
+diff --git a/overlay/EuiccOverlayMumba/AndroidManifest.xml b/overlay/EuiccOverlayMumba/AndroidManifest.xml
+new file mode 100644
+index 0000000..3cdb18f
+--- /dev/null
++++ b/overlay/EuiccOverlayMumba/AndroidManifest.xml
+@@ -0,0 +1,10 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     SPDX-FileCopyrightText: The LineageOS Project
++     SPDX-License-Identifier: Apache-2.0
++-->
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++          package="org.lineageos.euicc.overlay.mumba">
++    <overlay android:targetPackage="org.lineageos.euicc"
++             android:isStatic="true" />
++</manifest>
+diff --git a/overlay/EuiccOverlayMumba/res/values/strings.xml b/overlay/EuiccOverlayMumba/res/values/strings.xml
+new file mode 100644
+index 0000000..24c609d
+--- /dev/null
++++ b/overlay/EuiccOverlayMumba/res/values/strings.xml
+@@ -0,0 +1,106 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     SPDX-FileCopyrightText: The LineageOS Project
++     SPDX-License-Identifier: Apache-2.0
++-->
++<resources>
++    <string name="sim_slot_mappings_json" translatable="false">
++        {
++            \"sim-slot-mappings\": [
++                {
++                    \"devices\": [
++                    ],
++                    \"esim-slot-ids\": [
++                        0
++                    ],
++                    \"psim-slot-ids\": []
++                },
++                {
++                    \"devices\": [
++                        \"mumbain\",
++                        \"mumbap\",
++                        \"mumba_g\",
++                        \"mumba\"
++                    ],
++                    \"esim-slot-ids\": [
++                        1
++                    ],
++                    \"psim-slot-ids\": [
++                        0
++                    ]
++                }
++            ]
++        }
++    </string>
++    <string name="carrier_list_json" translatable="false">
++        {
++            \"carriers\": [
++                {
++                    \"carrierConfigName\": \"carrier_visible\",
++                    \"hideFromCarrierList\": true,
++                    \"app\": \"com.visiblemobile.flagship\",
++                    \"appCerts\": [
++                        \"D8EFE020E48AEC0A21E67EFC8FAFC2E674A05C74970381D99175E23C084B7BF0\"
++                    ],
++                    \"appHasOwnUi\": true,
++                    \"appNeedsEid\": false,
++                    \"id\": \"\",
++                    \"name\": \"Visible\",
++                    \"mCarrierPkgLoaded\": false,
++                    \"csTel\": \"\",
++                    \"type\": 3,
++                    \"urls\": {},
++                    \"types\": [
++                        3
++                    ],
++                    \"gaia\": false,
++                    \"icon\": \"\",
++                    \"spn\": \"Visible\",
++                    \"dataPlan\": false,
++                    \"multi\": true,
++                    \"transfer\": false,
++                    \"domains\": []
++                },
++                {
++                    \"carrierConfigName\": \"carrier_verizon\",
++                    \"hideFromCarrierList\": true,
++                    \"app\": \"com.vzw.hss.myverizon\",
++                    \"appCerts\": [
++                        \"AE23A03436DF07B0CD70FE881CDA2EC1D21215D7B7B0CC68E67B67F5DF89526A\"
++                    ],
++                    \"appHasOwnUi\": true,
++                    \"appNeedsEid\": false,
++                    \"id\": \"\",
++                    \"name\": \"Verizon\",
++                    \"mCarrierPkgLoaded\": false,
++                    \"csTel\": \"(800) 922-0204\",
++                    \"type\": 3,
++                    \"urls\": {},
++                    \"types\": [
++                        3
++                    ],
++                    \"gaia\": false,
++                    \"icon\": \"https://www.gstatic.com/esim/icons/verizon-logo.png\",
++                    \"spn\": \"Verizon\",
++                    \"dataPlan\": false,
++                    \"multi\": true,
++                    \"transfer\": false,
++                    \"domains\": []
++                }
++            ],
++            \"isDirect\": false,
++            \"isExclusive\": false
++        }
++    </string>
++    <string name="sim_illustration_lottie_mappings_json" translatable="false">
++        {
++            \"sim_illustration_lottie_mappings\": [
++                {
++                    \"devices\": [
++                    ],
++                    \"illustration_lottie\": \"sim_illustration_lottie_bottom_left\"
++                }
++            ]
++        }
++    </string>
++</resources>
+\ No newline at end of file
+diff --git a/overlay/FrameworksResMumba/res/values/config.xml b/overlay/FrameworksResMumba/res/values/config.xml
+index 9486cb0..0a3a8cf 100644
+--- a/overlay/FrameworksResMumba/res/values/config.xml
++++ b/overlay/FrameworksResMumba/res/values/config.xml
+@@ -430,4 +430,9 @@
+     <!-- Specifies the maximum burn-in offset vertically. -->
+     <integer name="config_burnInProtectionMaxVerticalOffset">40</integer>
+ 
++    <!-- Expose the panel's full adaptive range (30/60/90/120 Hz) to the
++         default refresh-rate policy and Smooth Display. -->
++    <integer name="config_defaultRefreshRate">120</integer>
++    <integer name="config_defaultPeakRefreshRate">120</integer>
++
+ </resources>
+diff --git a/overlay/FrameworksResMumba/res/xml/haptic_feedback_customization.xml b/overlay/FrameworksResMumba/res/xml/haptic_feedback_customization.xml
+new file mode 100644
+index 0000000..1041d2a
+--- /dev/null
++++ b/overlay/FrameworksResMumba/res/xml/haptic_feedback_customization.xml
+@@ -0,0 +1,34 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     SPDX-FileCopyrightText: The LineageOS Project
++     SPDX-License-Identifier: Apache-2.0
++-->
++<haptic-feedback-constants>
++    <!-- LONG_PRESS: stock virtual_key_longpress, sys.haptic.long.press = 0,1 -->
++    <constant id="0">
++        <vibration-effect>
++            <predefined-effect name="click"/>
++        </vibration-effect>
++    </constant>
++
++    <!-- VIRTUAL_KEY: stock virtual_key_down, sys.haptic.down = 5,2 -->
++    <constant id="1">
++        <vibration-effect>
++            <predefined-effect name="heavy_click"/>
++        </vibration-effect>
++    </constant>
++
++    <!-- KEYBOARD_TAP: stock virtual_key_tap, sys.haptic.tap.normal = 3,2. -->
++    <constant id="3">
++        <vibration-effect>
++            <predefined-effect name="thud"/>
++        </vibration-effect>
++    </constant>
++
++    <!-- TEXT_HANDLE_MOVE: stock mesh_light, sys.haptic.mesh.light = 5,1. -->
++    <constant id="9">
++        <vibration-effect>
++            <predefined-effect name="heavy_click"/>
++        </vibration-effect>
++    </constant>
++</haptic-feedback-constants>
+diff --git a/power_ext/Android.bp b/power_ext/Android.bp
+new file mode 100644
+index 0000000..74871c7
+--- /dev/null
++++ b/power_ext/Android.bp
+@@ -0,0 +1,17 @@
++//
++// SPDX-FileCopyrightText: The LineageOS Project
++// SPDX-License-Identifier: Apache-2.0
++//
++
++cc_library_static {
++    name: "libpower_ext_mumba",
++    defaults: ["android.hardware.power-ndk_shared"],
++    vendor: true,
++    srcs: [
++        "PowerModeExtension.cpp",
++    ],
++    shared_libs: [
++        "libbase",
++        "liblog",
++    ],
++}
+diff --git a/power_ext/PowerModeExtension.cpp b/power_ext/PowerModeExtension.cpp
+new file mode 100644
+index 0000000..6e5100f
+--- /dev/null
++++ b/power_ext/PowerModeExtension.cpp
+@@ -0,0 +1,76 @@
++/*
++ * SPDX-FileCopyrightText: The LineageOS Project
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++#include <aidl/android/hardware/power/BnPower.h>
++#include <android-base/file.h>
++#include <android-base/logging.h>
++
++namespace aidl {
++namespace google {
++namespace hardware {
++namespace power {
++namespace impl {
++namespace pixel {
++
++using ::aidl::android::hardware::power::Mode;
++
++// Motorola mumba: the chipone touch controller exposes gesture control through
++// /sys/class/touchscreen/<panel-name>/gesture ("ICNL9922C"/"primary" on this
++// device); value 49 enables the double-tap gesture bit, 48 disables it.
++// The driver additionally needs "gesture wakeup" enabled (gesture_en \(Y\)),
++// otherwise it suspends into "sleep" instead of "gesture" and never wakes up.
++static constexpr const char* kGestureNodes[] = {
++        "/sys/class/touchscreen/primary/gesture",
++        "/sys/class/touchscreen/ICNL9922C/gesture",
++};
++static constexpr const char* kGestureEnNodes[] = {
++        "/sys/devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a8c000.spi/spi_master/spi1/spi1.0/misc/gesture_en",
++};
++static constexpr const char kDt2wOn[] = "49";
++static constexpr const char kDt2wOff[] = "48";
++static constexpr const char kDt2wEnOn[] = "Y";
++static constexpr const char kDt2wEnOff[] = "N";
++
++bool isDeviceSpecificModeSupported(Mode type, bool* _aidl_return) {
++    switch (type) {
++        case Mode::DOUBLE_TAP_TO_WAKE:
++            *_aidl_return = true;
++            return true;
++        default:
++            return false;
++    }
++}
++
++bool setDeviceSpecificMode(Mode type, bool enabled) {
++    switch (type) {
++        case Mode::DOUBLE_TAP_TO_WAKE: {
++            bool ok = false;
++            for (const char* node : kGestureNodes) {
++                if (!::android::base::WriteStringToFile(enabled ? kDt2wOn : kDt2wOff, node)) {
++                    LOG(ERROR) << "Failed to write " << node;
++                } else {
++                    ok = true;
++                }
++            }
++            for (const char* node : kGestureEnNodes) {
++                if (!::android::base::WriteStringToFile(enabled ? kDt2wEnOn : kDt2wEnOff, node)) {
++                    LOG(ERROR) << "Failed to write " << node;
++                } else {
++                    ok = true;
++                }
++            }
++            return ok;
++        }
++        default:
++            return false;
++    }
++}
++
++}  // namespace pixel
++}  // namespace impl
++}  // namespace power
++}  // namespace hardware
++}  // namespace google
++}  // namespace aidl
+diff --git a/props/vendor.prop b/props/vendor.prop
+index 3a532a1..bb84db0 100644
+--- a/props/vendor.prop
++++ b/props/vendor.prop
+@@ -1,7 +1,6 @@
+ # Audio
+ audio.spatializer.pose_predictor_type=2
+ audio.spatializer.prediction_duration_ms=50
+-persist.vendor.audio.effectimplenter=dolby
+ ro.vendor.audio.stereo_master_volume=1
+ aaudio.hw_burst_min_usec=2000
+ aaudio.mmap_exclusive_policy=1
+@@ -17,7 +16,6 @@ persist.vendor.audio.ambisonic.auto.profile=false
+ persist.vendor.audio.ambisonic.capture=false
+ persist.vendor.audio.apptype.multirec.enabled=false
+ persist.vendor.audio.avs.afe_api_version=2
+-persist.vendor.audio.dolby.tws_tuning=true
+ persist.vendor.audio.fluence.speaker=true
+ persist.vendor.audio.fluence.tmic.enabled=false
+ persist.vendor.audio.fluence.voicecall=true
+@@ -49,13 +47,10 @@ ro.vendor.beluga.p=0x3
+ ro.vendor.beluga.s=0x900
+ ro.vendor.beluga.t=0x240
+ ro.mediaserver.64b.enable=true
+-persist.vendor.audio_fx.current=dolby
+ vendor.audio.adm.buffering.ms=2
+ vendor.audio.ainr_in_zoom=true
+ vendor.audio.c2.preferred=true
+ vendor.audio.deep_buffer.ringtone=true
+-vendor.audio.dolby.ds2.enabled=false
+-vendor.audio.dolby.ds2.hardbypass=false
+ vendor.audio.enable.mirrorlink=false
+ vendor.audio.feature.a2dp_offload.enable=true
+ vendor.audio.feature.afe_proxy.enable=true
+@@ -305,10 +300,8 @@ debug.stagefright.c2inputsurface=-1
+ debug.stagefright.ccodec=4
+ debug.stagefright.omx_default_rank=0
+ media.c2.hal.selection=aidl
+-media.settings.xml=/vendor/etc/media_profiles_vendor.xml
++media.settings.xml=/vendor/etc/media_profiles.xml
+ 
+-# Media (Dolby)
+-ro.vendor.dolby.dax.version=DAX3_3.12.0.8_r1
+ 
+ # Perf
+ ro.vendor.extension_library=libqti-perfd-client.so

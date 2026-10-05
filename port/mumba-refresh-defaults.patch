@@ -1,0 +1,23 @@
+diff --git a/device.mk b/device.mk
+index 19c46ac..2f20300 100644
+--- a/device.mk
++++ b/device.mk
+@@ -235,6 +235,7 @@ PRODUCT_PACKAGES += \
+ 
+ # Overlay
+ PRODUCT_ENFORCE_RRO_TARGETS := *
++PRODUCT_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
+ 
+ PRODUCT_PACKAGES += \
+     SystemUIResMumba \
+diff --git a/overlay/frameworks/base/packages/SettingsProvider/res/values/defaults.xml b/overlay/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+new file mode 100644
+index 0000000..d2b324c
+--- /dev/null
++++ b/overlay/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <integer name="def_min_refresh_rate">24</integer>
++    <integer name="def_peak_refresh_rate">120</integer>
++</resources>

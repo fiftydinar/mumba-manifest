@@ -1,0 +1,46 @@
+diff --git a/src/java/com/android/internal/telephony/uicc/UiccSlot.java b/src/java/com/android/internal/telephony/uicc/UiccSlot.java
+index 110e953752..82098fd796 100644
+--- a/src/java/com/android/internal/telephony/uicc/UiccSlot.java
++++ b/src/java/com/android/internal/telephony/uicc/UiccSlot.java
+@@ -428,4 +428,8 @@ public class UiccSlot extends Handler {
+ 
+-    // Return true if a slot index is for removable UICCs or eUICCs
++    // The resource array describes built-in eUICCs. Do not apply its slot index to a physical
++    // UICC on variants that reuse the same device tree but do not have an eSIM.
+     private boolean isSlotRemovable(int slotIndex) {
++        if (!mIsEuicc) {
++            return true;
++        }
+         int[] euiccSlots = mContext.getResources()
+diff --git a/tests/telephonytests/src/com/android/internal/telephony/uicc/UiccSlotTest.java b/tests/telephonytests/src/com/android/internal/telephony/uicc/UiccSlotTest.java
+index fdbc399f58..d52d66ffb1 100644
+--- a/tests/telephonytests/src/com/android/internal/telephony/uicc/UiccSlotTest.java
++++ b/tests/telephonytests/src/com/android/internal/telephony/uicc/UiccSlotTest.java
+@@ -488,4 +488,5 @@ public class UiccSlotTest extends TelephonyTest {
+ 
+-        // Simulate when SIM is added, UiccCard and UiccProfile should be created.
+-        mIccCardStatus.mCardState = IccCardStatus.CardState.CARDSTATE_PRESENT;
++        // Mark the built-in eUICC slot without creating a card on this test thread.
++        mIccCardStatus.mCardState = IccCardStatus.CardState.CARDSTATE_ABSENT;
++        mIccCardStatus.atr = "3F979580BFFE8210428031A073BE211797";
+         mUiccSlot.update(mSimulatedCommands, mIccCardStatus, phoneId, slotIndex);
+@@ -495,2 +496,19 @@ public class UiccSlotTest extends TelephonyTest {
+ 
++    @Test
++    public void testPhysicalCardInConfiguredEuiccSlotIsRemovable() throws InterruptedException {
++        int phoneId = 0;
++        int slotIndex = 1;
++
++        // A shared device tree may mark slot 1 as an eUICC even on physical-SIM variants.
++        mContextFixture.putIntArrayResource(com.android.internal.R.array.non_removable_euicc_slots,
++                new int[]{slotIndex});
++
++        mIccCardStatus.mCardState = IccCardStatus.CardState.CARDSTATE_PRESENT;
++        mIccCardStatus.atr = "3F979580BFFE8110428031A073BE211797";
++        mUiccSlot.update(mSimulatedCommands, mIccCardStatus, phoneId, slotIndex);
++
++        assertFalse("Physical card should not be identified as an eUICC", mUiccSlot.isEuicc());
++        assertTrue("Physical SIM should remain removable", mUiccSlot.isRemovable());
++    }
++
+     @Test
