@@ -128,7 +128,7 @@ upstream base SHAs are from the resolved `lineage-23.2` manifest
 | `frameworks/opt/telephony` | [`fiftydinar/android_frameworks_opt_telephony`](https://github.com/fiftydinar/android_frameworks_opt_telephony) | `LineageOS/android_frameworks_opt_telephony` | `566e62daf4e93be6f934001bc76d60aba087b4d6` | `566e62daf4e93be6f934001bc76d60aba087b4d6` |
 | `packages/apps/Settings` | [`fiftydinar/android_packages_apps_Settings`](https://github.com/fiftydinar/android_packages_apps_Settings) | `LineageOS/android_packages_apps_Settings` | `8d8f6486b274bcf0aa6e5d0cbba52c0b05ae5c65` | `8d8f6486b274bcf0aa6e5d0cbba52c0b05ae5c65` |
 | `packages/apps/Dialer` | [`fiftydinar/android_packages_apps_Dialer`](https://github.com/fiftydinar/android_packages_apps_Dialer) | `LineageOS/android_packages_apps_Dialer` | `6da8042323a97d5b3cba1fd975709cc42f29916f` | `6da8042323a97d5b3cba1fd975709cc42f29916f` |
-| `packages/apps/Messaging` | [`fiftydinar/android_packages_apps_Messaging`](https://github.com/fiftydinar/android_packages_apps_Messaging) | `LineageOS/android_packages_apps_Messaging` | `6d131ed8e7249b0ece41169e17d8d0162beae7e0` | `319ccebce12a4918e82c5fa94dcb1dd74ff453ce` |
+| `packages/apps/Messaging` | [`fiftydinar/android_packages_apps_Messaging`](https://github.com/fiftydinar/android_packages_apps_Messaging) | `LineageOS/android_packages_apps_Messaging` | `6d131ed8e7249b0ece41169e17d8d0162beae7e0` | `65d835a1749c0ac520fc3903fda01275165a3787` |
 | `hardware/qcom-caf/common` | [`fiftydinar/android_hardware_qcom-caf_common`](https://github.com/fiftydinar/android_hardware_qcom-caf_common) | `LineageOS/android_hardware_qcom-caf_common` | `1805784d14b386fce6127f2f06b5a16a3e9b94ed` | `1805784d14b386fce6127f2f06b5a16a3e9b94ed` |
 | `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `6a42341357a56903eea27a74fdb161a26402dcc3` | `6a42341357a56903eea27a74fdb161a26402dcc3` |
 
@@ -158,7 +158,9 @@ notification also offers **Copy code** when the latest message contains one clea
 4–8 digit code or 4–10 character alphanumeric token containing a digit near
 verification wording (for example, “verification code”, “OTP”, or “passcode”).
 The code is copied only after the user taps the action. Ambiguous detections and
-messages without a verification keyword are ignored.
+messages without a verification keyword are ignored. The keyword set covers all
+70 language codes shipped by Messaging (including both Serbian and Chinese
+scripts); detection accepts Unicode decimal digits and grouped three-digit codes.
 
 From the initialized build tree, run the detector/dispatch host tests and device
 intent/clipboard-payload tests with:
