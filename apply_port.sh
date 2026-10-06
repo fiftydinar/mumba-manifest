@@ -9,6 +9,7 @@ declare -A PATCH_TREE=(
   [device-mumba]="device/motorola/mumba"
   [mumba-refresh-defaults]="device/motorola/mumba"
   [speaker-eq-device]="device/motorola/mumba"
+  [display-srgb-device]="device/motorola/mumba"
   [settings-provider-refresh-defaults]="frameworks/base"
   [vendor-mumba]="vendor/motorola/mumba"
   [speaker-eq-vendor]="vendor/motorola/mumba"
@@ -16,6 +17,7 @@ declare -A PATCH_TREE=(
   [openeuicc-app]="packages/apps/OpenEUICC"
   [openeuicc-hide-launcher]="packages/apps/OpenEUICC"
   [settings-euicc-hardware-detection]="packages/apps/Settings"
+  [display-srgb-settings]="packages/apps/Settings"
   [uiccslot-physical-removable]="frameworks/opt/telephony"
   [dialer-autorecord]="packages/apps/Dialer"
   [perfd-client]="hardware/qcom-caf/common/libqti-perfd-client"
@@ -28,7 +30,7 @@ declare -A PATCH_TREE=(
   [display-refresh]="kernel/motorola/sm6435-devicetrees"
 )
 
-for name in device-mumba mumba-refresh-defaults speaker-eq-device settings-provider-refresh-defaults vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh; do
+for name in device-mumba mumba-refresh-defaults speaker-eq-device display-srgb-device settings-provider-refresh-defaults vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection display-srgb-settings uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh; do
   patch="$SELF_DIR/port/$name.patch"
   tree="${PATCH_TREE[$name]}"
   if [ ! -f "$patch" ]; then

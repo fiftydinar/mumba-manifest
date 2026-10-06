@@ -1,9 +1,10 @@
 # Ported changes: A17 (moto-elysia) -> A16 (ZaraKinYu device tree)
 
-`port/` contains twenty patches:
+`port/` contains twenty-two patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
 - `mumba-refresh-defaults.patch` -> `device/motorola/mumba` (clean-install refresh settings overlay)
 - `speaker-eq-device.patch` -> `device/motorola/mumba` (build and install the speaker-only EQ effect)
+- `display-srgb-device.patch` -> `device/motorola/mumba` (default to sRGB color management and initialize fresh installs in sRGB mode)
 - `settings-provider-refresh-defaults.patch` -> `frameworks/base` (seed optional refresh settings on initial settings database creation)
 - `vendor-mumba.patch` -> `vendor/motorola/mumba` (build fixes in generated vendor files)
 - `speaker-eq-vendor.patch` -> `vendor/motorola/mumba` (attach the speaker EQ, remove stale Dolby effects, and select the source QTI effect factory)
@@ -11,6 +12,7 @@
 - `openeuicc-app.patch` -> `packages/apps/OpenEUICC` (use AOSP datastore module)
 - `openeuicc-hide-launcher.patch` -> `packages/apps/OpenEUICC` (hide standalone launcher entry; keep the system LPA/LUI service)
 - `settings-euicc-hardware-detection.patch` -> `packages/apps/Settings` (only show Settings' Add SIM entry when Telephony detects an eUICC card)
+- `display-srgb-settings.patch` -> `packages/apps/Settings` (show a Native/sRGB color-mode selector in Display settings)
 - `uiccslot-physical-removable.patch` -> `frameworks/opt/telephony` (don't mark a physical SIM non-removable just because its slot is listed as an eUICC)
 - `dialer-autorecord.patch` -> `packages/apps/Dialer` (automatic call recording)
 - `perfd-client.patch` -> `hardware/qcom-caf/common/libqti-perfd-client` (missing QTI perf API stubs)
@@ -219,6 +221,22 @@ For short repeatable UiBench runs, pass `-e iterations 1` to
 navigation-drawer test performs four horizontal swipes per iteration. The
 standalone JankBench app cannot inject input events outside instrumentation on
 this Android build, so it is not used for automated results.
+
+## Display color mode
+
+The built-in display HAL reports `NATIVE` (0) and `SRGB` (7). `display-srgb-settings.patch`
+adds a **Display → Color mode** list with those two choices; Android's display manager
+persists the selected HWC mode. The list is shown only when the display reports both
+modes. `display-srgb-device.patch` changes SurfaceFlinger from unmanaged/native output
+to managed color output, removes the hard-forced color-mode property, and sets
+`config_defaultDisplayDefaultColorMode=7` so a fresh data partition starts in sRGB.
+Its post-fs-data action neutralizes stale persisted SurfaceFlinger mode properties
+before SurfaceFlinger starts, while DisplayManager's own saved HWC mode remains the
+user preference. This keeps Native selectable and preserves the selection over reboot.
+
+The device reports no wide-color display and no HDR output types; neither sRGB mode
+nor this UI adds P3 or HDR capability. The mode selector only chooses between the
+panel's native output and its hardware-composer sRGB mode.
 
 ## Touch latency
 

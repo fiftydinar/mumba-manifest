@@ -1,0 +1,223 @@
+diff --git a/res/values-b+sr+Latn/strings.xml b/res/values-b+sr+Latn/strings.xml
+--- a/res/values-b+sr+Latn/strings.xml
++++ b/res/values-b+sr+Latn/strings.xml
+@@ -1396,3 +1396,6 @@
+     <string name="screen_resolution_delimiter_a11y" msgid="5826162120538795842">"<xliff:g id="WIDTH">%1$s</xliff:g> sa <xliff:g id="HEIGHT">%2$s</xliff:g>"</string>
+     <string name="color_mode_title" msgid="8666690832113906028">"Boje"</string>
++    <string name="display_color_mode_title">Režim boja</string>
++    <string name="display_color_mode_native">Izvorno</string>
++    <string name="display_color_mode_srgb">sRGB</string>
+     <string name="color_mode_option_natural" msgid="6192875655101283303">"Prirodne"</string>
+diff --git a/res/values-sr/strings.xml b/res/values-sr/strings.xml
+--- a/res/values-sr/strings.xml
++++ b/res/values-sr/strings.xml
+@@ -1396,3 +1396,6 @@
+     <string name="screen_resolution_delimiter_a11y" msgid="5826162120538795842">"<xliff:g id="WIDTH">%1$s</xliff:g> са <xliff:g id="HEIGHT">%2$s</xliff:g>"</string>
+     <string name="color_mode_title" msgid="8666690832113906028">"Боје"</string>
++    <string name="display_color_mode_title">Режим боја</string>
++    <string name="display_color_mode_native">Изворно</string>
++    <string name="display_color_mode_srgb">sRGB</string>
+     <string name="color_mode_option_natural" msgid="6192875655101283303">"Природне"</string>
+diff --git a/res/values/arrays.xml b/res/values/arrays.xml
+--- a/res/values/arrays.xml
++++ b/res/values/arrays.xml
+@@ -19,3 +19,13 @@
+ -->
+ <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
++    <string-array name="display_color_mode_entries">
++        <item>@string/display_color_mode_native</item>
++        <item>@string/display_color_mode_srgb</item>
++    </string-array>
++
++    <string-array name="display_color_mode_values" translatable="false">
++        <item>0</item>
++        <item>7</item>
++    </string-array>
++
+     <!-- Display settings.  The delay in inactivity before the screen is turned off. These are shown in a list dialog. -->
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+--- a/res/values/strings.xml
++++ b/res/values/strings.xml
+@@ -3210,3 +3210,6 @@
+     <!-- Display settings screen, Color mode settings title [CHAR LIMIT=30] -->
+     <string name="color_mode_title">Colors</string>
++    <string name="display_color_mode_title">Color mode</string>
++    <string name="display_color_mode_native">Native</string>
++    <string name="display_color_mode_srgb">sRGB</string>
+     <!-- Display settings screen, Color mode option for "natural(sRGB) color"  [CHAR LIMIT=45] -->
+diff --git a/res/xml/display_settings.xml b/res/xml/display_settings.xml
+--- a/res/xml/display_settings.xml
++++ b/res/xml/display_settings.xml
+@@ -144,3 +144,11 @@
+             settings:requiresFeature="lineagehardware:FEATURE_DISPLAY_MODES" />
+-
++
++        <ListPreference
++            android:key="display_color_mode"
++            android:title="@string/display_color_mode_title"
++            android:entries="@array/display_color_mode_entries"
++            android:entryValues="@array/display_color_mode_values"
++            android:persistent="false"
++            settings:controller="com.android.settings.display.DisplayColorModePreferenceController" />
++
+         <Preference
+diff --git a/src/com/android/settings/display/DisplayColorModePreferenceController.java b/src/com/android/settings/display/DisplayColorModePreferenceController.java
+new file mode 100644
+--- /dev/null
++++ b/src/com/android/settings/display/DisplayColorModePreferenceController.java
+@@ -0,0 +1,155 @@
++/*
++ * Copyright (C) 2026 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.settings.display;
++
++import android.content.Context;
++import android.hardware.display.DisplayManager;
++import android.os.Handler;
++import android.os.Looper;
++import android.view.Display;
++
++import androidx.preference.ListPreference;
++import androidx.preference.Preference;
++import androidx.preference.PreferenceScreen;
++
++import com.android.settings.R;
++import com.android.settings.core.BasePreferenceController;
++import com.android.settingslib.core.lifecycle.LifecycleObserver;
++import com.android.settingslib.core.lifecycle.events.OnStart;
++import com.android.settingslib.core.lifecycle.events.OnStop;
++
++/** User-facing selector for the built-in display's native and sRGB color modes. */
++public class DisplayColorModePreferenceController extends BasePreferenceController
++        implements Preference.OnPreferenceChangeListener, DisplayManager.DisplayListener,
++        LifecycleObserver, OnStart, OnStop {
++
++    private final DisplayManager mDisplayManager;
++    private ListPreference mPreference;
++
++    public DisplayColorModePreferenceController(Context context, String key) {
++        super(context, key);
++        mDisplayManager = context.getSystemService(DisplayManager.class);
++    }
++
++    @Override
++    public int getAvailabilityStatus() {
++        final Display display = getDefaultDisplay();
++        return supportsColorMode(display, Display.COLOR_MODE_DEFAULT)
++                        && supportsColorMode(display, Display.COLOR_MODE_SRGB)
++                ? AVAILABLE : UNSUPPORTED_ON_DEVICE;
++    }
++
++    @Override
++    public void displayPreference(PreferenceScreen screen) {
++        super.displayPreference(screen);
++        mPreference = screen.findPreference(getPreferenceKey());
++        if (mPreference != null) {
++            mPreference.setOnPreferenceChangeListener(this);
++            updateState(mPreference);
++        }
++    }
++
++    @Override
++    public void updateState(Preference preference) {
++        super.updateState(preference);
++        final Display display = getDefaultDisplay();
++        if (display == null || !(preference instanceof ListPreference)) {
++            return;
++        }
++
++        final int colorMode = display.getColorMode();
++        final ListPreference listPreference = (ListPreference) preference;
++        listPreference.setValue(Integer.toString(colorMode));
++        listPreference.setSummary(colorMode == Display.COLOR_MODE_SRGB
++                ? R.string.display_color_mode_srgb : R.string.display_color_mode_native);
++    }
++
++    @Override
++    public boolean onPreferenceChange(Preference preference, Object newValue) {
++        if (!(newValue instanceof String)) {
++            return false;
++        }
++        final int colorMode;
++        try {
++            colorMode = Integer.parseInt((String) newValue);
++        } catch (NumberFormatException e) {
++            return false;
++        }
++        if (colorMode != Display.COLOR_MODE_DEFAULT && colorMode != Display.COLOR_MODE_SRGB) {
++            return false;
++        }
++
++        final Display display = getDefaultDisplay();
++        if (!supportsColorMode(display, colorMode)) {
++            return false;
++        }
++        display.requestColorMode(colorMode);
++        return true;
++    }
++
++    @Override
++    public void onStart() {
++        mDisplayManager.registerDisplayListener(this, new Handler(Looper.getMainLooper()));
++    }
++
++    @Override
++    public void onStop() {
++        mDisplayManager.unregisterDisplayListener(this);
++    }
++
++    @Override
++    public void onDisplayAdded(int displayId) {
++        updatePreference(displayId);
++    }
++
++    @Override
++    public void onDisplayChanged(int displayId) {
++        updatePreference(displayId);
++    }
++
++    @Override
++    public void onDisplayRemoved(int displayId) {
++        updatePreference(displayId);
++    }
++
++    @Override
++    public int getSliceHighlightMenuRes() {
++        return R.string.menu_key_display;
++    }
++
++    private Display getDefaultDisplay() {
++        return mDisplayManager.getDisplay(Display.DEFAULT_DISPLAY);
++    }
++
++    private void updatePreference(int displayId) {
++        if (displayId == Display.DEFAULT_DISPLAY && mPreference != null) {
++            updateState(mPreference);
++        }
++    }
++
++    private static boolean supportsColorMode(Display display, int colorMode) {
++        if (display == null) {
++            return false;
++        }
++        for (int supportedColorMode : display.getSupportedColorModes()) {
++            if (supportedColorMode == colorMode) {
++                return true;
++            }
++        }
++        return false;
++    }
++}

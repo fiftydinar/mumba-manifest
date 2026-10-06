@@ -1,0 +1,32 @@
+diff --git a/props/vendor.prop b/props/vendor.prop
+--- a/props/vendor.prop
++++ b/props/vendor.prop
+@@ -214,6 +209,6 @@ ro.vendor.hw.fps=true
+ ro.vendor.hw.pvtui=1
+-persist.sys.sf.color_mode=7
++persist.sys.sf.color_mode=0
+ persist.sys.sf.color_saturation=1.0
+ persist.sys.sf.force_brightness_capability=1
+-persist.sys.sf.native_mode=1
++persist.sys.sf.native_mode=0
+ ro.hardware.egl=adreno
+diff --git a/init/init.mmi.rc b/init/init.mmi.rc
+--- a/init/init.mmi.rc
++++ b/init/init.mmi.rc
+@@ -152,4 +152,7 @@
+ on post-fs-data
+     setprop ro.vendor.build.fingerprint ${ro.product.vendor.brand}/${ro.product.vendor.name}/${ro.product.vendor.device}:${ro.vendor.build.version.release}/${ro.vendor.build.id}/${ro.vendor.build.version.incremental}:${ro.vendor.build.type}/${ro.vendor.build.tags}
++    # Keep SurfaceFlinger's color management user-selectable across upgrades.
++    setprop persist.sys.sf.color_mode 0
++    setprop persist.sys.sf.native_mode 0
+-
++
+     setprop ro.product.model_for_attestation ${ro.product.vendor.model}
+diff --git a/overlay/FrameworksResMumba/res/values/config.xml b/overlay/FrameworksResMumba/res/values/config.xml
+--- a/overlay/FrameworksResMumba/res/values/config.xml
++++ b/overlay/FrameworksResMumba/res/values/config.xml
+@@ -434,2 +434,4 @@
+          default refresh-rate policy and Smooth Display. -->
++    <!-- Use sRGB as the initial color mode on fresh user data. -->
++    <integer name="config_defaultDisplayDefaultColorMode">7</integer>
+     <integer name="config_defaultRefreshRate">120</integer>
