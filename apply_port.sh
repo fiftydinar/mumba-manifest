@@ -23,11 +23,12 @@ declare -A PATCH_TREE=(
   [audiomanifest]="hardware/qcom-caf/sm8450-6.6/audio/primary-hal"
   [speaker-eq-audio]="hardware/qcom-caf/sm8450-6.6/audio/primary-hal"
   [speaker-eq-audioflinger]="frameworks/av"
+  [adb-root-debug]="packages/modules/adb"
   [touch-kbuild]="kernel/motorola/sm6435-modules"
   [display-refresh]="kernel/motorola/sm6435-devicetrees"
 )
 
-for name in device-mumba mumba-refresh-defaults speaker-eq-device settings-provider-refresh-defaults vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger touch-kbuild display-refresh; do
+for name in device-mumba mumba-refresh-defaults speaker-eq-device settings-provider-refresh-defaults vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh; do
   patch="$SELF_DIR/port/$name.patch"
   tree="${PATCH_TREE[$name]}"
   if [ ! -f "$patch" ]; then

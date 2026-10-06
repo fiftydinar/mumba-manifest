@@ -1,6 +1,6 @@
 # Ported changes: A17 (moto-elysia) -> A16 (ZaraKinYu device tree)
 
-`port/` contains nineteen patches:
+`port/` contains twenty patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
 - `mumba-refresh-defaults.patch` -> `device/motorola/mumba` (clean-install refresh settings overlay)
 - `speaker-eq-device.patch` -> `device/motorola/mumba` (build and install the speaker-only EQ effect)
@@ -18,6 +18,7 @@
 - `audiomanifest.patch` -> `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` (drop unregistered `IModule/usb`/`r_submix` from the audio VINTF manifest)
 - `speaker-eq-audio.patch` -> `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` (parse and route speaker device effects in the QTI AIDL effect factory)
 - `speaker-eq-audioflinger.patch` -> `frameworks/av` (allow this cut-only speaker device effect on the fast mixer output thread)
+- `adb-root-debug.patch` -> `packages/modules/adb` (default Rooted debugging on for debuggable builds unless a saved preference overrides it)
 - `touch-kbuild.patch` -> `kernel/motorola/sm6435-modules` (panel firmware selection, Chipone/Ilitek gesture flags, and DT2W input/wakeup fixes)
 - `display-refresh.patch` -> `kernel/motorola/sm6435-devicetrees` (24/25/30/40/48/50/60/80/90/96/100/120 Hz DFPS rates for all three mumba panels)
 
@@ -335,6 +336,16 @@ policy cannot instantiate the speaker effect.
 AudioFlinger's fast output thread normally rejects software device effects, so
 `speaker-eq-audioflinger.patch` permits only this exact speaker EQ UUID on the
 speaker device session; other effects retain the normal fast-thread restriction.
+
+## Rooted debugging on debug builds
+
+`adb-root-debug.patch` initializes ADBRootService's default to
+`ANDROID_DEBUGGABLE`. A fresh `userdebug` or `eng` data partition therefore
+starts with Rooted debugging enabled, while a `user` release build remains
+unsupported for `adb root`. A saved value in `/data/adbroot/enabled` takes
+precedence, so a developer can still switch Rooted debugging off and keep that
+choice across reboot; formatting data restores the build-variant default. This
+does not turn on USB debugging itself.
 
 ## SELinux audit and current boot findings
 

@@ -1,0 +1,9 @@
+diff --git a/root/adbroot_service.cpp b/root/adbroot_service.cpp
+--- a/root/adbroot_service.cpp
++++ b/root/adbroot_service.cpp
+@@ -85,4 +85,4 @@
+-ADBRootService::ADBRootService() : enabled_(false) {
++ADBRootService::ADBRootService() : enabled_(ANDROID_DEBUGGABLE) {
+     std::string buf;
+     if (ReadFileToString(kStoragePath + kEnabled, &buf)) {
+         enabled_ = Trim(buf) == "1";

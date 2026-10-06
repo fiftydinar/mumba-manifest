@@ -9,9 +9,9 @@ This repository contains:
 - `build.sh` - userdebug build; `SYNC=false` reuses the synced source tree.
 - `build_release.sh` + `sign_release.sh` - isolated `user` build and locally
   signed target-files/OTA release.
-- `apply_port.sh` + `port/` - nineteen local patches for device fixes, audio and
-  touchscreen compatibility, adaptive refresh rates, OpenEUICC/eSIM, and Dialer
-  auto call recording, applied on top of a fresh `repo sync`.
+- `apply_port.sh` + `port/` - twenty local patches for device fixes, audio,
+  debug tooling, touchscreen compatibility, adaptive refresh rates, OpenEUICC/eSIM,
+  and Dialer auto call recording, applied on top of a fresh `repo sync`.
 
 ## Usage
 
