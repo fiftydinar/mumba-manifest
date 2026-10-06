@@ -1,0 +1,45 @@
+diff --git a/Android.bp b/Android.bp
+--- a/Android.bp
++++ b/Android.bp
+@@ -25,6 +25,18 @@ install_symlink {
+ install_symlink {
+     name: "firmware_adrastea_WCNSS_qcom_cfg.ini_symlink",
+     vendor: true,
+     installed_location: "firmware/wlan/qca_cld/adrastea/WCNSS_qcom_cfg.ini",
+     symlink_target: "/vendor/etc/wifi/adrastea/WCNSS_qcom_cfg.ini",
+ }
++
++cc_library_shared {
++    name: "libmumba_speaker_eq",
++    vendor: true,
++    relative_install_path: "soundfx",
++    defaults: ["//hardware/interfaces/audio/aidl/default:aidlaudioeffectservice_defaults"],
++    srcs: [
++        "audio/speaker_eq/MumbaSpeakerEqualizer.cpp",
++        "//hardware/interfaces/audio/aidl/default:effectCommonFile",
++    ],
++    include_dirs: ["hardware/interfaces/audio/aidl/default/include"],
++}
+diff --git a/device.mk b/device.mk
+--- a/device.mk
++++ b/device.mk
+@@ -64,5 +64,6 @@ PRODUCT_PACKAGES += \
+     libdownmixaidl \
+     libdynamicsprocessingaidl \
+     libloudnessenhanceraidl \
++    libmumba_speaker_eq \
+     libreverbaidl \
+     libvisualizeraidl
+diff --git a/configs/audio/audio_module_config_primary.xml b/configs/audio/audio_module_config_primary.xml
+--- a/configs/audio/audio_module_config_primary.xml
++++ b/configs/audio/audio_module_config_primary.xml
+@@ -198,7 +198,7 @@ SPDX-License-Identifier: BSD-3-Clause-Clear
+     </devicePorts>
+     <routes>
+         <route type="mix" sink="earpiece" sources="low_latency_out,deep_buffer_out,direct_pcm_out,compress_offload_out,voip_playback,telephony_rx" />
+-        <route type="mix" sink="speaker" sources="low_latency_out,deep_buffer_out,direct_pcm_out,compress_offload_out,voip_playback,telephony_rx" />
++        <route type="mix" sink="speaker" sources="low_latency_out,deep_buffer_out,voip_playback,telephony_rx" />
+-
++
+         <route type="mix" sink="wired_headset" sources="low_latency_out,deep_buffer_out,direct_pcm_out,compress_offload_out,voip_playback,telephony_rx" />
+         <route type="mix" sink="wired_headphones" sources="low_latency_out,deep_buffer_out,direct_pcm_out,compress_offload_out,voip_playback,telephony_rx" />

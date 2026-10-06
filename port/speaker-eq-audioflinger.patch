@@ -1,0 +1,21 @@
+diff --git a/services/audioflinger/Threads.cpp b/services/audioflinger/Threads.cpp
+--- a/services/audioflinger/Threads.cpp
++++ b/services/audioflinger/Threads.cpp
+@@ -1524,7 +1524,16 @@ status_t ThreadBase::checkEffectCompatibility_l(
+                 ALOGW("%s: effect %s on playback thread in raw mode", __func__, desc->name);
+                 return BAD_VALUE;
+             }
+-            if ((desc->flags & EFFECT_FLAG_HW_ACC_TUNNEL) == 0) {
++            const bool isMumbaSpeakerEq =
++                    sessionId == AUDIO_SESSION_DEVICE &&
++                    desc->uuid.timeLow == 0x8de9f102u &&
++                    desc->uuid.timeMid == 0x4f4b &&
++                    desc->uuid.timeHiAndVersion == 0xa112 &&
++                    desc->uuid.clockSeq == 0x81a4 &&
++                    desc->uuid.node[0] == 0x6d && desc->uuid.node[1] == 0x75 &&
++                    desc->uuid.node[2] == 0x6d && desc->uuid.node[3] == 0x62 &&
++                    desc->uuid.node[4] == 0x61 && desc->uuid.node[5] == 0x02;
++            if ((desc->flags & EFFECT_FLAG_HW_ACC_TUNNEL) == 0 && !isMumbaSpeakerEq) {
+                 ALOGW("%s: non HW effect %s on playback thread in fast mode",
+                         __func__, desc->name);
+                 return BAD_VALUE;

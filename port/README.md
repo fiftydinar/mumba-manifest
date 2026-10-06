@@ -1,10 +1,12 @@
 # Ported changes: A17 (moto-elysia) -> A16 (ZaraKinYu device tree)
 
-`port/` contains fifteen patches:
+`port/` contains nineteen patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
 - `mumba-refresh-defaults.patch` -> `device/motorola/mumba` (clean-install refresh settings overlay)
+- `speaker-eq-device.patch` -> `device/motorola/mumba` (build and install the speaker-only EQ effect)
 - `settings-provider-refresh-defaults.patch` -> `frameworks/base` (seed optional refresh settings on initial settings database creation)
 - `vendor-mumba.patch` -> `vendor/motorola/mumba` (build fixes in generated vendor files)
+- `speaker-eq-vendor.patch` -> `vendor/motorola/mumba` (attach the speaker EQ, remove stale Dolby effects, and select the source QTI effect factory)
 - `openeuicc-deps.patch` -> `prebuilts/openeuicc-deps` (SDK 37 -> 36 for the A16 tree)
 - `openeuicc-app.patch` -> `packages/apps/OpenEUICC` (use AOSP datastore module)
 - `openeuicc-hide-launcher.patch` -> `packages/apps/OpenEUICC` (hide standalone launcher entry; keep the system LPA/LUI service)
@@ -14,6 +16,8 @@
 - `perfd-client.patch` -> `hardware/qcom-caf/common/libqti-perfd-client` (missing QTI perf API stubs)
 - `audio-kernel.patch` -> `kernel/motorola/sm6435-modules` (enable the mumba FS1815 amplifier modules)
 - `audiomanifest.patch` -> `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` (drop unregistered `IModule/usb`/`r_submix` from the audio VINTF manifest)
+- `speaker-eq-audio.patch` -> `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` (parse and route speaker device effects in the QTI AIDL effect factory)
+- `speaker-eq-audioflinger.patch` -> `frameworks/av` (allow this cut-only speaker device effect on the fast mixer output thread)
 - `touch-kbuild.patch` -> `kernel/motorola/sm6435-modules` (panel firmware selection, Chipone/Ilitek gesture flags, and DT2W input/wakeup fixes)
 - `display-refresh.patch` -> `kernel/motorola/sm6435-devicetrees` (24/25/30/40/48/50/60/80/90/96/100/120 Hz DFPS rates for all three mumba panels)
 
@@ -256,6 +260,81 @@ INTERACTION node looper started; jank went from 0.69% (4 missed deadlines) to
   audio boot-loop fix.
 - `BoardConfig.mk`: limits DTB/DTBO output to the two generic Parrot bases and two
   Mumba overlays, matching the stock layout.
+
+## Built-in speaker correction
+
+The [Notebookcheck Moto G57 Power review](https://www.notebookcheck.net/Huge-battery-and-sleek-design-Is-that-still-enough-against-Xiaomi-and-rivals-Motorola-Moto-G57-Power-review.1221966.0.html)
+embeds a Pink Noise SVG. Notebookcheck says it measures with a calibrated
+Earthworks M23R microphone at 15 cm and judges whether the audible bands are
+roughly equally loud. In the inline SVG, series 0 reports SPL 25.5, N 0.7,
+median 12, delta 6.5; series 1 is the loud curve (SPL 83.7 dB(A), N 56.8,
+median 66.3 dB(A), delta 9). The complete SVG readings are transcribed below.
+The x-axis values 31 and 63 are the graph's rounded labels for nominal 31.5 and
+63 Hz.
+
+| Hz | Series 0 dB(A) | Series 1 dB(A) |
+|---:|---:|---:|
+| 20 | 6.9 | 13.0 |
+| 25 | 11.7 | 17.8 |
+| 31.5 | 16.5 | 16.1 |
+| 40 | 21.7 | 21.6 |
+| 50 | 25.6 | 26.5 |
+| 63 | 24.1 | 25.2 |
+| 80 | 23.0 | 25.8 |
+| 100 | 23.1 | 24.7 |
+| 125 | 24.8 | 25.4 |
+| 160 | 25.3 | 34.7 |
+| 200 | 25.3 | 43.0 |
+| 250 | 23.3 | 51.2 |
+| 315 | 24.8 | 57.9 |
+| 400 | 19.2 | 60.6 |
+| 500 | 14.7 | 66.3 |
+| 630 | 14.8 | 68.8 |
+| 800 | 9.2 | 68.3 |
+| 1,000 | 7.3 | 76.9 |
+| 1,250 | 7.5 | 75.4 |
+| 1,600 | 8.7 | 74.4 |
+| 2,000 | 5.7 | 72.2 |
+| 2,500 | 12.0 | 68.9 |
+| 3,150 | 13.4 | 65.9 |
+| 4,000 | 9.9 | 65.8 |
+| 5,000 | 13.1 | 69.7 |
+| 6,300 | 9.2 | 73.4 |
+| 8,000 | 8.6 | 72.0 |
+| 10,000 | 10.0 | 63.9 |
+| 12,500 | 5.9 | 66.5 |
+| 16,000 | 5.6 | 53.1 |
+
+Notebookcheck's summary for this unit reports bass (100–315 Hz) 26.9% below its
+median, mids (400–2,000 Hz) 5.4% above, highs (2–16 kHz) 3.1% from median, and
+overall deviation 19.7%. Because the bass bins show the speaker's physical
+roll-off, the EQ applies **no positive gain** and does not try to force the
+entire spectrum down to the 100-Hz floor. Instead, a fixed cut-only parametric
+profile brings the 500-Hz–8-kHz area to about 65 dB(A), close to the chart's
+66.3-dB(A) median, with the 10-kHz and 16-kHz natural roll-offs retained.
+It is installed as an AIDL `deviceEffects` effect for `AUDIO_DEVICE_OUT_SPEAKER`,
+so wired and Bluetooth outputs are not processed. The profile is in
+`port/speaker-eq/MumbaSpeakerEqualizer.cpp`; its 1/3-octave correction centers
+are 630, 1,000, 1,250, 1,600, 2,000, 2,500, 5,000, 6,300, 8,000 and 12,500 Hz,
+with respective cuts of 2.9, 9.7, 6.6, 6.4, 4.6, 1.9, 2.9, 6.9, 5.5 and 1.0 dB.
+No boost is applied at any frequency.
+
+The built-in speaker route no longer advertises direct PCM or compressed-offload
+mix ports. Those paths can bypass software effects; speaker playback therefore
+falls back to AudioFlinger's mixer before reaching the speaker EQ. Other output
+devices retain their direct/offload routes. The trade-off is that high-resolution
+or compressed playback through the phone speaker may use more CPU/battery and
+will be mixed/resampled instead of bit-perfect.
+
+The QTI factory's original parser did not handle AIDL `deviceEffects`; the
+`speaker-eq-audio.patch` adds that support for the built-in speaker device.
+`speaker-eq-vendor.patch` selects the matching source QTI effect factory rather
+than the older vendor prebuilt and removes Dolby entries whose libraries are not
+present in this Dolby-free build. Without those parser/config fixes, audio
+policy cannot instantiate the speaker effect.
+AudioFlinger's fast output thread normally rejects software device effects, so
+`speaker-eq-audioflinger.patch` permits only this exact speaker EQ UUID on the
+speaker device session; other effects retain the normal fast-thread restriction.
 
 ## SELinux audit and current boot findings
 

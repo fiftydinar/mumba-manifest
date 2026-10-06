@@ -1,0 +1,82 @@
+diff --git a/hal/effects/Android.bp b/hal/effects/Android.bp
+index aaaca52bd..382f6a182 100644
+--- a/hal/effects/Android.bp
++++ b/hal/effects/Android.bp
+@@ -51,3 +51,6 @@ cc_library_shared {
+     name: "libaudioeffecthal.qti",
+-    defaults: ["aidlaudioeffectserviceqti_defaults"],
++    defaults: [
++        "aidlaudioeffectserviceqti_defaults",
++        "latest_android_media_audio_common_types_cpp_export_shared",
++    ],
+     owner: "qti",
+diff --git a/hal/effects/EffectConfig.cpp b/hal/effects/EffectConfig.cpp
+index 4971190b9..1fef7e1fc 100644
+--- a/hal/effects/EffectConfig.cpp
++++ b/hal/effects/EffectConfig.cpp
+@@ -24,2 +24,6 @@
+ #include <android-base/logging.h>
++#include <aidl/android/media/audio/common/AudioDevice.h>
++#include <aidl/android/media/audio/common/AudioDeviceAddress.h>
++#include <aidl/android/media/audio/common/AudioDeviceDescription.h>
++#include <aidl/android/media/audio/common/AudioDeviceType.h>
+ #include <system/audio_effects/audio_effects_conf.h>
+@@ -33,2 +37,6 @@ using aidl::android::media::audio::common::AudioSource;
+ using aidl::android::media::audio::common::AudioStreamType;
++using aidl::android::media::audio::common::AudioDevice;
++using aidl::android::media::audio::common::AudioDeviceAddress;
++using aidl::android::media::audio::common::AudioDeviceDescription;
++using aidl::android::media::audio::common::AudioDeviceType;
+ using aidl::android::media::audio::common::AudioUuid;
+@@ -81,2 +89,9 @@ EffectConfig::EffectConfig(const std::string& file) {
+         }
++
++        // Device-specific output effects (speaker, wired headset, and so on).
++        for (auto& xmlDeviceEffects : getChildren(xmlConfig, "deviceEffects")) {
++            for (auto& xmlDevice : getChildren(xmlDeviceEffects, "device")) {
++                registerFailure(parseProcessing(Processing::Type::device, xmlDevice));
++            }
++        }
+     }
+@@ -191,3 +206,4 @@ bool EffectConfig::parseLibrary(const tinyxml2::XMLElement& xml, struct Library&
+ std::optional<Processing::Type> EffectConfig::stringToProcessingType(Processing::Type::Tag typeTag,
+-                                                                     const std::string& type) {
++                                                                     const std::string& type,
++                                                                     const std::string& address) {
+     // see list of audio stream types in audio_stream_type_t:
+@@ -234,2 +250,19 @@ std::optional<Processing::Type> EffectConfig::stringToProcessingType(Processing:
+         }
++    } else if (typeTag == Processing::Type::device) {
++        if (type != "AUDIO_DEVICE_OUT_SPEAKER") {
++            LOG(ERROR) << __func__ << " unsupported device type " << type;
++            return std::nullopt;
++        }
++        AudioDeviceAddress deviceAddress;
++        deviceAddress.set<AudioDeviceAddress::id>(address);
++        AudioDevice device = {
++                .type = AudioDeviceDescription{
++                        .type = AudioDeviceType::OUT_SPEAKER,
++                        .connection = "",
++                },
++                .address = deviceAddress,
++        };
++        Processing::Type result;
++        result.set<Processing::Type::device>(device);
++        return result;
+     }
+@@ -241,3 +274,4 @@ bool EffectConfig::parseProcessing(Processing::Type::Tag typeTag, const tinyxml2
+     const char* typeStr = xml.Attribute("type");
+-    auto aidlType = stringToProcessingType(typeTag, typeStr);
++    const char* addressStr = xml.Attribute("address");
++    auto aidlType = stringToProcessingType(typeTag, typeStr, addressStr ? addressStr : "");
+     RETURN_VALUE_IF(!aidlType.has_value(), false, "illegalStreamType");
+diff --git a/hal/effects/include/effectFactory-impl/EffectConfig.h b/hal/effects/include/effectFactory-impl/EffectConfig.h
+index 67fa0d20a..cc2fa2f7e 100644
+--- a/hal/effects/include/effectFactory-impl/EffectConfig.h
++++ b/hal/effects/include/effectFactory-impl/EffectConfig.h
+@@ -139,3 +139,4 @@ class EffectConfig {
+     std::optional<Processing::Type> stringToProcessingType(Processing::Type::Tag typeTag,
+-                                                           const std::string& type);
++                                                           const std::string& type,
++                                                           const std::string& address);
+ };

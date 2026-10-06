@@ -9,7 +9,7 @@ This repository contains:
 - `build.sh` - userdebug build; `SYNC=false` reuses the synced source tree.
 - `build_release.sh` + `sign_release.sh` - isolated `user` build and locally
   signed target-files/OTA release.
-- `apply_port.sh` + `port/` - fifteen local patches for device fixes, audio and
+- `apply_port.sh` + `port/` - nineteen local patches for device fixes, audio and
   touchscreen compatibility, adaptive refresh rates, OpenEUICC/eSIM, and Dialer
   auto call recording, applied on top of a fresh `repo sync`.
 
@@ -205,4 +205,5 @@ Do not fork `LineageOS/android` directly: its `fetch=".."` would break every rem
   Dialer via `dialer-autorecord.patch` (Gerrit change 251235, never merged upstream).
 - Audio compatibility patches enable the Mumba FS1815 modules, restore the vendor
   audio policy volumes file, add missing QTI perf symbols, and match the stock
-  two-DTB/two-DTBO layout.
+  two-DTB/two-DTBO layout. The built-in speaker receives a speaker-only,
+  cut-only Pink Noise correction derived from Notebookcheck measurements.
