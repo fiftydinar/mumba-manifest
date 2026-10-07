@@ -14,7 +14,7 @@
   <project name="android_device_motorola_mumba"
            path="device/motorola/mumba"
            remote="mine"
-           revision="c87184155fc8482f4dd469aa67b0ab98049cb735" />
+           revision="ace9a99ae1cb20fa1a3b5b7e7b52707d25faa4e9" />
 
   <!-- vendor blobs -->
   <project name="vendor_motorola_mumba_latest"
@@ -60,7 +60,7 @@
   <project name="android_frameworks_base"
            path="frameworks/base"
            remote="mine"
-           revision="1c45e31a86be95f51a94ffd1a5014c3fb2019112" />
+           revision="427389d5e0a2fc4ad54db6d0fe49a420b7675156" />
 
   <remove-project name="LineageOS/android_frameworks_opt_telephony" />
   <project name="android_frameworks_opt_telephony"
