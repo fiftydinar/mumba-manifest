@@ -12,6 +12,9 @@ This repository contains:
 - `apply_port.sh` + `port/` - twenty-two local patches for device fixes, audio,
   debug tooling, touchscreen compatibility, adaptive refresh rates, OpenEUICC/eSIM,
   and Dialer auto call recording, applied on top of a fresh `repo sync`.
+- The device tree includes the small, pre-signed microG FakeStore package stub;
+  the framework fork contains restricted package-signature and Java boot-property
+  compatibility mappings.
 
 ## Usage
 
@@ -87,6 +90,7 @@ trust.
 | Path | Repository | Purpose |
 |---|---|---|
 | `device/motorola/mumba` | [fiftydinar/android_device_motorola_mumba](https://github.com/fiftydinar/android_device_motorola_mumba) | forked ZaraKinYu device tree; builds the kernel from source |
+| `device/motorola/mumba/fakestore` | [fiftydinar/android_device_motorola_mumba](https://github.com/fiftydinar/android_device_motorola_mumba) | upstream microG FakeStore v0.2.1 package stub; no GmsCore or Internet permission |
 | `vendor/motorola/mumba` | [fiftydinar/vendor_motorola_mumba_latest](https://github.com/fiftydinar/vendor_motorola_mumba_latest) | forked lostsignal vendor tree; proprietary blobs and device firmware |
 | `hardware/motorola` | [fiftydinar/android_hardware_motorola](https://github.com/fiftydinar/android_hardware_motorola) | forked Motorola HAL |
 | `kernel/motorola/sm6435` | [fiftydinar/android_kernel_motorola_sm6435](https://github.com/fiftydinar/android_kernel_motorola_sm6435) | forked kernel source (Kbuild) |
@@ -107,7 +111,9 @@ The additional Snapdragon Services executable and init rc are on the
 [`mumba-vendor-service-blobs` branch](https://github.com/fiftydinar/vendor_motorola_mumba_latest/tree/mumba-vendor-service-blobs/proprietary/vendor)
 and are included by the vendor commit pinned in `mumba.xml`.
 
-Everything else (framework, etc.) comes from the **official LineageOS** manifest.
+Unlisted projects come from the **official LineageOS** manifest. `frameworks/base`
+is the pinned fork listed below because it carries the microG and Java boot-property
+compatibility changes.
 
 ## Source revisions
 
@@ -115,7 +121,7 @@ The following revisions are pinned in `mumba.xml`:
 
 | Path | GitHub copy | Original upstream | Upstream source commit | `mumba.xml` pin |
 |---|---|---|---|---|
-| `device/motorola/mumba` | [`fiftydinar/android_device_motorola_mumba`](https://github.com/fiftydinar/android_device_motorola_mumba) | `ZaraKinYu-Playground/android_device_motorola_mumba` | `c87184155fc8482f4dd469aa67b0ab98049cb735` | `c87184155fc8482f4dd469aa67b0ab98049cb735` |
+| `device/motorola/mumba` | [`fiftydinar/android_device_motorola_mumba`](https://github.com/fiftydinar/android_device_motorola_mumba) | `ZaraKinYu-Playground/android_device_motorola_mumba` | `c87184155fc8482f4dd469aa67b0ab98049cb735` | `ace9a99ae1cb20fa1a3b5b7e7b52707d25faa4e9` |
 | `vendor/motorola/mumba` | [`fiftydinar/vendor_motorola_mumba_latest`](https://github.com/fiftydinar/vendor_motorola_mumba_latest) | `lostsignal-502/vendor_motorola_mumba_latest` | `8bcc9d41ca36b5e2ae93d592226eac163225ade9` | `3d41a357a60816d19321e74714f8bb6dfc024b43` |
 | `hardware/motorola` | [`fiftydinar/android_hardware_motorola`](https://github.com/fiftydinar/android_hardware_motorola) | `lostsignal-502/android_hardware_motorola` | `8cee9a14b9bd59b1d4eeab69d838569a0935a106` | `8cee9a14b9bd59b1d4eeab69d838569a0935a106` |
 | `kernel/motorola/sm6435` | [`fiftydinar/android_kernel_motorola_sm6435`](https://github.com/fiftydinar/android_kernel_motorola_sm6435) | `ZaraKinYu-Playground/android_kernel_motorola_sm6435` | `2df509385d9c1df4c65a01cfda0302e7de52fc75` | `2df509385d9c1df4c65a01cfda0302e7de52fc75` |
@@ -134,7 +140,7 @@ upstream base SHAs are from the resolved `lineage-23.2` manifest
 
 | Project path | GitHub copy | Original upstream | Base commit | `mumba.xml` pin |
 |---|---|---|---|---|
-| `frameworks/base` | [`fiftydinar/android_frameworks_base`](https://github.com/fiftydinar/android_frameworks_base) | `LineageOS/android_frameworks_base` | `1c45e31a86be95f51a94ffd1a5014c3fb2019112` | `1c45e31a86be95f51a94ffd1a5014c3fb2019112` |
+| `frameworks/base` | [`fiftydinar/android_frameworks_base`](https://github.com/fiftydinar/android_frameworks_base) | `LineageOS/android_frameworks_base` | `1c45e31a86be95f51a94ffd1a5014c3fb2019112` | `427389d5e0a2fc4ad54db6d0fe49a420b7675156` |
 | `frameworks/opt/telephony` | [`fiftydinar/android_frameworks_opt_telephony`](https://github.com/fiftydinar/android_frameworks_opt_telephony) | `LineageOS/android_frameworks_opt_telephony` | `566e62daf4e93be6f934001bc76d60aba087b4d6` | `566e62daf4e93be6f934001bc76d60aba087b4d6` |
 | `packages/apps/Settings` | [`fiftydinar/android_packages_apps_Settings`](https://github.com/fiftydinar/android_packages_apps_Settings) | `LineageOS/android_packages_apps_Settings` | `8d8f6486b274bcf0aa6e5d0cbba52c0b05ae5c65` | `8d8f6486b274bcf0aa6e5d0cbba52c0b05ae5c65` |
 | `packages/apps/Dialer` | [`fiftydinar/android_packages_apps_Dialer`](https://github.com/fiftydinar/android_packages_apps_Dialer) | `LineageOS/android_packages_apps_Dialer` | `6da8042323a97d5b3cba1fd975709cc42f29916f` | `6da8042323a97d5b3cba1fd975709cc42f29916f` |
@@ -143,7 +149,33 @@ upstream base SHAs are from the resolved `lineage-23.2` manifest
 | `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `6a42341357a56903eea27a74fdb161a26402dcc3` | `6a42341357a56903eea27a74fdb161a26402dcc3` |
 
 The GitHub projects are forks, except for the two OpenEUICC repositories,
-which are full GitHub mirrors of their original Gitea repositories.
+which are full GitHub mirrors of their original Gitea repositories. The FakeStore
+and framework changes are kept on topic branches (`feature/mumba-fakestore` and
+`feature/mumba-microg-user-build`); `mumba.xml` pins their exact commits.
+
+## FakeStore and Java compatibility behavior
+
+The ROM installs the upstream microG FakeStore v0.2.1 as `com.android.vending`
+in all build variants. The APK is pre-signed and has no `INTERNET` permission.
+It only supplies the Play Store package identity and stub interfaces; it does
+not include GmsCore, implement Google Play Services APIs, or contact Google
+servers. The PackageManager reports the fixed Google certificate only for the
+allowlisted microG package names when the package is signed by the upstream
+microG release certificate and carries the expected fake-signature metadata.
+
+The framework's Java `SystemProperties.get()` returns
+`ro.boot.flash.locked=1` and `ro.boot.verifiedbootstate=green`. This does not
+change the underlying boot properties, the actual unlocked bootloader state,
+native property reads, or Keystore attestation; it is not a general root-hiding
+patch.
+
+### GApps coexistence
+
+Google Play Store also uses `com.android.vending`, but is signed with Google's
+key rather than microG's. It cannot be installed as a normal APK update over
+FakeStore. A GApps installer must remove/replace the stub's system APK before
+the next boot. This has not yet been tested against a specific GApps ZIP, so do
+not assume every GApps installer replaces it automatically.
 
 OpenEUICC's submodules also use GitHub forks, pinned by the OpenEUICC gitlinks:
 
