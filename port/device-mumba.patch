@@ -66,7 +66,8 @@ index 9dea7e6..86cd418 100644
 
 @@ -237,10 +252,13 @@ ENABLE_VENDOR_RIL_SERVICE := true
  include device/lineage/sepolicy/libperfmgr/sepolicy.mk
- include device/qcom/sepolicy_vndr/SEPolicy.mk
+-include device/qcom/sepolicy_vndr/SEPolicy.mk
++include hardware/qcom-caf/common/os_pickup_sepolicy_vndr.mk
  include hardware/motorola/sepolicy/qti/SEPolicy.mk
 +BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor
  
@@ -338,7 +339,7 @@ index 2fa61c0..0b5ac3d 100644
  # Dalvik
  $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
  
-@@ -143,7 +149,8 @@ PRODUCT_COPY_FILES += \
+@@ -143,9 +149,10 @@ PRODUCT_COPY_FILES += \
  
  # eUICC
  PRODUCT_PACKAGES += \
@@ -346,8 +347,10 @@ index 2fa61c0..0b5ac3d 100644
 +    MotoEuicc \
 +    OpenEUICC
  
- # DRM
- PRODUCT_PACKAGES += \
+ # MindTheGapps supplies real Phonesky when GApps are built into the ROM.
+ ifneq ($(WITH_GMS),true)
+ PRODUCT_PACKAGES += FakeStore
+ endif
 @@ -219,6 +226,9 @@ $(call soong_config_set,lineage_health,charging_control_charging_enabled,0)
  $(call soong_config_set,lineage_health,charging_control_charging_path,/sys/class/power_supply/battery/device/force_charging_disable)
  $(call soong_config_set,lineage_health_bool,charging_control_supports_bypass,false)
@@ -744,12 +747,14 @@ diff --git a/overlay/FrameworksResMumba/res/values/config.xml b/overlay/Framewor
 index 9486cb0..0a3a8cf 100644
 --- a/overlay/FrameworksResMumba/res/values/config.xml
 +++ b/overlay/FrameworksResMumba/res/values/config.xml
-@@ -430,4 +430,9 @@
+@@ -430,4 +430,11 @@
      <!-- Specifies the maximum burn-in offset vertically. -->
      <integer name="config_burnInProtectionMaxVerticalOffset">40</integer>
  
 +    <!-- Expose the panel's full adaptive range (30/60/90/120 Hz) to the
 +         default refresh-rate policy and Smooth Display. -->
++    <!-- Use sRGB as the initial color mode on fresh user data. -->
++    <integer name="config_defaultDisplayDefaultColorMode">7</integer>
 +    <integer name="config_defaultRefreshRate">120</integer>
 +    <integer name="config_defaultPeakRefreshRate">120</integer>
 +

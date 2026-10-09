@@ -21,8 +21,13 @@ fi
 OUT_DIR="$(cd "$OUT_DIR" && pwd -P)"
 PRODUCT_OUT="$OUT_DIR/target/product/mumba"
 HOST_TOOLS="$OUT_DIR/host/linux-x86"
+JAVA_HOME="$SRC/prebuilts/jdk/jdk21/linux-x86"
 SIGN_TOOL="$HOST_TOOLS/bin/sign_target_files_apks"
 OTA_TOOL="$HOST_TOOLS/bin/ota_from_target_files"
+
+[[ -x "$JAVA_HOME/bin/java" ]] || { echo "error: missing bundled Java runtime: $JAVA_HOME/bin/java" >&2; exit 1; }
+export JAVA_HOME
+export PATH="$HOST_TOOLS/bin:$JAVA_HOME/bin:$SRC/prebuilts/tools-lineage/linux-x86/bin:$SRC/prebuilts/build-tools/linux-x86/bin:$PATH"
 
 KEY_DIR="$1"
 [[ -d "$KEY_DIR" ]] || { echo "error: signing key directory not found: $KEY_DIR" >&2; exit 1; }
@@ -70,6 +75,15 @@ if ! unzip -p "$TARGET_FILES" SYSTEM/build.prop | grep -Fx 'ro.build.type=user' 
   exit 1
 fi
 
+if [[ ! -x "$SIGN_TOOL" || ! -x "$OTA_TOOL" ]]; then
+  OTATOOLS_ZIP="$OUT_DIR/soong/.intermediates/build/make/tools/otatools_package/otatools-package/linux_glibc_x86_64/gen/otatools.zip"
+  [[ -f "$OTATOOLS_ZIP" ]] || {
+    echo "error: releasetools are missing; build the otatools-package target first" >&2
+    exit 1
+  }
+  echo "### extracting host releasetools from $OTATOOLS_ZIP"
+  unzip -n -q "$OTATOOLS_ZIP" -d "$HOST_TOOLS"
+fi
 [[ -x "$SIGN_TOOL" ]] || { echo "error: missing releasetools binary: $SIGN_TOOL" >&2; exit 1; }
 [[ -x "$OTA_TOOL" ]] || { echo "error: missing releasetools binary: $OTA_TOOL" >&2; exit 1; }
 
@@ -89,8 +103,10 @@ fi
 SIGNED_TARGET_FILES="$RELEASE_DIR/lineage_mumba-signed-target_files.zip"
 SIGNED_OTA="$RELEASE_DIR/lineage_mumba-signed-ota.zip"
 
+cd "$SRC"
 echo "### signing target-files with release APK/OTA and AVB keys"
 "$SIGN_TOOL" -p "$HOST_TOOLS" -o -d "$KEY_DIR" \
+  -e "Phonesky.apk=" \
   -k "build/make/target/product/security/nfc=$KEY_DIR/nfc" \
   --override_apex_keys "$KEY_DIR/apex-payload-rsa4096.pem" \
   --avb_vbmeta_algorithm SHA256_RSA4096 \

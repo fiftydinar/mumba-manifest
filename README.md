@@ -9,9 +9,12 @@ This repository contains:
 - `build.sh` - userdebug build; `SYNC=false` reuses the synced source tree.
 - `build_release.sh` + `sign_release.sh` - isolated `user` build and locally
   signed target-files/OTA release.
-- `apply_port.sh` + `port/` - twenty-two local patches for device fixes, audio,
+- `publish_release.sh` + `ota/` - publish a signed A/B OTA to GitHub Releases
+  and update the LineageOS Updater feed on `main`.
+- `apply_port.sh` + `port/` - twenty-three local patches for device fixes, audio,
   debug tooling, touchscreen compatibility, adaptive refresh rates, OpenEUICC/eSIM,
-  and Dialer auto call recording, applied on top of a fresh `repo sync`.
+  Dialer auto call recording, and the OTA feed URL, applied on top of a fresh
+  `repo sync`; it also installs the required QCOM CAF Soong namespace markers.
 - The device tree includes the small, pre-signed microG FakeStore package stub;
   the framework fork contains restricted package-signature and Java boot-property
   compatibility mappings.
@@ -46,7 +49,9 @@ Output: `out/target/product/mumba/lineage-23.2-*-mumba.zip`
 
 `build_release.sh` uses a separate source tree (`$HOME/Documenti/lineage-mumba-release`)
 and output directory, so it leaves the normal userdebug checkout and artifacts
-alone. It builds `lineage_mumba-bp4a-user` and creates a target-files package.
+alone. It builds `lineage_mumba-bp4a-user`, the target-files package, and the
+host releasetools required to sign it. The default release concurrency is two
+jobs; override with `JOBS` if the build host has more memory.
 For subsequent builds in that tree, `SYNC=false bash build_release.sh` skips
 `repo sync`; patch application is safe to repeat. The normal debug build can
 likewise be rebuilt without syncing using `SYNC=false bash build.sh`.
@@ -84,6 +89,37 @@ updates. The script refuses to overwrite a non-empty output directory or use
 keys inside the repo/source tree. These are personal ROM/AVB keys, not Motorola
 OEM keys, so they do not enable relocking the bootloader or OEM Verified Boot
 trust.
+
+### Publish an OTA to GitHub Releases
+
+The ROM includes the LineageOS **Updater** app and uses Android's A/B
+`update_engine`. `apply_port.sh` configures it to read the current update feed at
+[`ota/updates.json`](ota/updates.json) from this repository's `main` branch.
+Each published release contains the signed full OTA and a SHA-256 sidecar; the
+feed points to the versioned GitHub Release asset. The updater downloads and
+verifies the signed OTA, installs it to the inactive slot with `update_engine`,
+and prompts for a reboot.
+
+After `build_release.sh` and `sign_release.sh` complete, publish with GitHub CLI
+authenticated as a user who can publish releases and push to `main`. The fourth
+argument optionally adds a recovery image and its checksum sidecar:
+
+```bash
+SRC="$HOME/Documenti/lineage-mumba-release" \
+  bash publish_release.sh "mumba-23.2-YYYYMMDD" \
+  "$HOME/Documenti/lineage-mumba-release/out/target/product/mumba/release-signed" \
+  "" "$HOME/Scaricati/recovery.img"
+```
+
+The script validates that the target-files package is a `user` build for mumba
+and matches the signed A/B OTA metadata, uploads the OTA and checksum as the
+latest GitHub Release, then commits and pushes the new feed entry to `main`.
+Use a new tag for each release. The manifest checkout must be clean, on `main`,
+and synchronized with `origin/main`. If publishing succeeds but the feed push is
+interrupted, the release remains available; resolve the local manifest commit
+and push it to `main` to publish its feed entry.
+
+The feed generator tests can be run with `python3 -m unittest discover -s tests`.
 
 ## Components
 

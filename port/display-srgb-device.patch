@@ -22,11 +22,3 @@ diff --git a/init/init.mmi.rc b/init/init.mmi.rc
 -
 +
      setprop ro.product.model_for_attestation ${ro.product.vendor.model}
-diff --git a/overlay/FrameworksResMumba/res/values/config.xml b/overlay/FrameworksResMumba/res/values/config.xml
---- a/overlay/FrameworksResMumba/res/values/config.xml
-+++ b/overlay/FrameworksResMumba/res/values/config.xml
-@@ -434,2 +434,4 @@
-          default refresh-rate policy and Smooth Display. -->
-+    <!-- Use sRGB as the initial color mode on fresh user data. -->
-+    <integer name="config_defaultDisplayDefaultColorMode">7</integer>
-     <integer name="config_defaultRefreshRate">120</integer>

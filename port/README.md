@@ -1,7 +1,8 @@
 # Ported changes: A17 (moto-elysia) -> A16 (ZaraKinYu device tree)
 
-`port/` contains twenty-two patches:
+`port/` contains twenty-three patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
+- `mumba-ota-updater.patch` -> `device/motorola/mumba` (LineageOS Updater feed URL for signed GitHub OTA releases)
 - `mumba-refresh-defaults.patch` -> `device/motorola/mumba` (clean-install refresh settings overlay)
 - `speaker-eq-device.patch` -> `device/motorola/mumba` (build and install the speaker-only EQ effect)
 - `display-srgb-device.patch` -> `device/motorola/mumba` (default to sRGB color management and initialize fresh installs in sRGB mode)
@@ -54,6 +55,11 @@ The device/vendor changes backport important fixes from the A17 device tree to
 the A16 (LineageOS 23.2) tree. Dolby and Viper are intentionally NOT ported.
 
 ## What is ported
+
+`apply_port.sh` also installs the QCOM CAF `soong_namespace` marker files for
+the supported SoC trees. These compatibility files are missing from the
+upstream project checkouts and prevent unrelated SoC modules from colliding
+during a clean Soong bootstrap.
 
 | File | Purpose |
 |---|---|

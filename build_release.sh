@@ -4,9 +4,10 @@ set -euo pipefail
 
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC="${SRC:-$HOME/Documenti/lineage-mumba-release}"
-OUT_DIR="${OUT_DIR:-$SRC/out}"
+OUT_DIR="${OUT_DIR:-out}"
 TARGET="${TARGET:-lineage_mumba-bp4a-user}"
-BUILD_TARGET="${BUILD_TARGET:-target-files-package}"
+BUILD_TARGET="${BUILD_TARGET:-target-files-package otatools-package}"
+JOBS="${JOBS:-2}"
 
 if [[ "$TARGET" != *-user ]]; then
   echo "error: release target must use the user build variant, got: $TARGET" >&2
@@ -17,5 +18,5 @@ case " $BUILD_TARGET " in
   *) echo "error: BUILD_TARGET must include target-files-package" >&2; exit 1 ;;
 esac
 
-export SRC OUT_DIR TARGET BUILD_TARGET
+export SRC OUT_DIR TARGET BUILD_TARGET JOBS
 exec bash "$SELF_DIR/build.sh"

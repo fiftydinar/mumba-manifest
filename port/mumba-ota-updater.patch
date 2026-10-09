@@ -1,0 +1,7 @@
+diff --git a/lineage_mumba.mk b/lineage_mumba.mk
+--- a/lineage_mumba.mk
++++ b/lineage_mumba.mk
+@@ -22,1 +22,3 @@
++PRODUCT_PRODUCT_PROPERTIES += lineage.updater.uri=https://raw.githubusercontent.com/fiftydinar/mumba-manifest/main/ota/updates.json
++
+ PRODUCT_GMS_CLIENTID_BASE := android-motorola
