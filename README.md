@@ -158,7 +158,7 @@ The following revisions are pinned in `mumba.xml`:
 
 | Path | GitHub copy | Original upstream | Upstream source commit | `mumba.xml` pin |
 |---|---|---|---|---|
-| `device/motorola/mumba` | [`fiftydinar/android_device_motorola_mumba`](https://github.com/fiftydinar/android_device_motorola_mumba) | `ZaraKinYu-Playground/android_device_motorola_mumba` | `c87184155fc8482f4dd469aa67b0ab98049cb735` | `a415c78f5969360b6c7ccc30c40f780de5296e0d` |
+| `device/motorola/mumba` | [`fiftydinar/android_device_motorola_mumba`](https://github.com/fiftydinar/android_device_motorola_mumba) | `ZaraKinYu-Playground/android_device_motorola_mumba` | `c87184155fc8482f4dd469aa67b0ab98049cb735` | `95204226d3d83f569aa0e9c84bdf2a60eef960e7` |
 | `vendor/motorola/mumba` | [`fiftydinar/vendor_motorola_mumba_latest`](https://github.com/fiftydinar/vendor_motorola_mumba_latest) | `lostsignal-502/vendor_motorola_mumba_latest` | `8bcc9d41ca36b5e2ae93d592226eac163225ade9` | `3d41a357a60816d19321e74714f8bb6dfc024b43` |
 | `hardware/motorola` | [`fiftydinar/android_hardware_motorola`](https://github.com/fiftydinar/android_hardware_motorola) | `lostsignal-502/android_hardware_motorola` | `8cee9a14b9bd59b1d4eeab69d838569a0935a106` | `8cee9a14b9bd59b1d4eeab69d838569a0935a106` |
 | `kernel/motorola/sm6435` | [`fiftydinar/android_kernel_motorola_sm6435`](https://github.com/fiftydinar/android_kernel_motorola_sm6435) | `ZaraKinYu-Playground/android_kernel_motorola_sm6435` | `2df509385d9c1df4c65a01cfda0302e7de52fc75` | `2df509385d9c1df4c65a01cfda0302e7de52fc75` |
