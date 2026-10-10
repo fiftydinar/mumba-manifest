@@ -90,7 +90,7 @@
   <project name="android_hardware_qcom-caf_common"
            path="hardware/qcom-caf/common"
            remote="mine"
-           revision="1805784d14b386fce6127f2f06b5a16a3e9b94ed" />
+           revision="5cd53603d36aaddd9ba9d882dad5411f1b30fbed" />
 
   <!-- Keep the other CAF audio trees from the resolved LineageOS manifest. -->
   <remove-project name="LineageOS/android_hardware_qcom_audio-ar" />

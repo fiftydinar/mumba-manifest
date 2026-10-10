@@ -50,7 +50,7 @@ are from the resolved `lineage-23.2` manifest.
 | `packages/apps/Settings` | [`android_packages_apps_Settings`](https://github.com/fiftydinar/android_packages_apps_Settings) | `8d8f6486b274bcf0aa6e5d0cbba52c0b05ae5c65` |
 | `packages/apps/Dialer` | [`android_packages_apps_Dialer`](https://github.com/fiftydinar/android_packages_apps_Dialer) | `6da8042323a97d5b3cba1fd975709cc42f29916f` |
 | `packages/apps/Updater` | [`android_packages_apps_Updater`](https://github.com/LineageOS/android_packages_apps_Updater) | `1d060907cf540997952607c590dd23da13ac1dc8` |
-| `hardware/qcom-caf/common` | [`android_hardware_qcom-caf_common`](https://github.com/fiftydinar/android_hardware_qcom-caf_common) | `1805784d14b386fce6127f2f06b5a16a3e9b94ed` |
+| `hardware/qcom-caf/common` | [`android_hardware_qcom-caf_common`](https://github.com/fiftydinar/android_hardware_qcom-caf_common) | `5cd53603d36aaddd9ba9d882dad5411f1b30fbed` |
 | `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` | [`android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `6a42341357a56903eea27a74fdb161a26402dcc3` |
 
 The device/vendor changes backport important fixes from the A17 device tree to
