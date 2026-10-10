@@ -14,7 +14,7 @@
   <project name="android_device_motorola_mumba"
            path="device/motorola/mumba"
            remote="mine"
-           revision="2a34d1ed87fadfaf1dc34f503b99a7f418085f72" />
+           revision="a415c78f5969360b6c7ccc30c40f780de5296e0d" />
 
   <!-- vendor blobs -->
   <project name="vendor_motorola_mumba_latest"
