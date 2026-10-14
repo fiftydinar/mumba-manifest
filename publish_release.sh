@@ -77,26 +77,24 @@ python3 "$SELF_DIR/ota/generate_updates.py" \
   --output "$FEED_FILE" \
   --checksum-output "$CHECKSUM_FILE"
 
-if [[ -n "$RECOVERY_IMG" ]]; then
-  RECOVERY_CHECKSUM_FILE="$TEMP_DIR/$(basename "$RECOVERY_IMG").sha256"
-  python3 - "$RECOVERY_IMG" "$RECOVERY_CHECKSUM_FILE" <<'PY'
-import hashlib
-import sys
-from pathlib import Path
-
-asset = Path(sys.argv[1])
-checksum_file = Path(sys.argv[2])
-digest = hashlib.sha256()
-with asset.open("rb") as stream:
-    for chunk in iter(lambda: stream.read(4 * 1024 * 1024), b""):
-        digest.update(chunk)
-checksum_file.write_text(
-    f"{digest.hexdigest()}  {asset.name}\n",
-    encoding="utf-8",
-)
-PY
-  RELEASE_ASSETS+=("$RECOVERY_IMG" "$RECOVERY_CHECKSUM_FILE")
+# Flash set: vbmeta, vbmeta_system, vendor_boot and recovery must come from the
+# same signed target-files package. Flashing only recovery/vendor_boot fails AVB.
+FLASH_DIR="$TEMP_DIR/flash"
+mkdir -p "$FLASH_DIR"
+FLASH_IMAGES=(vbmeta.img vbmeta_system.img vendor_boot.img recovery.img)
+for image in "${FLASH_IMAGES[@]}"; do
+  unzip -p "$TARGET_FILES" "IMAGES/$image" > "$FLASH_DIR/$image"
+  [[ -s "$FLASH_DIR/$image" ]] || { echo "error: IMAGES/$image missing from target-files" >&2; exit 1; }
+done
+if [[ -n "$RECOVERY_IMG" ]] && ! cmp -s "$RECOVERY_IMG" "$FLASH_DIR/recovery.img"; then
+  echo "error: recovery image differs from IMAGES/recovery.img in the signed target-files" >&2
+  echo "       it would not match the signed vbmeta; omit the argument or use the matching build" >&2
+  exit 1
 fi
+for image in "${FLASH_IMAGES[@]}"; do
+  (cd "$FLASH_DIR" && sha256sum "$image" > "$image.sha256")
+  RELEASE_ASSETS+=("$FLASH_DIR/$image" "$FLASH_DIR/$image.sha256")
+done
 
 TITLE="LineageOS 23.2 for mumba — $TAG"
 if [[ -n "$NOTES_FILE" ]]; then
@@ -107,9 +105,12 @@ if [[ -n "$NOTES_FILE" ]]; then
     --latest
 else
   RELEASE_NOTES="Signed full A/B OTA for Motorola Moto G57 Power / G100s (mumba)."
-  if [[ -n "$RECOVERY_IMG" ]]; then
-    RELEASE_NOTES+=$'\n\nRecovery image included for manual recovery use.'
-  fi
+  RELEASE_NOTES+=$'\n\nFresh fastboot install (unlocked bootloader), from this release only:\n'
+  RELEASE_NOTES+=$'  fastboot flash vbmeta_b vbmeta.img\n'
+  RELEASE_NOTES+=$'  fastboot flash vbmeta_system_b vbmeta_system.img\n'
+  RELEASE_NOTES+=$'  fastboot flash recovery_b recovery.img\n'
+  RELEASE_NOTES+=$'  fastboot flash vendor_boot_b vendor_boot.img\n'
+  RELEASE_NOTES+=$'Verify each image with its .sha256 file first (sha256sum -c vbmeta.img.sha256). Do not mix images from different releases.'
   gh release create "$TAG" "${RELEASE_ASSETS[@]}" \
     --repo "$REPOSITORY" \
     --title "$TITLE" \
