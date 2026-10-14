@@ -104,13 +104,9 @@ if [[ -n "$NOTES_FILE" ]]; then
     --notes-file "$NOTES_FILE" \
     --latest
 else
-  RELEASE_NOTES="Signed full A/B OTA for Motorola Moto G57 Power / G100s (mumba)."
-  RELEASE_NOTES+=$'\n\nFresh fastboot install (unlocked bootloader), from this release only:\n'
-  RELEASE_NOTES+=$'  fastboot flash vbmeta_b vbmeta.img\n'
-  RELEASE_NOTES+=$'  fastboot flash vbmeta_system_b vbmeta_system.img\n'
-  RELEASE_NOTES+=$'  fastboot flash recovery_b recovery.img\n'
-  RELEASE_NOTES+=$'  fastboot flash vendor_boot_b vendor_boot.img\n'
-  RELEASE_NOTES+=$'Verify each image with its .sha256 file first (sha256sum -c vbmeta.img.sha256). Do not mix images from different releases.'
+  RELEASE_NOTES="Signed full A/B OTA for Motorola Moto G57 Power / G100s (mumba).
+
+Installation instructions (XDA thread): https://xdaforums.com/t/rom-16-2-unofficial-lineageos-23-2-with-slight-additions-for-motorola-moto-g57-power-mumba.4804376/"
   gh release create "$TAG" "${RELEASE_ASSETS[@]}" \
     --repo "$REPOSITORY" \
     --title "$TITLE" \
