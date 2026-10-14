@@ -274,7 +274,9 @@ Do not fork `LineageOS/android` directly: its `fetch=".."` would break every rem
 ## Notes
 - Build uses test-keys -> the first flash is a **clean flash**.
 - The userdebug build is SELinux permissive; the separate `user` release omits
-  that boot argument, uses enforcing mode, and leaves AVB verification enabled.
+  that boot argument and uses enforcing mode. AVB verification is disabled in
+  the shipped `vbmeta` (flags `3`) for all variants, so installs do not depend
+  on `fastboot --disable-verification`.
 - `flash_all.sh` runs `fastboot -w` and erases userdata. Set `IMG_DIR` to the
   build output directory, e.g. `IMG_DIR="/path/to/lineage-mumba/out/target/product/mumba" bash flash_all.sh`.
 - ccache speeds up rebuilds.

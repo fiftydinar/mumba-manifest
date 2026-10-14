@@ -378,10 +378,10 @@ does not turn on USB debugging itself.
 The `eng` and `userdebug` variants remain **Permissive**
 (`androidboot.selinux=permissive`) for debugging. The `user` release variant
 omits that argument and boots with SELinux enforcing by default; enforcing-mode
-boot and hardware validation have not yet been completed. Debug variants also
-set AVB flags `3` (disable verification/hashtree); the `user` variant omits
-those debug flags so AVB verification stays enabled and can be re-signed with
-the owner's AVB keys.
+boot and hardware validation have not yet been completed. All variants set AVB
+flags `3` (disable verification/hashtree) so recovery and the OTA images boot
+without depending on `fastboot --disable-verification`, matching the other
+custom ROMs for this device.
 An earlier boot lost over 1,500 audit records because logd applied a 5/sec rate
 limit and the kernel audit backlog was 64.
 
