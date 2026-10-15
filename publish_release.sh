@@ -97,6 +97,19 @@ for image in "${FLASH_IMAGES[@]}"; do
   RELEASE_ASSETS+=("$FLASH_DIR/$image" "$FLASH_DIR/$image.sha256")
 done
 
+# copy-partitions is a separate signed artifact (not produced by the build) and
+# is required by the install instructions. Override with COPY_PARTITIONS_ZIP.
+COPY_PARTITIONS_ZIP="${COPY_PARTITIONS_ZIP:-$SELF_DIR/ota/copy-partitions-20220613-signed.zip}"
+[[ -f "$COPY_PARTITIONS_ZIP" ]] || {
+  echo "error: copy-partitions zip not found: $COPY_PARTITIONS_ZIP" >&2
+  echo "       set COPY_PARTITIONS_ZIP or place it at ota/copy-partitions-20220613-signed.zip" >&2
+  exit 1
+}
+COPY_PARTITIONS_NAME="$(basename "$COPY_PARTITIONS_ZIP")"
+COPY_PARTITIONS_CHECKSUM="$TEMP_DIR/$COPY_PARTITIONS_NAME.sha256"
+(cd "$(dirname "$COPY_PARTITIONS_ZIP")" && sha256sum "$COPY_PARTITIONS_NAME") > "$COPY_PARTITIONS_CHECKSUM"
+RELEASE_ASSETS+=("$COPY_PARTITIONS_ZIP" "$COPY_PARTITIONS_CHECKSUM")
+
 TITLE="LineageOS 23.2 for mumba — $TAG"
 if [[ -n "$NOTES_FILE" ]]; then
   gh release create "$TAG" "${RELEASE_ASSETS[@]}" \
