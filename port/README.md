@@ -8,7 +8,7 @@
 - `speaker-eq-device.patch` -> `device/motorola/mumba` (build and install the speaker-only EQ effect)
 - `display-srgb-device.patch` -> `device/motorola/mumba` (default to sRGB color management and initialize fresh installs in sRGB mode)
 - `settings-provider-refresh-defaults.patch` -> `frameworks/base` (seed optional refresh settings on initial settings database creation)
-- `dt2s-motion-wake.patch` -> `frameworks/base` (ignore motion events while the device is going to sleep, so double-tap-to-sleep and power-off are not undone by residual touches/gestures)
+- `dt2s-motion-wake.patch` -> `frameworks/base` (ignore motion and the double-tap-to-wake key for a short grace period after the device starts going to sleep, so double-tap-to-sleep and power-off are not undone by residual touches/gestures)
 - `vendor-mumba.patch` -> `vendor/motorola/mumba` (build fixes in generated vendor files)
 - `speaker-eq-vendor.patch` -> `vendor/motorola/mumba` (attach the speaker EQ, remove stale Dolby effects, and select the source QTI effect factory)
 - `openeuicc-deps.patch` -> `prebuilts/openeuicc-deps` (SDK 37 -> 36 for the A16 tree)

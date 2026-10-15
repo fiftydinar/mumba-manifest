@@ -1,20 +1,58 @@
 diff --git a/services/core/java/com/android/server/policy/PhoneWindowManager.java b/services/core/java/com/android/server/policy/PhoneWindowManager.java
-index 69fefe33bfa9..f72bdb9661a8 100644
+index 69fefe33bfa9..5c6e5e1f1bb9 100644
 --- a/services/core/java/com/android/server/policy/PhoneWindowManager.java
 +++ b/services/core/java/com/android/server/policy/PhoneWindowManager.java
-@@ -5824,6 +5824,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+@@ -5824,6 +5824,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
      public int interceptMotionBeforeQueueingNonInteractive(int displayId, int source, int action,
              long whenNanos, int policyFlags) {
          if ((policyFlags & FLAG_WAKE) != 0) {
-+            if (mDeviceGoingToSleep) {
-+                // Ignore motion events that arrive while the device is going to sleep.
-+                // The touch panel on mumba keeps reporting touches (and the
-+                // double-tap-to-wake gesture) throughout the screen-off transition, so a
-+                // double-tap-to-sleep or a power-button press made while a finger is on
-+                // the screen would otherwise be immediately undone by the residual
-+                // motion event.
++            if (isWakeSuppressedAfterSleep(whenNanos / 1000000)) {
 +                return 0;
 +            }
              if (mWindowWakeUpPolicy.wakeUpFromMotion(displayId, whenNanos / 1000000, source,
                      action == MotionEvent.ACTION_DOWN, mDeviceGoingToSleep)) {
                  // Woke up. Pass motion events to user.
+@@ -5838,6 +5841,29 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+         return 0;
+     }
+ 
++    // mumba: the touch panel keeps reporting the double-tap that triggered
++    // double-tap-to-sleep (and any finger still resting on the screen) as a motion
++    // or gesture event right as the device goes to sleep. Those residual events
++    // would otherwise immediately wake the device again, so the screen would never
++    // stay off. Ignore wakes for a short grace period after the device starts going
++    // to sleep. This is keyed off the recorded sleep time rather than
++    // mDeviceGoingToSleep, which is only set a few milliseconds later and would miss
++    // the event that races the sleep transition. Power and volume keys are handled
++    // separately and are not affected.
++    private static final long WAKE_AFTER_SLEEP_GRACE_MS = 500;
++
++    private boolean isWakeSuppressedAfterSleep(long eventTime) {
++        if (mDeviceGoingToSleep) {
++            return true;
++        }
++        final PowerManager.SleepData sleepData = mPowerManagerInternal.getLastGoToSleep();
++        if (sleepData == null) {
++            return false;
++        }
++        final long delta = eventTime - sleepData.goToSleepUptimeMillis;
++        return delta >= 0 && delta < WAKE_AFTER_SLEEP_GRACE_MS;
++    }
++
+     private boolean shouldDispatchInputWhenNonInteractive(int displayId, int keyCode) {
+         // Apply the default display policy to unknown displays as well.
+         final boolean isDefaultDisplay = displayId == DEFAULT_DISPLAY
+@@ -6323,6 +6349,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+ 
+     private void wakeUpFromWakeKey(long eventTime, int keyCode, boolean isDown,
+             boolean withProximityCheck) {
++        if (keyCode == KeyEvent.KEYCODE_WAKEUP && isWakeSuppressedAfterSleep(eventTime)) {
++            // mumba: the double-tap-to-wake gesture is delivered as KEYCODE_WAKEUP by
++            // the touch panel. Ignore it while the device is still settling into sleep
++            // so double-tap-to-sleep is not immediately undone. Power/volume keys are
++            // not affected.
++            return;
++        }
+         if (mWindowWakeUpPolicy.wakeUpFromKey(DEFAULT_DISPLAY, eventTime, keyCode, isDown,
+                 withProximityCheck)) {
+             final boolean keyCanLaunchHome = keyCode == KEYCODE_HOME || keyCode == KEYCODE_POWER;
