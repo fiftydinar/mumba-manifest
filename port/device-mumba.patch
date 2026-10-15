@@ -315,8 +315,7 @@ index 811c840..347e307 100644
      {
        "PowerHint": "LAUNCH",
 diff --git a/device.mk b/device.mk
-diff --git a/device.mk b/device.mk
-index 2fa61c0..0b5ac3d 100644
+index dc98d55..db34882 100644
 --- a/device.mk
 +++ b/device.mk
 @@ -5,6 +5,14 @@
@@ -334,7 +333,15 @@ index 2fa61c0..0b5ac3d 100644
  # Add common definitions for Qualcomm
  $(call inherit-product, hardware/qcom-caf/common/common.mk)
  
-@@ -123,6 +126,9 @@ PRODUCT_COPY_FILES += \
+@@ -64,6 +72,7 @@ PRODUCT_PACKAGES += \
+     libdownmixaidl \
+     libdynamicsprocessingaidl \
+     libloudnessenhanceraidl \
++    libmumba_speaker_eq \
+     libreverbaidl \
+     libvisualizeraidl
+ 
+@@ -123,6 +132,9 @@ PRODUCT_COPY_FILES += \
      frameworks/native/data/etc/android.hardware.camera.full.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.full.xml \
      frameworks/native/data/etc/android.hardware.camera.raw.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.raw.xml
  
@@ -344,19 +351,22 @@ index 2fa61c0..0b5ac3d 100644
  # Dalvik
  $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
  
-@@ -143,9 +149,10 @@ PRODUCT_COPY_FILES += \
+@@ -143,12 +155,8 @@ PRODUCT_COPY_FILES += \
  
  # eUICC
  PRODUCT_PACKAGES += \
 -    MotoEuicc
+-
+-# MindTheGapps supplies real Phonesky when GApps are built into the ROM.
+-ifneq ($(WITH_GMS),true)
+-PRODUCT_PACKAGES += FakeStore
+-endif
 +    MotoEuicc \
 +    OpenEUICC
  
- # MindTheGapps supplies real Phonesky when GApps are built into the ROM.
- ifneq ($(WITH_GMS),true)
- PRODUCT_PACKAGES += FakeStore
- endif
-@@ -219,6 +226,9 @@ $(call soong_config_set,lineage_health,charging_control_charging_enabled,0)
+ # DRM
+ PRODUCT_PACKAGES += \
+@@ -224,6 +232,9 @@ $(call soong_config_set,lineage_health,charging_control_charging_enabled,0)
  $(call soong_config_set,lineage_health,charging_control_charging_path,/sys/class/power_supply/battery/device/force_charging_disable)
  $(call soong_config_set,lineage_health_bool,charging_control_supports_bypass,false)
  
@@ -366,7 +376,14 @@ index 2fa61c0..0b5ac3d 100644
  # Moto hardware
  PRODUCT_PACKAGES += \
      MotoActions \
-@@ -232,7 +242,16 @@ PRODUCT_PACKAGES += \
+@@ -231,13 +242,23 @@ PRODUCT_PACKAGES += \
+ 
+ # Overlay
+ PRODUCT_ENFORCE_RRO_TARGETS := *
++PRODUCT_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
+ 
+ PRODUCT_PACKAGES += \
+     SystemUIResMumba \
      WifiResMumba \
      FrameworksResMumba \
      SettingsResMumba \

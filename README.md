@@ -16,8 +16,7 @@ This repository contains:
   Dialer auto call recording, updater changelog/issues links, and the OTA feed URL,
   applied on top of a fresh `repo sync`; it also installs the required QCOM CAF
   Soong namespace markers.
-- The device tree includes the small, pre-signed microG FakeStore package stub;
-  the framework fork contains restricted package-signature and Java boot-property
+- The framework fork contains restricted package-signature and Java boot-property
   compatibility mappings.
 
 ## Usage
@@ -127,7 +126,7 @@ The feed generator tests can be run with `python3 -m unittest discover -s tests`
 | Path | Repository | Purpose |
 |---|---|---|
 | `device/motorola/mumba` | [fiftydinar/android_device_motorola_mumba](https://github.com/fiftydinar/android_device_motorola_mumba) | forked ZaraKinYu device tree; builds the kernel from source |
-| `device/motorola/mumba/fakestore` | [fiftydinar/android_device_motorola_mumba](https://github.com/fiftydinar/android_device_motorola_mumba) | upstream microG FakeStore v0.2.1 package stub; no GmsCore or Internet permission |
+| `device/motorola/mumba/fakestore` | [fiftydinar/android_device_motorola_mumba](https://github.com/fiftydinar/android_device_motorola_mumba) | upstream microG FakeStore v0.2.1 stub; present in the tree but no longer built (removed by `device-mumba.patch`) |
 | `vendor/motorola/mumba` | [fiftydinar/vendor_motorola_mumba_latest](https://github.com/fiftydinar/vendor_motorola_mumba_latest) | forked lostsignal vendor tree; proprietary blobs and device firmware |
 | `hardware/motorola` | [fiftydinar/android_hardware_motorola](https://github.com/fiftydinar/android_hardware_motorola) | forked Motorola HAL |
 | `kernel/motorola/sm6435` | [fiftydinar/android_kernel_motorola_sm6435](https://github.com/fiftydinar/android_kernel_motorola_sm6435) | forked kernel source (Kbuild) |
@@ -186,21 +185,11 @@ upstream base SHAs are from the resolved `lineage-23.2` manifest
 | `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `6a42341357a56903eea27a74fdb161a26402dcc3` | `6a42341357a56903eea27a74fdb161a26402dcc3` |
 
 The GitHub projects are forks, except for the two OpenEUICC repositories,
-which are full GitHub mirrors of their original Gitea repositories. The FakeStore
-and framework compatibility changes are pinned to exact source commits in
+which are full GitHub mirrors of their original Gitea repositories. The
+framework compatibility changes are pinned to exact source commits in
 `mumba.xml`.
 
-## FakeStore and Java compatibility behavior
-
-The ROM installs the upstream microG FakeStore v0.2.1 as `com.android.vending`
-in all vanilla build variants at
-`/product/priv-app/Phonesky/Phonesky.apk`. The APK is pre-signed and has no
-`INTERNET` permission.
-It only supplies the Play Store package identity and stub interfaces; it does
-not include GmsCore, implement Google Play Services APIs, or contact Google
-servers. The PackageManager reports the fixed Google certificate only for the
-allowlisted microG package names when the package is signed by the upstream
-microG release certificate and carries the expected fake-signature metadata.
+## Java boot-property compatibility behavior
 
 The framework's Java `SystemProperties.get()` returns
 `ro.boot.flash.locked=1` and `ro.boot.verifiedbootstate=green`. This does not
@@ -208,26 +197,17 @@ change the underlying boot properties, the actual unlocked bootloader state,
 native property reads, or Keystore attestation; it is not a general root-hiding
 patch.
 
-### GApps coexistence
+## GApps
 
-Google Play Store also uses `com.android.vending`, but is signed with Google's
-key rather than microG's. For LineageOS 23 / Android 16, LineageOS recommends
-[MindTheGapps ARM64](https://github.com/MindTheGapps/16.0.0-arm64/releases).
-Its Android 16 package places Phonesky at
-`product/priv-app/Phonesky/Phonesky.apk`; the recovery installer copies that
-product tree onto `/product`. FakeStore is deliberately staged at the same path,
-so flashing MindTheGapps immediately after the ROM and **before the first system
-boot** replaces the stub APK with the Google-signed APK. The official LineageOS
-GApps instructions also require installing the add-on before first boot.
+FakeStore is no longer bundled. `device-mumba.patch` removes the
+`PRODUCT_PACKAGES += FakeStore` block from `device.mk`, because the
+`com.android.vending` stub conflicted with installing GApps. The `fakestore/`
+directory remains in the device tree but is not built.
 
-For an integrated GApps build, set `WITH_GMS=true`; `device.mk` then omits
-FakeStore and the GApps product supplies Phonesky. Do not try to install a
-Google-signed Play Store APK as a normal app update over an already booted
-FakeStore installation: Android records the microG signer, so replacing it later
-may require clearing package state or a clean install. The same-path replacement
-matches MindTheGapps' Android 16 recovery installer, which copies its `product`
-tree onto `/product`; other GApps ZIPs should be checked for the same destination
-path before recommending them.
+For LineageOS 23 / Android 16, LineageOS recommends
+[MindTheGapps ARM64](https://github.com/MindTheGapps/16.0.0-arm64/releases),
+installed after the ROM and before the first system boot. For an integrated
+GApps build, set `WITH_GMS=true`.
 
 OpenEUICC's submodules also use GitHub forks, pinned by the OpenEUICC gitlinks:
 
