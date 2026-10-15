@@ -77,11 +77,12 @@ python3 "$SELF_DIR/ota/generate_updates.py" \
   --output "$FEED_FILE" \
   --checksum-output "$CHECKSUM_FILE"
 
-# Flash set: vbmeta, vbmeta_system, vendor_boot and recovery must come from the
-# same signed target-files package. Flashing only recovery/vendor_boot fails AVB.
+# Flash set: boot, dtbo, init_boot, vendor_boot, recovery, vbmeta and
+# vbmeta_system must come from the same signed target-files package. Flashing
+# only recovery/vendor_boot fails AVB.
 FLASH_DIR="$TEMP_DIR/flash"
 mkdir -p "$FLASH_DIR"
-FLASH_IMAGES=(vbmeta.img vbmeta_system.img vendor_boot.img recovery.img)
+FLASH_IMAGES=(boot.img dtbo.img init_boot.img vendor_boot.img recovery.img vbmeta.img vbmeta_system.img)
 for image in "${FLASH_IMAGES[@]}"; do
   unzip -p "$TARGET_FILES" "IMAGES/$image" > "$FLASH_DIR/$image"
   [[ -s "$FLASH_DIR/$image" ]] || { echo "error: IMAGES/$image missing from target-files" >&2; exit 1; }
