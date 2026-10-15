@@ -1,0 +1,20 @@
+diff --git a/services/core/java/com/android/server/policy/PhoneWindowManager.java b/services/core/java/com/android/server/policy/PhoneWindowManager.java
+index 69fefe33bfa9..f72bdb9661a8 100644
+--- a/services/core/java/com/android/server/policy/PhoneWindowManager.java
++++ b/services/core/java/com/android/server/policy/PhoneWindowManager.java
+@@ -5824,6 +5824,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+     public int interceptMotionBeforeQueueingNonInteractive(int displayId, int source, int action,
+             long whenNanos, int policyFlags) {
+         if ((policyFlags & FLAG_WAKE) != 0) {
++            if (mDeviceGoingToSleep) {
++                // Ignore motion events that arrive while the device is going to sleep.
++                // The touch panel on mumba keeps reporting touches (and the
++                // double-tap-to-wake gesture) throughout the screen-off transition, so a
++                // double-tap-to-sleep or a power-button press made while a finger is on
++                // the screen would otherwise be immediately undone by the residual
++                // motion event.
++                return 0;
++            }
+             if (mWindowWakeUpPolicy.wakeUpFromMotion(displayId, whenNanos / 1000000, source,
+                     action == MotionEvent.ACTION_DOWN, mDeviceGoingToSleep)) {
+                 // Woke up. Pass motion events to user.

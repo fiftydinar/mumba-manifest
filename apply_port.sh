@@ -13,6 +13,7 @@ declare -A PATCH_TREE=(
   [speaker-eq-device]="device/motorola/mumba"
   [display-srgb-device]="device/motorola/mumba"
   [settings-provider-refresh-defaults]="frameworks/base"
+  [dt2s-motion-wake]="frameworks/base"
   [vendor-mumba]="vendor/motorola/mumba"
   [speaker-eq-vendor]="vendor/motorola/mumba"
   [openeuicc-deps]="prebuilts/openeuicc-deps"
@@ -35,7 +36,7 @@ declare -A PATCH_TREE=(
 PORT_STATE_DIR="$PWD/.repo/local_manifests/mumba-port-state"
 mkdir -p "$PORT_STATE_DIR"
 
-for name in device-mumba mumba-ota-updater updater-links mumba-refresh-defaults speaker-eq-device display-srgb-device settings-provider-refresh-defaults vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection display-srgb-settings uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh; do
+for name in device-mumba mumba-ota-updater updater-links mumba-refresh-defaults speaker-eq-device display-srgb-device settings-provider-refresh-defaults dt2s-motion-wake vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection display-srgb-settings uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh; do
   patch="$SELF_DIR/port/$name.patch"
   tree="${PATCH_TREE[$name]}"
   if [ ! -f "$patch" ]; then
