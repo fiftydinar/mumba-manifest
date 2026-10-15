@@ -64,7 +64,7 @@ index 9dea7e6..86cd418 100644
  # Metadata
  BOARD_USES_METADATA_PARTITION := true
 
-@@ -237,10 +252,11 @@ ENABLE_VENDOR_RIL_SERVICE := true
+@@ -237,10 +252,13 @@ ENABLE_VENDOR_RIL_SERVICE := true
  include device/lineage/sepolicy/libperfmgr/sepolicy.mk
 -include device/qcom/sepolicy_vndr/SEPolicy.mk
 +include hardware/qcom-caf/common/os_pickup_sepolicy_vndr.mk
@@ -73,7 +73,9 @@ index 9dea7e6..86cd418 100644
  
  # Verified Boot
  BOARD_AVB_ENABLE := true
++ifneq ($(filter eng userdebug,$(TARGET_BUILD_VARIANT)),)
  BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
++endif
  BOARD_AVB_ROLLBACK_INDEX := 22
  BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := 22
  BOARD_AVB_VBMETA_SYSTEM := system system_ext product pvmfw
