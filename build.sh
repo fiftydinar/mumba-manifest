@@ -87,6 +87,12 @@ fi
 echo "### apply local patches"
 bash "$SELF_DIR/apply_port.sh"
 
+# GApps variant: stage the latest MindTheGapps into vendor/partner_gms before lunch.
+if [[ "$TARGET" == lineage_mumba_gapps-* ]]; then
+  echo "### stage MindTheGapps (vendor/partner_gms)"
+  python3 "$SELF_DIR/tools/fetch_mindthegapps.py" --tree "$SRC" ${MINDTHEGAPPS_TAG:+--tag "$MINDTHEGAPPS_TAG"}
+fi
+
 echo "### build"
 # Lineage envsetup/lunch use optional unset shell variables.
 set +u
