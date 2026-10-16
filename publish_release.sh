@@ -16,6 +16,12 @@ SRC="${SRC:-$HOME/Documenti/lineage-mumba-release}"
 RELEASE_DIR="${2:-$SRC/out/target/product/mumba/release-signed}"
 NOTES_FILE="${3:-}"
 RECOVERY_IMG="${4:-}"
+VARIANT="${VARIANT:-vanilla}"
+case "$VARIANT" in
+  vanilla) FEED_BASENAME="updates.json";       VARIANT_LABEL="" ;;
+  gapps)   FEED_BASENAME="updates-gapps.json"; VARIANT_LABEL=" (GApps)" ;;
+  *) echo "error: unknown VARIANT '$VARIANT' (expected vanilla or gapps)" >&2; exit 1 ;;
+esac
 
 [[ "$TAG" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || {
   echo "error: invalid release tag: $TAG" >&2
@@ -110,7 +116,7 @@ COPY_PARTITIONS_CHECKSUM="$TEMP_DIR/$COPY_PARTITIONS_NAME.sha256"
 (cd "$(dirname "$COPY_PARTITIONS_ZIP")" && sha256sum "$COPY_PARTITIONS_NAME") > "$COPY_PARTITIONS_CHECKSUM"
 RELEASE_ASSETS+=("$COPY_PARTITIONS_ZIP" "$COPY_PARTITIONS_CHECKSUM")
 
-TITLE="LineageOS 23.2 for mumba — $TAG"
+TITLE="LineageOS 23.2 for mumba$VARIANT_LABEL — $TAG"
 if [[ -n "$NOTES_FILE" ]]; then
   gh release create "$TAG" "${RELEASE_ASSETS[@]}" \
     --repo "$REPOSITORY" \
@@ -128,7 +134,7 @@ Installation instructions (XDA thread): https://xdaforums.com/t/rom-16-2-unoffic
     --latest
 fi
 
-python3 - "$FEED_FILE" "$SELF_DIR/ota/updates.json" <<'PY'
+python3 - "$FEED_FILE" "$SELF_DIR/ota/$FEED_BASENAME" <<'PY'
 import os
 import shutil
 import sys
@@ -144,7 +150,7 @@ with tempfile.NamedTemporaryFile(dir=destination.parent, delete=False) as tempor
 os.replace(temporary_path, destination)
 PY
 
-git add ota/updates.json
+git add "ota/$FEED_BASENAME"
 git commit -m "ota: Publish $TAG"
 if ! git push origin main; then
   echo "error: release is live, but the feed commit was not pushed; resolve main and push it" >&2
@@ -152,4 +158,4 @@ if ! git push origin main; then
 fi
 
 echo "Published GitHub release: https://github.com/$REPOSITORY/releases/tag/$TAG"
-echo "Updater feed: https://raw.githubusercontent.com/$REPOSITORY/main/ota/updates.json"
+echo "Updater feed: https://raw.githubusercontent.com/$REPOSITORY/main/ota/$FEED_BASENAME"
