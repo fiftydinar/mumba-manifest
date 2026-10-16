@@ -1,7 +1,8 @@
 # Ported changes: A17 (moto-elysia) -> A16 (ZaraKinYu device tree)
 
-`port/` contains twenty-five patches:
+`port/` contains twenty-six patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
+- `device-mumba-gapps.patch` -> `device/motorola/mumba` (GApps product `lineage_mumba_gapps`: `WITH_GMS` with MindTheGapps staged by `tools/fetch_mindthegapps.py`, separate `updates-gapps.json` feed)
 - `mumba-ota-updater.patch` -> `device/motorola/mumba` (LineageOS Updater feed URL for signed GitHub OTA releases)
 - `updater-links.patch` -> `packages/apps/Updater` (open this ROM's XDA changelog and GitHub issue tracker)
 - `mumba-refresh-defaults.patch` -> `device/motorola/mumba` (clean-install refresh settings overlay)
