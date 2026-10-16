@@ -10,10 +10,12 @@ usage() {
 [[ $# -ge 1 && $# -le 3 ]] || usage
 
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. "$SELF_DIR/tools/out_dir.sh"
 SRC="${SRC:-$HOME/Documenti/lineage-mumba-release}"
 [[ -d "$SRC" ]] || { echo "error: source tree not found: $SRC" >&2; exit 1; }
 SRC="$(cd "$SRC" && pwd -P)"
-OUT_DIR="${OUT_DIR:-$SRC/out}"
+TARGET="${TARGET:-lineage_mumba-bp4a-user}"
+OUT_DIR="${OUT_DIR:-$(mumba_out_dir "$TARGET")}"
 if [[ "$OUT_DIR" != /* ]]; then
   OUT_DIR="$SRC/$OUT_DIR"
 fi

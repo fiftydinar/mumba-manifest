@@ -10,18 +10,19 @@ usage() {
 [[ $# -ge 1 && $# -le 4 ]] || usage
 
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. "$SELF_DIR/tools/out_dir.sh"
 REPOSITORY="fiftydinar/mumba-manifest"
 TAG="$1"
 SRC="${SRC:-$HOME/Documenti/lineage-mumba-release}"
-RELEASE_DIR="${2:-$SRC/out/target/product/mumba/release-signed}"
-NOTES_FILE="${3:-}"
-RECOVERY_IMG="${4:-}"
 VARIANT="${VARIANT:-vanilla}"
 case "$VARIANT" in
-  vanilla) FEED_BASENAME="updates.json";       VARIANT_LABEL="" ;;
-  gapps)   FEED_BASENAME="updates-gapps.json"; VARIANT_LABEL=" (GApps)" ;;
+  vanilla) FEED_BASENAME="updates.json";       VARIANT_LABEL="";        TARGET="lineage_mumba-bp4a-user" ;;
+  gapps)   FEED_BASENAME="updates-gapps.json"; VARIANT_LABEL=" (GApps)"; TARGET="lineage_mumba_gapps-bp4a-user" ;;
   *) echo "error: unknown VARIANT '$VARIANT' (expected vanilla or gapps)" >&2; exit 1 ;;
 esac
+RELEASE_DIR="${2:-$SRC/$(mumba_out_dir "$TARGET")/target/product/mumba/release-signed}"
+NOTES_FILE="${3:-}"
+RECOVERY_IMG="${4:-}"
 
 [[ "$TAG" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || {
   echo "error: invalid release tag: $TAG" >&2

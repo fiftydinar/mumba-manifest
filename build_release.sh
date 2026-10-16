@@ -3,9 +3,10 @@
 set -euo pipefail
 
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$SELF_DIR/tools/out_dir.sh"
 SRC="${SRC:-$HOME/Documenti/lineage-mumba-release}"
-OUT_DIR="${OUT_DIR:-out}"
 TARGET="${TARGET:-lineage_mumba-bp4a-user}"
+OUT_DIR="${OUT_DIR:-$(mumba_out_dir "$TARGET")}"
 BUILD_TARGET="${BUILD_TARGET:-target-files-package otatools-package}"
 JOBS="${JOBS:-2}"
 
