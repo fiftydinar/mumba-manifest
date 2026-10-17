@@ -32,12 +32,13 @@ declare -A PATCH_TREE=(
   [adb-root-debug]="packages/modules/adb"
   [touch-kbuild]="kernel/motorola/sm6435-modules"
   [display-refresh]="kernel/motorola/sm6435-devicetrees"
+  [vendor-lineage-kernel-out]="vendor/lineage"
 )
 
 PORT_STATE_DIR="$PWD/.repo/local_manifests/mumba-port-state"
 mkdir -p "$PORT_STATE_DIR"
 
-for name in device-mumba device-mumba-gapps mumba-ota-updater updater-links mumba-refresh-defaults speaker-eq-device display-srgb-device settings-provider-refresh-defaults dt2s-motion-wake vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection display-srgb-settings uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh; do
+for name in device-mumba device-mumba-gapps mumba-ota-updater updater-links mumba-refresh-defaults speaker-eq-device display-srgb-device settings-provider-refresh-defaults dt2s-motion-wake vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection display-srgb-settings uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh vendor-lineage-kernel-out; do
   patch="$SELF_DIR/port/$name.patch"
   tree="${PATCH_TREE[$name]}"
   if [ ! -f "$patch" ]; then
