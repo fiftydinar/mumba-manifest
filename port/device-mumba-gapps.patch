@@ -2440,3 +2440,23 @@ index 0000000..c9da8c2
 +    DeviceProduct=mumba_g \
 +    SystemDevice=mumba \
 +    SystemName=mumba
+
+diff --git a/device.mk b/device.mk
+index f5ae720..e118e99 100644
+--- a/device.mk
++++ b/device.mk
+@@ -154,8 +154,13 @@ PRODUCT_COPY_FILES += \
+ 
+ # eUICC
+ PRODUCT_PACKAGES += \
+-    MotoEuicc \
++    MotoEuicc
++
++# OpenEUICC is the vanilla LPA. GApps uses the vendor Google Euicc instead.
++ifneq ($(WITH_GMS),true)
++PRODUCT_PACKAGES += \
+     OpenEUICC
++endif
+ 
+ # DRM
+ PRODUCT_PACKAGES += \

@@ -252,6 +252,13 @@ There are two ways to get Google apps:
   signed `product`/`system_ext` hashtree. Updates arrive through the separate
   `ota/updates-gapps.json` feed. For a debug GApps build use
   `TARGET=lineage_mumba_gapps-bp4a-userdebug`; its output tree is `out-gapps`.
+  The GApps product uses the vendor Google Euicc (`com.google.android.euicc`);
+  OpenEUICC is not installed in this variant.
+
+Sideloading MindTheGapps onto the vanilla product is different: OpenEUICC stays
+installed, and GMS makes `EuiccPolicy` enable EuiccGoogle, so both LPAs can be
+present. Use the integrated GApps product for a clean Google-eUICC setup, or
+disable one of the two LPAs.
 
 OpenEUICC's submodules also use GitHub forks, pinned by the OpenEUICC gitlinks:
 
@@ -304,8 +311,14 @@ Do not fork `LineageOS/android` directly: its `fetch=".."` would break every rem
 - ccache speeds up rebuilds.
 - The first build takes hours (kernel + ~170k targets).
 - **eSIM** works on vanilla via **OpenEUICC** (privileged LPA, no Google).
+  GApps uses the vendor Google Euicc (`com.google.android.euicc`) instead;
+  OpenEUICC is not installed in the GApps variant. `EuiccPolicy` disables
+  Google Euicc when GMS is absent, so each variant has exactly one LPA.
   The mirrored source is based on the last pre-SDK37 commit; the three
   `openeuicc-*` patches adapt it to the A16 tree and hide its standalone launcher.
+  Vanilla initial setup uses LineageOS SetupWizard, which has no eSIM download
+  flow; add the profile afterwards through Settings. In GApps, Google
+  SetupWizard is active and can offer its eSIM setup flow through EuiccGoogle.
 - Tested on the eSIM variant XT2537-5. Settings and telephony include runtime
   handling for physical-SIM-only variants, but a physical-only unit has not
   been tested.

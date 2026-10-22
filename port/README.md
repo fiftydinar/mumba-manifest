@@ -2,7 +2,7 @@
 
 `port/` contains twenty-seven patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
-- `device-mumba-gapps.patch` -> `device/motorola/mumba` (GApps product `lineage_mumba_gapps`: `WITH_GMS` with MindTheGapps staged by `tools/fetch_mindthegapps.py`, separate `updates-gapps.json` feed)
+- `device-mumba-gapps.patch` -> `device/motorola/mumba` (GApps product `lineage_mumba_gapps`: `WITH_GMS` with MindTheGapps staged by `tools/fetch_mindthegapps.py`, separate `updates-gapps.json` feed, and no OpenEUICC)
 - `mumba-ota-updater.patch` -> `device/motorola/mumba` (LineageOS Updater feed URL for signed GitHub OTA releases)
 - `updater-links.patch` -> `packages/apps/Updater` (open this ROM's XDA changelog and GitHub issue tracker)
 - `mumba-refresh-defaults.patch` -> `device/motorola/mumba` (clean-install refresh settings overlay)
@@ -482,9 +482,11 @@ carrier MCC.
 
 ## eSIM: OpenEUICC integration
 
-Vanilla LineageOS ships no LPA, so eSIM cannot be provisioned. OpenEUICC is
-added as a privileged `system_ext` app that serves as the system
-`EuiccService` (LPA), with no Google dependency.
+Vanilla LineageOS ships no LPA, so eSIM cannot be provisioned. In the vanilla
+product, OpenEUICC is added as a privileged `system_ext` app that serves as the
+system `EuiccService` (LPA), with no Google dependency. The GApps product
+excludes OpenEUICC and uses the vendor Google Euicc (`com.google.android.euicc`)
+instead; `EuiccPolicy` enables it when GMS is present.
 
 - Sources (in the local manifest `mumba.xml`):
   - `fiftydinar/OpenEUICC` -> `packages/apps/OpenEUICC`, pinned to mirror commit
@@ -494,13 +496,19 @@ added as a privileged `system_ext` app that serves as the system
     `fiftydinar/cJSON` and are fetched via `sync-s`.
   - `fiftydinar/android_prebuilts_openeuicc-deps` -> `prebuilts/openeuicc-deps`,
     pinned to `540216793010cabc49782bd01844cd8dd28a4c7c`.
-- `device.mk`: `PRODUCT_PACKAGES += OpenEUICC`.
+- `device.mk`: `PRODUCT_PACKAGES += OpenEUICC` only when `WITH_GMS` is not
+  `true`; `device-mumba-gapps.patch` makes the GApps product use `EuiccGoogle`.
 - Installs to `system_ext/priv-app/OpenEUICC/` with
   `system_ext/etc/permissions/privapp_whitelist_im.angry.openeuicc.xml`.
 - The standalone `MAIN`/`LAUNCHER` entry is hidden; Settings is the user entry
   point. Verified on-device via `Settings > Network & Internet > SIM cards >
   Add SIM`: this launches OpenEUICC's LUI, and `Download eSIM` reaches the
   eUICC/slot selection screen.
+- Vanilla initial setup runs LineageOS SetupWizard and only shows its SIM-missing
+  page when no profile is active; eSIM is configured afterwards from Settings.
+  In GApps, MindTheGapps installs Google SetupWizard; LineageSetupWizard disables
+  its own home component when GMS and Google SetupWizard are present, so Google
+  SetupWizard can offer its eSIM setup flow using EuiccGoogle.
 
 Two compatibility fixes are required for the A16 tree (applied by
 `openeuicc-deps.patch` and `openeuicc-app.patch`):
