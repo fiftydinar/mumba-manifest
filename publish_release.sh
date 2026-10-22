@@ -86,6 +86,7 @@ python3 "$SELF_DIR/ota/generate_updates.py" \
   --ota "$OTA" \
   --tag "$TAG" \
   --repository "$REPOSITORY" \
+  --variant "$VARIANT" \
   --output "$FEED_FILE" \
   --checksum-output "$CHECKSUM_FILE"
 

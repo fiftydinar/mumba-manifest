@@ -13,7 +13,12 @@ OTA_PROPERTIES = (
 )
 
 
-def write_target_files(path: Path, build_type: str = "user", timestamp: str = BUILD_TIMESTAMP):
+def write_target_files(
+    path: Path,
+    build_type: str = "user",
+    timestamp: str = BUILD_TIMESTAMP,
+    version: str = "23.2-20261007-UNOFFICIAL-mumba",
+):
     system_properties = "\n".join(
         (
             f"ro.build.type={build_type}",
@@ -26,7 +31,7 @@ def write_target_files(path: Path, build_type: str = "user", timestamp: str = BU
     product_properties = "\n".join(
         (
             "ro.lineage.releasetype=UNOFFICIAL",
-            "ro.lineage.version=23.2-20261007-UNOFFICIAL-mumba",
+            f"ro.lineage.version={version}",
         )
     )
     with zipfile.ZipFile(path, "w") as archive:
@@ -34,14 +39,19 @@ def write_target_files(path: Path, build_type: str = "user", timestamp: str = BU
         archive.writestr("PRODUCT/etc/build.prop", product_properties)
 
 
-def write_ota(path: Path, ota_type: str = "AB", timestamp: str = BUILD_TIMESTAMP):
+def write_ota(
+    path: Path,
+    ota_type: str = "AB",
+    timestamp: str = BUILD_TIMESTAMP,
+    pre_device: str = "mumba_g",
+):
     metadata = "\n".join(
         (
             f"ota-type={ota_type}",
             f"post-timestamp={timestamp}",
             "post-sdk-level=36",
             "post-security-patch-level=2026-09-01",
-            "pre-device=mumba_g",
+            f"pre-device={pre_device}",
             f"ota-streaming-property-files={OTA_PROPERTIES}",
         )
     )
@@ -99,6 +109,33 @@ class OtaUpdateFeedTest(unittest.TestCase):
         write_ota(self.ota, timestamp="1791387585")
         with self.assertRaisesRegex(ValueError, "post-timestamp"):
             create_update(self.target_files, self.ota, "mumba-test")
+
+    def test_rejects_unknown_pre_device(self):
+        write_ota(self.ota, pre_device="notmumba")
+        with self.assertRaisesRegex(ValueError, "pre-device"):
+            create_update(self.target_files, self.ota, "mumba-test")
+
+    def test_rejects_gapps_build_for_vanilla_variant(self):
+        write_target_files(
+            self.target_files,
+            version="23.2-20261016-UNOFFICIAL-mumba_gapps",
+        )
+        with self.assertRaisesRegex(ValueError, "GApps build"):
+            create_update(self.target_files, self.ota, "mumba-test", variant="vanilla")
+
+    def test_rejects_vanilla_build_for_gapps_variant(self):
+        with self.assertRaisesRegex(ValueError, "not a GApps build"):
+            create_update(self.target_files, self.ota, "mumba-test", variant="gapps")
+
+    def test_accepts_gapps_build_for_gapps_variant(self):
+        write_target_files(
+            self.target_files,
+            version="23.2-20261016-UNOFFICIAL-mumba_gapps",
+        )
+        updates, _ = create_update(
+            self.target_files, self.ota, "mumba-test", variant="gapps"
+        )
+        self.assertEqual(updates[0]["version"], "23.2-20261016-UNOFFICIAL-mumba_gapps")
 
     def test_feed_is_json_serializable(self):
         updates, _ = create_update(self.target_files, self.ota, "mumba-test")

@@ -14,6 +14,7 @@ from urllib.parse import quote
 
 DEFAULT_REPOSITORY = "fiftydinar/mumba-manifest"
 EXPECTED_DEVICE = "mumba"
+ALLOWED_PRE_DEVICES = {"mumba", "mumba_g", "mumba_gapps"}
 ASSET_MAX_BYTES = 2 * 1024 * 1024 * 1024
 
 
@@ -69,6 +70,7 @@ def create_update(
     ota: Path,
     tag: str,
     repository: str = DEFAULT_REPOSITORY,
+    variant: str | None = None,
 ) -> tuple[list[dict[str, object]], str]:
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", tag):
         raise ValueError("release tag may contain only letters, digits, '.', '_' and '-'")
@@ -117,8 +119,16 @@ def create_update(
 
     if metadata.get("ota-type") != "AB":
         raise ValueError("OTA package is not an A/B update")
-    if EXPECTED_DEVICE not in metadata.get("pre-device", "").lower():
-        raise ValueError("OTA pre-device metadata does not match mumba")
+    pre_devices = {
+        device.strip().lower()
+        for device in metadata.get("pre-device", "").split(",")
+        if device.strip()
+    }
+    if not pre_devices or not pre_devices <= ALLOWED_PRE_DEVICES:
+        raise ValueError(
+            "OTA pre-device metadata is not an allowed mumba device: "
+            + ", ".join(sorted(pre_devices))
+        )
 
     try:
         build_timestamp = int(props["ro.build.date.utc"])
@@ -147,6 +157,14 @@ def create_update(
     version = props.get("ro.lineage.version") or props.get("ro.build.version.incremental")
     if not version:
         raise ValueError("target-files is missing the ROM version")
+    if variant is not None:
+        if variant not in {"vanilla", "gapps"}:
+            raise ValueError(f"unknown release variant: {variant}")
+        is_gapps = "mumba_gapps" in version
+        if variant == "gapps" and not is_gapps:
+            raise ValueError(f"target-files version is not a GApps build: {version}")
+        if variant == "vanilla" and is_gapps:
+            raise ValueError(f"target-files version is a GApps build: {version}")
 
     checksum = sha256_file(ota)
     asset_url = (
@@ -178,6 +196,7 @@ def main() -> None:
     parser.add_argument("--ota", required=True, type=Path)
     parser.add_argument("--tag", required=True)
     parser.add_argument("--repository", default=DEFAULT_REPOSITORY)
+    parser.add_argument("--variant", choices=("vanilla", "gapps"))
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--checksum-output", required=True, type=Path)
     args = parser.parse_args()
@@ -188,6 +207,7 @@ def main() -> None:
             args.ota,
             args.tag,
             args.repository,
+            args.variant,
         )
     except (OSError, ValueError, zipfile.BadZipFile) as error:
         parser.error(str(error))
