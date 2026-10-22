@@ -569,6 +569,3 @@ Dolby is removed from the ROM entirely (not just "not ported"):
 
 ## Not ported (by design)
 - Dolby / Viper audio effects (see above).
-
-## Still to consider (later)
-- Speaker EQ profile baked into the audio config/driver.
