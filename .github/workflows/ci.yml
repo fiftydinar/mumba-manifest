@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run shellcheck on all shell scripts
+        run: |
+          find . -maxdepth 2 -name '*.sh' -type f -not -path './.git/*' \
+            -print0 | xargs -0 -n1 shellcheck --severity=warning
+
+  python-tests:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run unit tests
+        run: python3 -m unittest discover -s tests -v
+
+  manifest-and-patches:
+    name: Manifest and patch sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate mumba.xml structure
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          import sys
+
+          tree = ET.parse("mumba.xml")
+          root = tree.getroot()
+          if root.tag != "manifest":
+              sys.exit("mumba.xml: root element is not <manifest>")
+
+          paths = [p.get("path") for p in root.iter("project")]
+          duplicates = sorted(p for p in set(paths) if paths.count(p) > 1)
+          if duplicates:
+              sys.exit(f"duplicate project paths: {duplicates}")
+
+          sources = set()
+          for p in root.iter("project"):
+              if not p.get("path") or not p.get("revision"):
+                  sys.exit(f"project missing path/revision: {p.get('name')}")
+              sources.add(p.get("path"))
+          for r in root.iter("remove-project"):
+              if r.get("name") not in {p.get('name') for p in root.iter('project')} and r.get('path') not in sources:
+                  # LineageOS-style unprefixed name pointing to a forked project is allowed.
+                  pass
+
+          print(f"mumba.xml valid: {len(paths)} projects")
+          PY
+
+      - name: Check patch files exist and are listed
+        run: |
+          # Every patch referenced by apply_port.sh must exist, and every port/*.patch must be wired.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+
+          apply = Path("apply_port.sh").read_text(encoding="utf-8")
+          declared = set(re.findall(r"\[([\w-]+)\]=", apply))
+          ordered = re.search(r"for name in ([\w -]+); do", apply)
+          loop_names = {n.strip() for n in ordered.group(1).split()}
+
+          if declared != loop_names:
+              missing_in_loop = declared - loop_names
+              missing_in_table = loop_names - declared
+              for what, missing in (("PATCH_TREE", missing_in_loop), ("loop", missing_in_table)):
+                  if missing:
+                      sys.exit(f"{what} mismatch: {sorted(missing)}")
+
+          actual = {p.stem.strip('".') for p in Path("port").glob("*.patch")} - {""}
+          actual = {p.name[: -len(".patch")] for p in Path("port").glob("*.patch")}
+          wired = {f"{n}" for n in loop_names}
+          unwired = actual - wired
+          phantom = wired - actual
+          if unwired:
+              sys.exit(f"port/*.patch not wired in apply_port.sh: {sorted(unwired)}")
+          if phantom:
+              sys.exit(f"apply_port.sh references missing patches: {sorted(phantom)}")
+          print(f"{len(actual)} patches wired correctly")
+          PY

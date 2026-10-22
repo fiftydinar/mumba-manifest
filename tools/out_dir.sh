@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Sourced by the build/sign/publish scripts.
 # Vanilla and GApps are separate products and must not share an output tree:
 # building one after the other in the same out/ leaks the other's files into the

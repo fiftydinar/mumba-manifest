@@ -8,7 +8,14 @@ set -euo pipefail
 # --- settings ---
 LINEAGE_BRANCH="${LINEAGE_BRANCH:-lineage-23.2}"
 TARGET="${TARGET:-lineage_mumba-bp4a-userdebug}"
-JOBS="${JOBS:-$(nproc --all)}"
+# Cap parallel jobs by memory as well as cores: a full AOSP build uses roughly
+# 5 GiB per job, so nproc alone OOMs and the kernel gets killed mid-build.
+JOBS="${JOBS:-$(python3 -c "
+import os
+page = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+cpu = os.cpu_count() or 1
+print(max(1, min(cpu, int(page / (5 << 30)) * 2)))
+")}"
 SRC="${SRC:-$HOME/Documenti/lineage-mumba}"
 OUT_DIR="${OUT_DIR:-out}"
 BUILD_TARGET="${BUILD_TARGET:-bacon}"
