@@ -53,6 +53,9 @@ are from the resolved `lineage-23.2` manifest.
 | `packages/apps/Settings` | [`android_packages_apps_Settings`](https://github.com/fiftydinar/android_packages_apps_Settings) | `8d8f6486b274bcf0aa6e5d0cbba52c0b05ae5c65` |
 | `packages/apps/Dialer` | [`android_packages_apps_Dialer`](https://github.com/fiftydinar/android_packages_apps_Dialer) | `6da8042323a97d5b3cba1fd975709cc42f29916f` |
 | `packages/apps/Updater` | [`android_packages_apps_Updater`](https://github.com/LineageOS/android_packages_apps_Updater) | `edcdadf41606ee7f1eb7adad4699d09374438c52` |
+| `frameworks/av` | [`android_frameworks_av`](https://github.com/LineageOS/android_frameworks_av) | `b6b36c1fdb3c6ffced822a054fbf035b544f0de2` |
+| `packages/modules/adb` | [`android_packages_modules_adb`](https://github.com/LineageOS/android_packages_modules_adb) | `e7ed41a85f5a0a8c9db0ed7ba21c6ebd277b5db6` |
+| `vendor/lineage` | [`android_vendor_lineage`](https://github.com/LineageOS/android_vendor_lineage) | `ca37c450e98fefb0cd53b864c469c1a7d024c53f` |
 | `hardware/qcom-caf/common` | [`android_hardware_qcom-caf_common`](https://github.com/fiftydinar/android_hardware_qcom-caf_common) | `5cd53603d36aaddd9ba9d882dad5411f1b30fbed` |
 | `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` | [`android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `6a42341357a56903eea27a74fdb161a26402dcc3` |
 

@@ -89,8 +89,13 @@ bash "$SELF_DIR/apply_port.sh"
 
 # GApps variant: stage the latest MindTheGapps into vendor/partner_gms before lunch.
 if [[ "$TARGET" == lineage_mumba_gapps-* ]]; then
+  # Pin an exact MindTheGapps release so GApps builds are reproducible.
+  if [[ -z "${MINDTHEGAPPS_TAG:-}" ]]; then
+    MINDTHEGAPPS_TAG="MindTheGapps-16.0.0-arm64-20260915_222150"
+    echo "### MINDTHEGAPPS_TAG not set, using pinned default: $MINDTHEGAPPS_TAG"
+  fi
   echo "### stage MindTheGapps (vendor/partner_gms)"
-  python3 "$SELF_DIR/tools/fetch_mindthegapps.py" --tree "$SRC" ${MINDTHEGAPPS_TAG:+--tag "$MINDTHEGAPPS_TAG"}
+  python3 "$SELF_DIR/tools/fetch_mindthegapps.py" --tree "$SRC" --tag "$MINDTHEGAPPS_TAG"
 fi
 
 echo "### build"

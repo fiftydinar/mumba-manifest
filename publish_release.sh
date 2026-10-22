@@ -30,6 +30,11 @@ RECOVERY_IMG="${4:-}"
 }
 [[ -d "$RELEASE_DIR" ]] || { echo "error: release directory not found: $RELEASE_DIR" >&2; exit 1; }
 RELEASE_DIR="$(cd "$RELEASE_DIR" && pwd -P)"
+# Record the MindTheGapps release used, so GApps builds document their GApps version.
+MINDTHEGAPPS_NOTE=""
+if [[ -f "$SRC/vendor/partner_gms/products/gms_minimal.mk" ]]; then
+  MINDTHEGAPPS_NOTE="$(sed -n 's/^# MindTheGapps //p' "$SRC/vendor/partner_gms/products/gms_minimal.mk" | head -1)"
+fi
 OTA="$RELEASE_DIR/lineage_mumba-signed-ota.zip"
 TARGET_FILES="$RELEASE_DIR/lineage_mumba-signed-target_files.zip"
 [[ -f "$OTA" ]] || { echo "error: signed OTA not found: $OTA" >&2; exit 1; }
@@ -126,7 +131,13 @@ if [[ -n "$NOTES_FILE" ]]; then
     --latest
 else
   RELEASE_NOTES="Signed full A/B OTA for Motorola Moto G57 Power / G100s (mumba).
-
+"
+  if [[ "$VARIANT" == "gapps" && -n "$MINDTHEGAPPS_NOTE" ]]; then
+    RELEASE_NOTES+="
+GApps: MindTheGapps ${MINDTHEGAPPS_NOTE}.
+"
+  fi
+  RELEASE_NOTES+="
 Installation instructions (XDA thread): https://xdaforums.com/t/rom-16-2-unofficial-lineageos-23-2-with-slight-additions-for-motorola-moto-g57-power-mumba.4804376/"
   gh release create "$TAG" "${RELEASE_ASSETS[@]}" \
     --repo "$REPOSITORY" \

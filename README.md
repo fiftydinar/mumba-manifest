@@ -5,7 +5,7 @@ with the **kernel built from source**.
 
 This repository contains:
 - `mumba.xml` - local manifest (device tree, vendor, hardware, kernel source/modules/devicetrees,
-  OpenEUICC LPA) with **pinned revisions** (commit SHA). Custom forks are pinned exactly; projects that are only patched (Updater, frameworks/av, adb, vendor/lineage) track the moving `lineage-23.2` manifest and are not pinned.
+  OpenEUICC LPA) with **pinned revisions** (commit SHA) for reproducible builds.
 - `build.sh` - userdebug build; `SYNC=false` reuses the synced source tree.
 - `build_release.sh` + `sign_release.sh` - isolated `user` build and locally
   signed target-files/OTA release.
@@ -183,6 +183,10 @@ upstream base SHAs are from the resolved `lineage-23.2` manifest
 | `packages/apps/Messaging` | [`fiftydinar/android_packages_apps_Messaging`](https://github.com/fiftydinar/android_packages_apps_Messaging) | `LineageOS/android_packages_apps_Messaging` | `6d131ed8e7249b0ece41169e17d8d0162beae7e0` | `d8feea90e13da21fa279e72982cc0bae49600f35` |
 | `hardware/qcom-caf/common` | [`fiftydinar/android_hardware_qcom-caf_common`](https://github.com/fiftydinar/android_hardware_qcom-caf_common) | `LineageOS/android_hardware_qcom-caf_common` | `5cd53603d36aaddd9ba9d882dad5411f1b30fbed` | `5cd53603d36aaddd9ba9d882dad5411f1b30fbed` |
 | `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `6a42341357a56903eea27a74fdb161a26402dcc3` | `6a42341357a56903eea27a74fdb161a26402dcc3` |
+| `packages/apps/Updater` | LineageOS (via `remote="lineage"`) | `LineageOS/android_packages_apps_Updater` | `edcdadf41606ee7f1eb7adad4699d09374438c52` | `edcdadf41606ee7f1eb7adad4699d09374438c52` |
+| `frameworks/av` | LineageOS (via `remote="lineage"`) | `LineageOS/android_frameworks_av` | `b6b36c1fdb3c6ffced822a054fbf035b544f0de2` | `b6b36c1fdb3c6ffced822a054fbf035b544f0de2` |
+| `packages/modules/adb` | LineageOS (via `remote="lineage"`) | `LineageOS/android_packages_modules_adb` | `e7ed41a85f5a0a8c9db0ed7ba21c6ebd277b5db6` | `e7ed41a85f5a0a8c9db0ed7ba21c6ebd277b5db6` |
+| `vendor/lineage` | LineageOS (via `remote="lineage"`) | `LineageOS/android_vendor_lineage` | `ca37c450e98fefb0cd53b864c469c1a7d024c53f` | `ca37c450e98fefb0cd53b864c469c1a7d024c53f` |
 
 The GitHub projects are forks, except for the two OpenEUICC repositories,
 which are full GitHub mirrors of their original Gitea repositories. The
