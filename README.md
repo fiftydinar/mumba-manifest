@@ -104,6 +104,32 @@ keys inside the repo/source tree. These are personal ROM/AVB keys, not Motorola
 OEM keys, so they do not enable relocking the bootloader or OEM Verified Boot
 trust.
 
+### Build fingerprint and signing keys
+
+`lineage_mumba.mk` overrides the generated build fingerprint to a stock Motorola
+value:
+
+```text
+motorola/mumba_g/mumba:16/W1WAAS36.48-12-23-9/83f8c:user/test-keys
+```
+
+This is a compatibility override, not a statement about the signing keys:
+
+- The final `test-keys` field is part of the fingerprint string that apps read
+  through `ro.build.fingerprint`. It does not select, contain, or verify a
+  signing key.
+- The default `userdebug` build is signed with the public AOSP test keys.
+- The signed `user` release is re-signed by `sign_release.sh` with the personal
+  `releasekey`, platform/shared/media/... keys and the personal AVB keys. Its
+  actual signer is your key, even though the overridden fingerprint still ends
+  in `test-keys`.
+- Keystore and Play Integrity attestation do not trust this string; they use
+  attestation and the actual keys.
+- To make the fingerprint reflect the real build instead, remove the
+  `BuildFingerprint`/`BuildDesc` overrides or change `test-keys` to
+  `release-keys`. That may affect app compatibility, which is why the stock
+  value is kept.
+
 ### Publish an OTA to GitHub Releases
 
 The ROM includes the LineageOS **Updater** app and uses Android's A/B
@@ -303,9 +329,6 @@ atest MessagingNotificationActionTests
 Do not fork `LineageOS/android` directly: its `fetch=".."` would break every remote in the manifest.
 
 ## Notes
-- The default `userdebug` build is signed with the public AOSP test keys. The
-  signed `user` release is re-signed with your personal keys; the `test-keys`
-  string in the spoofed build fingerprint is not the signing key.
 - A clean flash is required when switching from a ROM signed with different keys
   (stock, official LineageOS, or another custom ROM). Later updates signed with
   the same release keys can be installed through the Updater without wiping.
