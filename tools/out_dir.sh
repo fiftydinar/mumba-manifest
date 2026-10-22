@@ -11,12 +11,3 @@ mumba_out_dir() {
     *)       echo "out-vanilla" ;;
   esac
 }
-
-# Resolve a possibly-relative output directory against the source tree.
-mumba_resolve_out_dir() {
-  local src="$1" dir="$2"
-  if [[ "$dir" != /* ]]; then
-    dir="$src/$dir"
-  fi
-  printf '%s\n' "$dir"
-}

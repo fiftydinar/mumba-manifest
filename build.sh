@@ -17,13 +17,21 @@ cpu = os.cpu_count() or 1
 print(max(1, min(cpu, int(page / (5 << 30)) * 2)))
 ")}"
 SRC="${SRC:-$HOME/Documenti/lineage-mumba}"
-OUT_DIR="${OUT_DIR:-out}"
+OUT_DIR="${OUT_DIR:-}"
 BUILD_TARGET="${BUILD_TARGET:-bacon}"
 SYNC="${SYNC:-true}"
 
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MANIFEST_FILE="${MANIFEST_FILE:-$SELF_DIR/mumba.xml}"
 MANIFEST_URL="${MANIFEST_URL:-https://raw.githubusercontent.com/fiftydinar/mumba-manifest/main/mumba.xml}"
+# Debug GApps builds need their own out tree just like release builds.
+if [[ -z "$OUT_DIR" ]]; then
+  if [[ "$TARGET" == *gapps* ]]; then
+    OUT_DIR="out-gapps"
+  else
+    OUT_DIR="out"
+  fi
+fi
 # ----------------
 
 export PATH="$HOME/.local/bin:$PATH"
