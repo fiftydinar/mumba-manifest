@@ -207,6 +207,29 @@ Unlisted projects come from the **official LineageOS** manifest. `frameworks/bas
 is the pinned fork listed below because it carries the microG and Java boot-property
 compatibility changes.
 
+## Aperture camera on mumba
+
+The mumba-specific camera work is maintained separately in the
+[`fiftydinar/android_packages_apps_Aperture` `mumba-test` branch](https://github.com/fiftydinar/android_packages_apps_Aperture/tree/mumba-test)
+(camera update `272ca78`). It is not currently pinned by `mumba.xml`; a clean
+manifest sync uses LineageOS Aperture unless the build tree explicitly selects
+that fork.
+
+On the Moto G57 Power, the fork uses a Camera2/GL path for aspect-ratio-aware
+photo capture and supported SDR video profiles. Main, ultra-wide (0.6×), and
+selfie switches can stay in one video file when that camera supports the selected
+resolution and frame rate. The selfie and pause/resume controls remain separate
+while recording. Camera2 sessions are closed before a profile resize/rebind, to
+avoid stale-session preview freezes during PHOTO/VIDEO changes.
+
+The phone exposes three Camera2 devices: rear main (`0`), front (`1`), and rear
+ultra-wide (`2`). The front and ultra-wide sensors top out at 30fps; the main
+camera supports FHD 60fps and 720p 120fps. Thus lens/selfie switching is exposed
+for compatible profiles up to 30fps. The dedicated 720p120 constrained-high-speed
+path remains main-camera-only. Motorola identifies the additional rear module as
+a 2-in-1 ambient-light/flicker sensor, not an imaging/depth camera
+([device specifications](https://en-us.support.motorola.com/app/answers/detail/a_id/190335/~/specifications---moto-g57-power)).
+
 ## Source revisions
 
 The following revisions are pinned in `mumba.xml`:
