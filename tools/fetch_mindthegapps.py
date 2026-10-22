@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Stage the latest MindTheGapps (Android 16, arm64) as vendor/partner_gms.
+"""Stage MindTheGapps (Android 16, arm64) as vendor/partner_gms.
 
-Downloads the newest MindTheGapps 16.0.0-arm64 release, verifies its sha256 and
-stages:
+Downloads the selected MindTheGapps 16.0.0-arm64 release (latest by default),
+requires and verifies its sha256, and stages:
 
 - proprietary/: product/ and system_ext/ from the zip (APKs are not used from the
   zip's overlay/ directory; overlays are rebuilt from source, see below).
@@ -223,7 +223,7 @@ def main() -> None:
     parser.add_argument("--tree", type=Path, default=Path.cwd(),
                         help="build tree root (contains device/ and vendor/)")
     parser.add_argument("--cache", type=Path, default=None,
-                        help="download cache dir (default: <tree>/.cache/mindthegapps)")
+                        help="download cache dir (default: ~/.cache/mumba-mindthegapps)")
     parser.add_argument("--tag", default=None,
                         help="pin an exact MindTheGapps release tag (default: latest)")
     args = parser.parse_args()
@@ -244,16 +244,16 @@ def main() -> None:
         print(f"### downloading {zip_name}")
         download(assets[zip_name], zip_path)
 
-    expected = None
     sha_name = zip_name + ".sha256sum"
-    if sha_name in assets:
-        sha_path = cache / sha_name
-        if not sha_path.exists():
-            download(assets[sha_name], sha_path)
-        expected = sha_path.read_text(encoding="utf-8").split()[0].strip()
+    if sha_name not in assets:
+        sys.exit(f"error: MindTheGapps release has no {sha_name} asset")
+    sha_path = cache / sha_name
+    if not sha_path.exists():
+        download(assets[sha_name], sha_path)
+    expected = sha_path.read_text(encoding="utf-8").split()[0].strip()
 
     actual = sha256_file(zip_path)
-    if expected and expected != actual:
+    if expected != actual:
         zip_path.unlink(missing_ok=True)
         sys.exit(f"error: sha256 mismatch for {zip_name} (expected {expected}, got {actual})")
     print(f"### MindTheGapps {tag} sha256 {actual}")
