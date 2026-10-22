@@ -48,10 +48,16 @@ Output: `out/target/product/mumba/lineage-23.2-*-mumba.zip`
 ## Separate signed user release
 
 `build_release.sh` uses a separate source tree (`$HOME/Documenti/lineage-mumba-release`)
-and output directory, so it leaves the normal userdebug checkout and artifacts
-alone. It builds `lineage_mumba-bp4a-user`, the target-files package, and the
-host releasetools required to sign it. The default release concurrency is two
-jobs; override with `JOBS` if the build host has more memory.
+and per-variant output directories (`out-vanilla`, `out-gapps`), so it leaves the
+normal userdebug checkout and artifacts alone and keeps the variants from
+leaking files into each other. It builds the `user` target for the chosen
+variant — `TARGET=lineage_mumba-bp4a-user` (vanilla, default) or
+`TARGET=lineage_mumba_gapps-bp4a-user` (GApps) — including the target-files
+package and the host releasetools required to sign it. The default release
+concurrency is two jobs; override with `JOBS` if the build host has more memory.
+The GApps target stages MindTheGapps into `vendor/partner_gms` before `lunch`
+(see the GApps section); it is pinned by `MINDTHEGAPPS_TAG`, defaulting to a
+fixed release.
 For subsequent builds in that tree, `SYNC=false bash build_release.sh` skips
 `repo sync`; patch application is safe to repeat. The normal debug build can
 likewise be rebuilt without syncing using `SYNC=false bash build.sh`.
@@ -81,10 +87,15 @@ SRC="$HOME/Documenti/lineage-mumba-release" bash sign_release.sh "$KEYS"
 ```
 
 `sign_release.sh` preserves the unsigned target-files package and writes a
-signed target-files ZIP, signed full OTA, and SHA-256 checksums under
-`out/target/product/mumba/release-signed/`. It expects the key names shown
+signed target-files ZIP, signed full OTA, and SHA-256 checksums under the
+per-variant release directory, e.g.
+`out-vanilla/target/product/mumba/release-signed/` for the vanilla target
+(`TARGET=lineage_mumba-bp4a-user`, the default) or
+`out-gapps/target/product/mumba/release-signed/` for the GApps target
+(`TARGET=lineage_mumba_gapps-bp4a-user`). It expects the key names shown
 above; it remaps the platform/default APK keys, replaces APEX payload keys, and
-signs vbmeta with the personal AVB keys. Keep the same key set for future OTA
+signs vbmeta with the personal AVB keys, leaving GApps APKs `presigned` in the
+GApps variant. Keep the same key set for future OTA
 updates. The script refuses to overwrite a non-empty output directory or use
 keys inside the repo/source tree. These are personal ROM/AVB keys, not Motorola
 OEM keys, so they do not enable relocking the bootloader or OEM Verified Boot
@@ -94,22 +105,36 @@ trust.
 
 The ROM includes the LineageOS **Updater** app and uses Android's A/B
 `update_engine`. `apply_port.sh` configures it to read the current update feed at
-[`ota/updates.json`](ota/updates.json) from this repository's `main` branch.
-Each published release contains the signed full OTA and a SHA-256 sidecar; the
-feed points to the versioned GitHub Release asset. The updater downloads and
+[`ota/updates.json`](ota/updates.json) from this repository's `main` branch; the
+GApps variant uses the separate [`ota/updates-gapps.json`](ota/updates-gapps.json)
+feed, so vanilla and GApps installs never receive each other's OTAs. Each
+published release contains the signed full OTA, the flash images (boot, dtbo,
+init_boot, vendor_boot, recovery, vbmeta, vbmeta_system) with per-file checksums,
+and `copy-partitions-20220613-signed.zip`; the feed points to the versioned
+GitHub Release asset. The updater downloads and
 verifies the signed OTA, installs it to the inactive slot with `update_engine`,
 and prompts for a reboot.
 
 After `build_release.sh` and `sign_release.sh` complete, publish with GitHub CLI
-authenticated as a user who can publish releases and push to `main`. The fourth
-argument optionally adds a recovery image and its checksum sidecar:
+authenticated as a user who can publish releases and push to `main`. Set
+`VARIANT=gapps` for the GApps release (it publishes to `updates-gapps.json` and
+labels the release "(GApps)"); the release directory must match the variant:
 
 ```bash
+# vanilla (default)
 SRC="$HOME/Documenti/lineage-mumba-release" \
   bash publish_release.sh "mumba-23.2-YYYYMMDD" \
-  "$HOME/Documenti/lineage-mumba-release/out/target/product/mumba/release-signed" \
-  "" "$HOME/Scaricati/recovery.img"
+  "$SRC/out-vanilla/target/product/mumba/release-signed"
+
+# GApps
+SRC="$HOME/Documenti/lineage-mumba-release" \
+  env VARIANT=gapps bash publish_release.sh "mumba-23.2-gapps-YYYYMMDD" \
+  "$SRC/out-gapps/target/product/mumba/release-signed"
 ```
+
+The vanilla example adds optional release notes / recovery image as the third and
+fourth arguments (as before). The releases appear in the XDA thread download
+links; both variants must use distinct tags.
 
 The script validates that the target-files package is a `user` build for mumba
 and matches the signed A/B OTA metadata, uploads the OTA and checksum as the
@@ -125,8 +150,7 @@ The feed generator tests can be run with `python3 -m unittest discover -s tests`
 
 | Path | Repository | Purpose |
 |---|---|---|
-| `device/motorola/mumba` | [fiftydinar/android_device_motorola_mumba](https://github.com/fiftydinar/android_device_motorola_mumba) | forked ZaraKinYu device tree; builds the kernel from source |
-| `device/motorola/mumba/fakestore` | [fiftydinar/android_device_motorola_mumba](https://github.com/fiftydinar/android_device_motorola_mumba) | upstream microG FakeStore v0.2.1 stub; present in the tree but no longer built (removed by `device-mumba.patch`) |
+| `device/motorola/mumba` | [fiftydinar/android_device_motorola_mumba](https://github.com/fiftydinar/android_device_motorola_mumba) | forked ZaraKinYu device tree; builds the kernel from source. The bundled microG FakeStore stub was removed (`fakestore/` directory dropped by `device-mumba-gapps.patch`) |
 | `vendor/motorola/mumba` | [fiftydinar/vendor_motorola_mumba_latest](https://github.com/fiftydinar/vendor_motorola_mumba_latest) | forked lostsignal vendor tree; proprietary blobs and device firmware |
 | `hardware/motorola` | [fiftydinar/android_hardware_motorola](https://github.com/fiftydinar/android_hardware_motorola) | forked Motorola HAL |
 | `kernel/motorola/sm6435` | [fiftydinar/android_kernel_motorola_sm6435](https://github.com/fiftydinar/android_kernel_motorola_sm6435) | forked kernel source (Kbuild) |
@@ -203,15 +227,23 @@ patch.
 
 ## GApps
 
-FakeStore is no longer bundled. `device-mumba.patch` removes the
-`PRODUCT_PACKAGES += FakeStore` block from `device.mk`, because the
-`com.android.vending` stub conflicted with installing GApps. The `fakestore/`
-directory remains in the device tree but is not built.
+FakeStore is not bundled. `device-mumba.patch` removes the
+`PRODUCT_PACKAGES += FakeStore` block from `device.mk` (the
+`com.android.vending` stub conflicted with installing GApps), and
+`device-mumba-gapps.patch` removes the now-unused `fakestore/` directory from
+the device tree.
 
-For LineageOS 23 / Android 16, LineageOS recommends
-[MindTheGapps ARM64](https://github.com/MindTheGapps/16.0.0-arm64/releases),
-installed after the ROM and before the first system boot. For an integrated
-GApps build, set `WITH_GMS=true`.
+There are two ways to get Google apps:
+- **Sideload afterwards** — for LineageOS 23 / Android 16, LineageOS recommends
+  [MindTheGapps ARM64](https://github.com/MindTheGapps/16.0.0-arm64/releases),
+  installed after the ROM and before the first system boot.
+- **Integrated GApps build** — the separate `lineage_mumba_gapps` product
+  (`TARGET=lineage_mumba_gapps-bp4a-user`) stages MindTheGapps into
+  `vendor/partner_gms` via `tools/fetch_mindthegapps.py` and is pinned by
+  `MINDTHEGAPPS_TAG`. Google APKs keep their original Google signatures
+  (`presigned`), and AVB stays enabled because the GApps content is part of the
+  signed `product`/`system_ext` hashtree. Updates arrive through the separate
+  `ota/updates-gapps.json` feed.
 
 OpenEUICC's submodules also use GitHub forks, pinned by the OpenEUICC gitlinks:
 
@@ -260,7 +292,7 @@ Do not fork `LineageOS/android` directly: its `fetch=".."` would break every rem
 - The userdebug build is SELinux permissive; the separate `user` release omits
   that boot argument, uses enforcing mode, and leaves AVB verification enabled.
 - `flash_all.sh` runs `fastboot -w` and erases userdata. Set `IMG_DIR` to the
-  build output directory, e.g. `IMG_DIR="/path/to/lineage-mumba/out/target/product/mumba" bash flash_all.sh`.
+  build output directory, e.g. `IMG_DIR="/path/to/lineage-mumba/out-vanilla/target/product/mumba" bash flash_all.sh`.
 - ccache speeds up rebuilds.
 - The first build takes hours (kernel + ~170k targets).
 - **eSIM** works on vanilla via **OpenEUICC** (privileged LPA, no Google).

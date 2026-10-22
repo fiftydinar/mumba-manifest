@@ -37,8 +37,10 @@ These are the exact source commits the patch files were made against. The
 device, vendor, and kernel revisions are pinned in `mumba.xml`; the OpenEUICC
 patches are based on upstream commit `2a85b8dad6000eea9dd622a468b7558e79933b2a`.
 Its manifest pin is a mirror-only child commit that rewrites the two submodule
-URLs to the corresponding `fiftydinar` forks. The LineageOS project revisions
-are from the resolved `lineage-23.2` manifest.
+URLs to the corresponding `fiftydinar` forks. The LineageOS projects that are
+only patched (Updater, `frameworks/av`, `adb`, `vendor/lineage`) are pinned in
+`mumba.xml` via the `lineage` remote so patch application cannot break between
+builds.
 
 | Patch target | GitHub copy | Commit |
 |---|---|---|
@@ -383,11 +385,15 @@ does not turn on USB debugging itself.
 
 The `eng` and `userdebug` variants remain **Permissive**
 (`androidboot.selinux=permissive`) for debugging. The `user` release variant
-omits that argument and boots with SELinux enforcing by default; enforcing-mode
-boot and hardware validation have not yet been completed. Debug variants also
-set AVB flags `3` (disable verification/hashtree); the `user` variant omits
-those debug flags so AVB verification stays enabled and can be re-signed with
-the owner's AVB keys.
+omits that argument and boots with SELinux enforcing by default; enforcing mode
+is the shipped configuration. It is validated in daily use and confirmed working
+by users on the device (boot, calls, data, camera, fingerprint, eSIM); the audit
+sections below reflect what was fixed while reaching that state. Debug variants
+also set AVB flags `3` (disable verification/hashtree); the `user` variant omits
+those debug flags so AVB verification stays enabled, the signed `vbmeta`
+descriptors chain through `vbmeta_system` with flags `0`, and the full
+`avbtool verify_image --follow_chain_partitions` chain passes for both the
+vanilla and GApps release packages.
 An earlier boot lost over 1,500 audit records because logd applied a 5/sec rate
 limit and the kernel audit backlog was 64.
 
