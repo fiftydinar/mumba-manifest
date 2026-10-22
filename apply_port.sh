@@ -52,8 +52,15 @@ for name in device-mumba device-mumba-gapps mumba-ota-updater updater-links mumb
   tree_revision="$(git -C "$tree" rev-parse HEAD)"
   if [ -f "$marker" ] && read -r applied_hash applied_revision < "$marker" && \
      [ "$patch_hash" = "$applied_hash" ] && [ "$tree_revision" = "$applied_revision" ]; then
-    echo "already applied (state): $patch -> $tree"
-    continue
+    # A clean worktree at the same revision means the tree was reset after the
+    # marker was written; re-apply instead of silently skipping the patch.
+    if [ -z "$(git -C "$tree" status --porcelain)" ]; then
+      echo "stale state marker (clean tree): $patch -> $tree"
+      rm -f "$marker"
+    else
+      echo "already applied (state): $patch -> $tree"
+      continue
+    fi
   fi
   if git -C "$tree" apply --check --whitespace=nowarn "$patch" >/dev/null 2>&1; then
     git -C "$tree" apply --whitespace=nowarn "$patch"
