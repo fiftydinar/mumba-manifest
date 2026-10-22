@@ -5,13 +5,13 @@ with the **kernel built from source**.
 
 This repository contains:
 - `mumba.xml` - local manifest (device tree, vendor, hardware, kernel source/modules/devicetrees,
-  OpenEUICC LPA) with **pinned revisions** (commit SHA) for reproducible builds.
+  OpenEUICC LPA) with **pinned revisions** (commit SHA). Custom forks are pinned exactly; projects that are only patched (Updater, frameworks/av, adb, vendor/lineage) track the moving `lineage-23.2` manifest and are not pinned.
 - `build.sh` - userdebug build; `SYNC=false` reuses the synced source tree.
 - `build_release.sh` + `sign_release.sh` - isolated `user` build and locally
   signed target-files/OTA release.
 - `publish_release.sh` + `ota/` - publish a signed A/B OTA to GitHub Releases
   and update the LineageOS Updater feed on `main`.
-- `apply_port.sh` + `port/` - twenty-six local patches for device fixes, audio,
+- `apply_port.sh` + `port/` - twenty-seven local patches for device fixes, audio,
   debug tooling, touchscreen compatibility, adaptive refresh rates, OpenEUICC/eSIM,
   Dialer auto call recording, updater changelog/issues links, and the OTA feed URL,
   applied on top of a fresh `repo sync`; it also installs the required QCOM CAF
