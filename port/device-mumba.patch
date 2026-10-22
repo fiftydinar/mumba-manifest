@@ -1,5 +1,5 @@
 diff --git a/BoardConfig.mk b/BoardConfig.mk
-index 9dea7e6..86cd418 100644
+index 9dea7e6..5829df0 100644
 --- a/BoardConfig.mk
 +++ b/BoardConfig.mk
 @@ -58,7 +58,13 @@ TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/config.fs
@@ -18,7 +18,7 @@ index 9dea7e6..86cd418 100644
  # Init Boot
  BOARD_INIT_BOOT_HEADER_VERSION := 4
 @@ -71,13 +77,18 @@ BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
-
+ 
  # Kernel
  BOARD_KERNEL_CMDLINE += \
 -    console=ttynull \
@@ -63,8 +63,10 @@ index 9dea7e6..86cd418 100644
 +
  # Metadata
  BOARD_USES_METADATA_PARTITION := true
-
-@@ -237,10 +252,13 @@ ENABLE_VENDOR_RIL_SERVICE := true
+ 
+@@ -235,12 +250,15 @@ ENABLE_VENDOR_RIL_SERVICE := true
+ 
+ # SEPolicy
  include device/lineage/sepolicy/libperfmgr/sepolicy.mk
 -include device/qcom/sepolicy_vndr/SEPolicy.mk
 +include hardware/qcom-caf/common/os_pickup_sepolicy_vndr.mk
@@ -79,54 +81,6 @@ index 9dea7e6..86cd418 100644
  BOARD_AVB_ROLLBACK_INDEX := 22
  BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := 22
  BOARD_AVB_VBMETA_SYSTEM := system system_ext product pvmfw
-
-diff --git a/sepolicy/vendor/hal_vibrator_default.te b/sepolicy/vendor/hal_vibrator_default.te
-new file mode 100644
-index 0000000..a82bba0
---- /dev/null
-+++ b/sepolicy/vendor/hal_vibrator_default.te
-@@ -0,0 +1 @@
-+hal_client_domain(hal_vibrator_default, hal_audio)
-
-diff --git a/sepolicy/vendor/service_contexts b/sepolicy/vendor/service_contexts
-new file mode 100644
-index 0000000..b71e8a9
---- /dev/null
-+++ b/sepolicy/vendor/service_contexts
-@@ -0,0 +1,2 @@
-+com.motorola.hardware.camera.postprocess.IPostProcService/default u:object_r:vendor_hal_postproc_service:s0
-+com.motorola.hardware.biometric.fingerprint.IMotoCaptiveSensorTest/default u:object_r:hal_fingerprint_service:s0
-
-diff --git a/sepolicy/vendor/location.te b/sepolicy/vendor/location.te
-new file mode 100644
-index 0000000..6984053
---- /dev/null
-+++ b/sepolicy/vendor/location.te
-@@ -0,0 +1,14 @@
-+# The QTI location launcher uses binder for QMS and platform services,
-+# QRTR for modem communication, and network access for XTRA/LOWI assistance.
-+binder_use(vendor_location)
-+binder_call(vendor_location, system_server)
-+binder_call(vendor_location, vendor_cnd)
-+binder_call(vendor_location, vendor_qms)
-+
-+allow vendor_location vendor_qms_service:service_manager find;
-+allow vendor_location fwk_sensor_hwservice:hwservice_manager find;
-+allow vendor_location vendor_hal_gnss_qti:unix_dgram_socket sendto;
-+allow vendor_location self:qipcrtr_socket create_socket_perms_no_ioctl;
-+allow vendor_location self:netlink_route_socket { create bind read };
-+allowxperm vendor_location self:udp_socket ioctl lowi_server_ioctls;
-+net_domain(vendor_location)
-
-diff --git a/sepolicy/vendor/hal_gnss_qti.te b/sepolicy/vendor/hal_gnss_qti.te
-new file mode 100644
-index 0000000..3b1ee9a
---- /dev/null
-+++ b/sepolicy/vendor/hal_gnss_qti.te
-@@ -0,0 +1,2 @@
-+# GNSS uses the framework sensor manager for its sensor-assisted location path.
-+allow vendor_hal_gnss_qti fwk_sensor_service:service_manager find;
-
 diff --git a/camera/Android.bp b/camera/Android.bp
 new file mode 100644
 index 0000000..c18ace5
@@ -240,22 +194,6 @@ index 0000000..3891406
 +    int32_t strength = getTorchDefaultStrengthLevelExt();
 +    setTorchStrengthLevelExt(enabled ? strength : 0, enabled);
 +}
-diff --git a/configs/vintf/compatibility_matrix.device.xml b/configs/vintf/compatibility_matrix.device.xml
-index 151182e..bb1b9b5 100644
---- a/configs/vintf/compatibility_matrix.device.xml
-+++ b/configs/vintf/compatibility_matrix.device.xml
-@@ -54,11 +54,4 @@
-             <instance>default</instance>
-         </interface>
-     </hal>
--    <hal format="aidl">
--        <name>vendor.dolby.dms</name>
--        <interface>
--            <name>IDms</name>
--            <instance>default</instance>
--        </interface>
--    </hal>
- </compatibility-matrix>
 diff --git a/configs/power/powerhint.json b/configs/power/powerhint.json
 index 811c840..347e307 100644
 --- a/configs/power/powerhint.json
@@ -314,8 +252,24 @@ index 811c840..347e307 100644
      },
      {
        "PowerHint": "LAUNCH",
+diff --git a/configs/vintf/compatibility_matrix.device.xml b/configs/vintf/compatibility_matrix.device.xml
+index 151182e..bb1b9b5 100644
+--- a/configs/vintf/compatibility_matrix.device.xml
++++ b/configs/vintf/compatibility_matrix.device.xml
+@@ -54,11 +54,4 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="aidl">
+-        <name>vendor.dolby.dms</name>
+-        <interface>
+-            <name>IDms</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+ </compatibility-matrix>
 diff --git a/device.mk b/device.mk
-index dc98d55..db34882 100644
+index dc98d55..f5ae720 100644
 --- a/device.mk
 +++ b/device.mk
 @@ -5,6 +5,14 @@
@@ -333,15 +287,7 @@ index dc98d55..db34882 100644
  # Add common definitions for Qualcomm
  $(call inherit-product, hardware/qcom-caf/common/common.mk)
  
-@@ -64,6 +72,7 @@ PRODUCT_PACKAGES += \
-     libdownmixaidl \
-     libdynamicsprocessingaidl \
-     libloudnessenhanceraidl \
-+    libmumba_speaker_eq \
-     libreverbaidl \
-     libvisualizeraidl
- 
-@@ -123,6 +132,9 @@ PRODUCT_COPY_FILES += \
+@@ -123,6 +131,9 @@ PRODUCT_COPY_FILES += \
      frameworks/native/data/etc/android.hardware.camera.full.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.full.xml \
      frameworks/native/data/etc/android.hardware.camera.raw.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.raw.xml
  
@@ -351,7 +297,7 @@ index dc98d55..db34882 100644
  # Dalvik
  $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
  
-@@ -143,12 +155,8 @@ PRODUCT_COPY_FILES += \
+@@ -143,12 +154,8 @@ PRODUCT_COPY_FILES += \
  
  # eUICC
  PRODUCT_PACKAGES += \
@@ -366,7 +312,7 @@ index dc98d55..db34882 100644
  
  # DRM
  PRODUCT_PACKAGES += \
-@@ -224,6 +232,9 @@ $(call soong_config_set,lineage_health,charging_control_charging_enabled,0)
+@@ -224,6 +231,9 @@ $(call soong_config_set,lineage_health,charging_control_charging_enabled,0)
  $(call soong_config_set,lineage_health,charging_control_charging_path,/sys/class/power_supply/battery/device/force_charging_disable)
  $(call soong_config_set,lineage_health_bool,charging_control_supports_bypass,false)
  
@@ -376,14 +322,7 @@ index dc98d55..db34882 100644
  # Moto hardware
  PRODUCT_PACKAGES += \
      MotoActions \
-@@ -231,13 +242,23 @@ PRODUCT_PACKAGES += \
- 
- # Overlay
- PRODUCT_ENFORCE_RRO_TARGETS := *
-+PRODUCT_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
- 
- PRODUCT_PACKAGES += \
-     SystemUIResMumba \
+@@ -237,7 +247,16 @@ PRODUCT_PACKAGES += \
      WifiResMumba \
      FrameworksResMumba \
      SettingsResMumba \
@@ -457,9 +396,8 @@ index a22a6d3..887f91d 100644
  service vendor.hal-fps-sh /vendor/bin/init.oem.fingerprint2.sh
      class late_start
      user root
- 
 diff --git a/init/init.qcom.rc b/init/init.qcom.rc
-index 5819383..85d0653 100644
+index 5819383..1a9c569 100644
 --- a/init/init.qcom.rc
 +++ b/init/init.qcom.rc
 @@ -253,6 +253,9 @@ on boot
@@ -610,7 +548,7 @@ index 0000000..288cfa9
 +</manifest>
 diff --git a/overlay/DeviceAsWebcamMumba/res/raw/ignored_v4l2_nodes.json b/overlay/DeviceAsWebcamMumba/res/raw/ignored_v4l2_nodes.json
 new file mode 100644
-index 0000000..0537a29
+index 0000000..5abeff1
 --- /dev/null
 +++ b/overlay/DeviceAsWebcamMumba/res/raw/ignored_v4l2_nodes.json
 @@ -0,0 +1,6 @@
@@ -765,7 +703,7 @@ index 0000000..24c609d
 +</resources>
 \ No newline at end of file
 diff --git a/overlay/FrameworksResMumba/res/values/config.xml b/overlay/FrameworksResMumba/res/values/config.xml
-index 9486cb0..0a3a8cf 100644
+index 9486cb0..d58735c 100644
 --- a/overlay/FrameworksResMumba/res/values/config.xml
 +++ b/overlay/FrameworksResMumba/res/values/config.xml
 @@ -430,4 +430,11 @@
@@ -971,3 +909,46 @@ index 3a532a1..bb84db0 100644
  
  # Perf
  ro.vendor.extension_library=libqti-perfd-client.so
+diff --git a/sepolicy/vendor/hal_gnss_qti.te b/sepolicy/vendor/hal_gnss_qti.te
+new file mode 100644
+index 0000000..3b1ee9a
+--- /dev/null
++++ b/sepolicy/vendor/hal_gnss_qti.te
+@@ -0,0 +1,2 @@
++# GNSS uses the framework sensor manager for its sensor-assisted location path.
++allow vendor_hal_gnss_qti fwk_sensor_service:service_manager find;
+diff --git a/sepolicy/vendor/hal_vibrator_default.te b/sepolicy/vendor/hal_vibrator_default.te
+new file mode 100644
+index 0000000..a82bba0
+--- /dev/null
++++ b/sepolicy/vendor/hal_vibrator_default.te
+@@ -0,0 +1 @@
++hal_client_domain(hal_vibrator_default, hal_audio)
+diff --git a/sepolicy/vendor/location.te b/sepolicy/vendor/location.te
+new file mode 100644
+index 0000000..6984053
+--- /dev/null
++++ b/sepolicy/vendor/location.te
+@@ -0,0 +1,14 @@
++# The QTI location launcher uses binder for QMS and platform services,
++# QRTR for modem communication, and network access for XTRA/LOWI assistance.
++binder_use(vendor_location)
++binder_call(vendor_location, system_server)
++binder_call(vendor_location, vendor_cnd)
++binder_call(vendor_location, vendor_qms)
++
++allow vendor_location vendor_qms_service:service_manager find;
++allow vendor_location fwk_sensor_hwservice:hwservice_manager find;
++allow vendor_location vendor_hal_gnss_qti:unix_dgram_socket sendto;
++allow vendor_location self:qipcrtr_socket create_socket_perms_no_ioctl;
++allow vendor_location self:netlink_route_socket { create bind read };
++allowxperm vendor_location self:udp_socket ioctl lowi_server_ioctls;
++net_domain(vendor_location)
+diff --git a/sepolicy/vendor/service_contexts b/sepolicy/vendor/service_contexts
+new file mode 100644
+index 0000000..b71e8a9
+--- /dev/null
++++ b/sepolicy/vendor/service_contexts
+@@ -0,0 +1,2 @@
++com.motorola.hardware.camera.postprocess.IPostProcService/default u:object_r:vendor_hal_postproc_service:s0
++com.motorola.hardware.biometric.fingerprint.IMotoCaptiveSensorTest/default u:object_r:hal_fingerprint_service:s0
