@@ -303,7 +303,12 @@ atest MessagingNotificationActionTests
 Do not fork `LineageOS/android` directly: its `fetch=".."` would break every remote in the manifest.
 
 ## Notes
-- Build uses test-keys -> the first flash is a **clean flash**.
+- The default `userdebug` build is signed with the public AOSP test keys. The
+  signed `user` release is re-signed with your personal keys; the `test-keys`
+  string in the spoofed build fingerprint is not the signing key.
+- A clean flash is required when switching from a ROM signed with different keys
+  (stock, official LineageOS, or another custom ROM). Later updates signed with
+  the same release keys can be installed through the Updater without wiping.
 - The userdebug build is SELinux permissive; the separate `user` release omits
   that boot argument, uses enforcing mode, and leaves AVB verification enabled.
 - `flash_all.sh` runs `fastboot -w` and erases userdata. Set `IMG_DIR` to the

@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 #
-# flash_all.sh - flash LineageOS mumba via fastboot (userdebug/permissive build)
-# Bypasses the OTA build-tag check that blocks `adb sideload`.
+# flash_all.sh - flash built LineageOS mumba images with fastboot.
+# This flashes images directly and always wipes userdata; it is not an OTA update.
 #
 # Usage:
 #   1. Phone -> bootloader:  adb reboot bootloader   (or Power+VolDown)
 #   2. ./flash_all.sh
 #
-# WARNING: this wipes userdata (needed when switching from a differently-signed ROM).
+# WARNING: this always wipes userdata. A clean flash is required when switching
+# from a ROM signed with different keys.
 #
 set -e
 
@@ -58,7 +59,7 @@ $FB flash vendor        vendor.img
 $FB flash system_dlkm   system_dlkm.img
 $FB flash vendor_dlkm   vendor_dlkm.img
 
-echo "### wiping userdata (required for signature change)"
+echo "### wiping userdata (this script always performs a clean flash)"
 $FB -w
 
 echo "### rebooting"
