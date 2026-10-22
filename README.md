@@ -5,7 +5,10 @@ with the **kernel built from source**.
 
 This repository contains:
 - `mumba.xml` - local manifest (device tree, vendor, hardware, kernel source/modules/devicetrees,
-  OpenEUICC LPA) with **pinned revisions** (commit SHA) for reproducible builds.
+  OpenEUICC LPA) with **pinned revisions** (commit SHA) for custom and patch-target
+  projects. Unmodified upstream projects still follow the `lineage-23.2` branch;
+  run `repo manifest -r -o manifest-snapshot.xml` in a synced tree if you need
+  a fully reproducible manifest snapshot.
 - `build.sh` - userdebug build; `SYNC=false` reuses the synced source tree.
 - `build_release.sh` + `sign_release.sh` - isolated `user` build and locally
   signed target-files/OTA release.
@@ -121,30 +124,33 @@ authenticated as a user who can publish releases and push to `main`. Set
 labels the release "(GApps)"); the release directory must match the variant:
 
 ```bash
+export SRC="$HOME/Documenti/lineage-mumba-release"
+
 # vanilla (default)
-SRC="$HOME/Documenti/lineage-mumba-release" \
-  bash publish_release.sh "mumba-23.2-YYYYMMDD" \
+bash publish_release.sh "mumba-23.2-YYYYMMDD" \
   "$SRC/out-vanilla/target/product/mumba/release-signed"
 
 # GApps
-SRC="$HOME/Documenti/lineage-mumba-release" \
-  env VARIANT=gapps bash publish_release.sh "mumba-23.2-gapps-YYYYMMDD" \
+VARIANT=gapps bash publish_release.sh "mumba-23.2-gapps-YYYYMMDD" \
   "$SRC/out-gapps/target/product/mumba/release-signed"
 ```
 
-The vanilla example adds optional release notes / recovery image as the third and
-fourth arguments (as before). The releases appear in the XDA thread download
+Both commands accept optional release notes and a matching recovery image as
+the third and fourth arguments. The releases appear in the XDA thread download
 links; both variants must use distinct tags.
 
-The script validates that the target-files package is a `user` build for mumba
-and matches the signed A/B OTA metadata, uploads the OTA and checksum as the
-latest GitHub Release, then commits and pushes the new feed entry to `main`.
+The script validates that the target-files package is a `user` build for mumba,
+that its version matches the selected variant, and that it matches the signed
+A/B OTA metadata; it then uploads the OTA and checksum as the latest GitHub
+Release and commits and pushes the new feed entry to `main`.
 Use a new tag for each release. The manifest checkout must be clean, on `main`,
 and synchronized with `origin/main`. If publishing succeeds but the feed push is
 interrupted, the release remains available; resolve the local manifest commit
 and push it to `main` to publish its feed entry.
 
 The feed generator tests can be run with `python3 -m unittest discover -s tests`.
+The device patch chain can be checked against the pinned tree with
+`bash tools/check_device_patches.sh`.
 
 ## Components
 
@@ -212,10 +218,11 @@ upstream base SHAs are from the resolved `lineage-23.2` manifest
 | `packages/modules/adb` | LineageOS (via `remote="lineage"`) | `LineageOS/android_packages_modules_adb` | `e7ed41a85f5a0a8c9db0ed7ba21c6ebd277b5db6` | `e7ed41a85f5a0a8c9db0ed7ba21c6ebd277b5db6` |
 | `vendor/lineage` | LineageOS (via `remote="lineage"`) | `LineageOS/android_vendor_lineage` | `ca37c450e98fefb0cd53b864c469c1a7d024c53f` | `ca37c450e98fefb0cd53b864c469c1a7d024c53f` |
 
-The GitHub projects are forks, except for the two OpenEUICC repositories,
-which are full GitHub mirrors of their original Gitea repositories. The
-framework compatibility changes are pinned to exact source commits in
-`mumba.xml`.
+The `fiftydinar`-hosted projects are forks, except for the two OpenEUICC
+repositories, which are full GitHub mirrors of their original Gitea
+repositories. Official LineageOS projects that only need patches are pinned
+through the `lineage` remote. The framework compatibility changes are pinned to
+exact source commits in `mumba.xml`.
 
 ## Java boot-property compatibility behavior
 
@@ -243,7 +250,8 @@ There are two ways to get Google apps:
   `MINDTHEGAPPS_TAG`. Google APKs keep their original Google signatures
   (`presigned`), and AVB stays enabled because the GApps content is part of the
   signed `product`/`system_ext` hashtree. Updates arrive through the separate
-  `ota/updates-gapps.json` feed.
+  `ota/updates-gapps.json` feed. For a debug GApps build use
+  `TARGET=lineage_mumba_gapps-bp4a-userdebug`; its output tree is `out-gapps`.
 
 OpenEUICC's submodules also use GitHub forks, pinned by the OpenEUICC gitlinks:
 
@@ -307,3 +315,9 @@ Do not fork `LineageOS/android` directly: its `fetch=".."` would break every rem
   audio policy volumes file, add missing QTI perf symbols, and match the stock
   two-DTB/two-DTBO layout. The built-in speaker receives a speaker-only,
   cut-only Pink Noise correction derived from Notebookcheck measurements.
+
+## License
+
+The manifest, scripts, and documentation are licensed under Apache-2.0 (see
+`LICENSE`). Patches that modify GPL-2.0 kernel sources remain under the kernel's
+GPL-2.0 license.
