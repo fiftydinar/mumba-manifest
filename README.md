@@ -213,16 +213,19 @@ compatibility changes.
 
 The mumba-specific camera work is maintained in the
 [`fiftydinar/android_packages_apps_Aperture` `mumba-test` branch](https://github.com/fiftydinar/android_packages_apps_Aperture/tree/mumba-test)
-and pinned by `mumba.xml` to camera update `272ca783ca165e6db361e4b39c7912e124ca1e2a`,
+and pinned by `mumba.xml` to camera update `a0017795553a0f1b6b79068600bc010dc6671aae`,
 based on LineageOS Aperture commit `1120b49b7f24e7ef04213db14a6f2e5e52b4f11c`.
 A clean manifest sync therefore selects the tested mumba fork.
 
 On the Moto G57 Power, the fork uses a Camera2/GL path for aspect-ratio-aware
-photo capture and supported SDR video profiles. Main, ultra-wide (0.6×), and
-selfie switches can stay in one video file when that camera supports the selected
-resolution and frame rate. The selfie and pause/resume controls remain separate
-while recording. Camera2 sessions are closed before a profile resize/rebind, to
-avoid stale-session preview freezes during PHOTO/VIDEO changes.
+photo capture and supported SDR video profiles. Zoom is unified across the rear
+sensors from 0.3× (native ultra-wide) to 8× (main) through pinch or the lens
+buttons. Main, ultra-wide (0.3×), and selfie switches can stay in one video file
+when that camera supports the selected resolution and frame rate. The selfie and
+pause/resume controls remain separate while recording. Camera2 sessions are closed
+before a profile resize/rebind, to avoid stale-session preview freezes during
+PHOTO/VIDEO changes. A lens change draws its first frame with the crop for the
+current zoom, so the viewfinder does not flash a native ultra-wide frame.
 
 The phone exposes three Camera2 devices: rear main (`0`), front (`1`), and rear
 ultra-wide (`2`). The front and ultra-wide sensors top out at 30fps; the main
@@ -246,7 +249,7 @@ The following revisions are pinned in `mumba.xml`:
 | `kernel/motorola/sm6435-devicetrees` | [`fiftydinar/android_kernel_motorola_sm6435-devicetrees`](https://github.com/fiftydinar/android_kernel_motorola_sm6435-devicetrees) | `ZaraKinYu-Playground/android_kernel_motorola_sm6435-devicetrees` | `2c0587b0d4d90e0b3b00f87c9430360ea15ebdb6` | `2c0587b0d4d90e0b3b00f87c9430360ea15ebdb6` |
 | `packages/apps/OpenEUICC` | [`fiftydinar/OpenEUICC`](https://github.com/fiftydinar/OpenEUICC) | `gitea.angry.im/PeterCxy/OpenEUICC` | `2a85b8dad6000eea9dd622a468b7558e79933b2a` | `4130828243a2fb07aa1c07fc5813aa218ea912bf` |
 | `prebuilts/openeuicc-deps` | [`fiftydinar/android_prebuilts_openeuicc-deps`](https://github.com/fiftydinar/android_prebuilts_openeuicc-deps) | `gitea.angry.im/PeterCxy/android_prebuilts_openeuicc-deps` | `540216793010cabc49782bd01844cd8dd28a4c7c` | `540216793010cabc49782bd01844cd8dd28a4c7c` |
-| `packages/apps/Aperture` | [`fiftydinar/android_packages_apps_Aperture`](https://github.com/fiftydinar/android_packages_apps_Aperture) | `LineageOS/android_packages_apps_Aperture` | `1120b49b7f24e7ef04213db14a6f2e5e52b4f11c` | `272ca783ca165e6db361e4b39c7912e124ca1e2a` |
+| `packages/apps/Aperture` | [`fiftydinar/android_packages_apps_Aperture`](https://github.com/fiftydinar/android_packages_apps_Aperture) | `LineageOS/android_packages_apps_Aperture` | `1120b49b7f24e7ef04213db14a6f2e5e52b4f11c` | `a0017795553a0f1b6b79068600bc010dc6671aae` |
 | `hardware/qcom-caf/sm8450/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `9f4dec53710a32af11cfffd89256daf7de2a9dee` | `9f4dec53710a32af11cfffd89256daf7de2a9dee` |
 | `hardware/qcom-caf/sm8550/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `aa1495561e9ca90e80c5a2b898a67f75406dc874` | `aa1495561e9ca90e80c5a2b898a67f75406dc874` |
 | `hardware/qcom-caf/sm8650/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `2aa541f626ecc029fce24f3882aaee84c11fb161` | `2aa541f626ecc029fce24f3882aaee84c11fb161` |
