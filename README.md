@@ -213,9 +213,9 @@ compatibility changes.
 
 The mumba-specific camera work is maintained in the
 [`fiftydinar/android_packages_apps_Aperture` `mumba-test` branch](https://github.com/fiftydinar/android_packages_apps_Aperture/tree/mumba-test)
-and pinned by `mumba.xml` to camera update `a0017795553a0f1b6b79068600bc010dc6671aae`,
-based on LineageOS Aperture commit `1120b49b7f24e7ef04213db14a6f2e5e52b4f11c`.
-A clean manifest sync therefore selects the tested mumba fork.
+and currently pinned by `mumba.xml` to the upstream LineageOS Aperture commit
+`1120b49b7f24e7ef04213db14a6f2e5e52b4f11c`. The mumba Camera2/GL work is paused and
+is not yet part of the manifest, so a clean manifest sync selects the upstream camera.
 
 On the Moto G57 Power, the fork uses a Camera2/GL path for aspect-ratio-aware
 photo capture and supported SDR video profiles. Zoom is unified across the rear
@@ -249,7 +249,7 @@ The following revisions are pinned in `mumba.xml`:
 | `kernel/motorola/sm6435-devicetrees` | [`fiftydinar/android_kernel_motorola_sm6435-devicetrees`](https://github.com/fiftydinar/android_kernel_motorola_sm6435-devicetrees) | `ZaraKinYu-Playground/android_kernel_motorola_sm6435-devicetrees` | `2c0587b0d4d90e0b3b00f87c9430360ea15ebdb6` | `2c0587b0d4d90e0b3b00f87c9430360ea15ebdb6` |
 | `packages/apps/OpenEUICC` | [`fiftydinar/OpenEUICC`](https://github.com/fiftydinar/OpenEUICC) | `gitea.angry.im/PeterCxy/OpenEUICC` | `2a85b8dad6000eea9dd622a468b7558e79933b2a` | `4130828243a2fb07aa1c07fc5813aa218ea912bf` |
 | `prebuilts/openeuicc-deps` | [`fiftydinar/android_prebuilts_openeuicc-deps`](https://github.com/fiftydinar/android_prebuilts_openeuicc-deps) | `gitea.angry.im/PeterCxy/android_prebuilts_openeuicc-deps` | `540216793010cabc49782bd01844cd8dd28a4c7c` | `540216793010cabc49782bd01844cd8dd28a4c7c` |
-| `packages/apps/Aperture` | [`fiftydinar/android_packages_apps_Aperture`](https://github.com/fiftydinar/android_packages_apps_Aperture) | `LineageOS/android_packages_apps_Aperture` | `1120b49b7f24e7ef04213db14a6f2e5e52b4f11c` | `a0017795553a0f1b6b79068600bc010dc6671aae` |
+| `packages/apps/Aperture` | [`fiftydinar/android_packages_apps_Aperture`](https://github.com/fiftydinar/android_packages_apps_Aperture) | `LineageOS/android_packages_apps_Aperture` | `1120b49b7f24e7ef04213db14a6f2e5e52b4f11c` | `1120b49b7f24e7ef04213db14a6f2e5e52b4f11c` |
 | `hardware/qcom-caf/sm8450/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `9f4dec53710a32af11cfffd89256daf7de2a9dee` | `9f4dec53710a32af11cfffd89256daf7de2a9dee` |
 | `hardware/qcom-caf/sm8550/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `aa1495561e9ca90e80c5a2b898a67f75406dc874` | `aa1495561e9ca90e80c5a2b898a67f75406dc874` |
 | `hardware/qcom-caf/sm8650/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `2aa541f626ecc029fce24f3882aaee84c11fb161` | `2aa541f626ecc029fce24f3882aaee84c11fb161` |

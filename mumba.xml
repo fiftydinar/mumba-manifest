@@ -86,12 +86,12 @@
            remote="mine"
            revision="d8feea90e13da21fa279e72982cc0bae49600f35" />
 
-  <!-- Mumba Camera2/GL recording, lens switching, and high-speed fixes. -->
+  <!-- Mumba Aperture fork. Pinned to upstream until the mumba Camera2/GL work is ready. -->
   <remove-project name="LineageOS/android_packages_apps_Aperture" />
   <project name="android_packages_apps_Aperture"
            path="packages/apps/Aperture"
            remote="mine"
-           revision="a0017795553a0f1b6b79068600bc010dc6671aae" />
+           revision="1120b49b7f24e7ef04213db14a6f2e5e52b4f11c" />
 
   <remove-project name="LineageOS/android_hardware_qcom-caf_common" />
   <project name="android_hardware_qcom-caf_common"
