@@ -1,7 +1,32 @@
 diff --git a/overlay/WifiResMumba/res/values/config.xml b/overlay/WifiResMumba/res/values/config.xml
-index 7a917cb..f199e67 100644
+index 7a917cb..9bdfd44 100644
 --- a/overlay/WifiResMumba/res/values/config.xml
 +++ b/overlay/WifiResMumba/res/values/config.xml
+@@ -43,19 +43,19 @@
+     <bool name="config_wifi_fast_bss_transition_enabled">true</bool>
+ 
+     <!-- Wifi driver supports IEEE80211AX for softap -->
+-    <bool translatable="false" name="config_wifiSoftapIeee80211axSupported">true</bool>
++    <bool translatable="false" name="config_wifiSoftapIeee80211axSupported">false</bool>
+ 
+     <!-- Wifi driver supports IEEE80211AX single user beamformer for softap -->
+-    <bool translatable="false" name="config_wifiSoftapHeSuBeamformerSupported">true</bool>
++    <bool translatable="false" name="config_wifiSoftapHeSuBeamformerSupported">false</bool>
+ 
+     <!-- Wifi driver supports IEEE80211AX single user beamformee for softap -->
+-   <bool translatable="false" name="config_wifiSoftapHeSuBeamformeeSupported">true</bool>
++   <bool translatable="false" name="config_wifiSoftapHeSuBeamformeeSupported">false</bool>
+ 
+     <!-- Wifi driver supports IEEE80211AX multiple user beamformer for softap -->
+-    <bool translatable="false" name="config_wifiSoftapHeMuBeamformerSupported">true</bool>
++    <bool translatable="false" name="config_wifiSoftapHeMuBeamformerSupported">false</bool>
+ 
+     <!-- Wifi driver supports IEEE80211AX TWT (Target Wake Time) for softap -->
+-    <bool translatable="false" name="config_wifiSoftapHeTwtSupported">true</bool>
++    <bool translatable="false" name="config_wifiSoftapHeTwtSupported">false</bool>
+ 
+     <!-- Indicate the driver support NL80211_REG_CHANGED event. -->
+     <bool translatable="false" name="config_wifiDriverSupportedNl80211RegChangedEvent">true</bool>
 @@ -63,8 +63,10 @@
      <!-- Indicate the device support request channel on Wi-Fi Aware data-path. -->
      <bool translatable="false" name="config_wifiSupportChannelOnDataPath">true</bool>
@@ -15,7 +40,7 @@ index 7a917cb..f199e67 100644
  
      <!-- Enable concurrent STA + STA peer to peer + internet connectivity -->
      <bool translatable="false" name="config_wifiMultiStaLocalOnlyConcurrencyEnabled">true</bool>
-@@ -75,8 +77,8 @@
+@@ -75,14 +77,14 @@
      <!-- Wifi driver supports 5GHz band for softap when chip support 5GHz -->
      <bool translatable="false" name="config_wifiSoftap5ghzSupported">true</bool>
  
@@ -26,3 +51,10 @@ index 7a917cb..f199e67 100644
  
      <!-- Wifi driver supports Automatic channel selection (ACS) for softap -->
      <bool translatable="false" name="config_wifi_softap_acs_supported">true</bool>
+ 
+     <!-- boolean indicating whether the WiFi chipset has 6GHz band support -->
+-    <bool translatable="false" name ="config_wifi6ghzSupport">true</bool>
++    <bool translatable="false" name ="config_wifi6ghzSupport">false</bool>
+ 
+     <!-- Do not translate. Default access point SSID used for tethering -->
+     <string name="wifi_tether_configure_ssid_default" translatable="false">Motorola G57 Power</string>

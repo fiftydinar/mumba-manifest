@@ -26,7 +26,7 @@
 - `speaker-eq-audioflinger.patch` -> `frameworks/av` (allow this cut-only speaker device effect on the fast mixer output thread)
 - `adb-root-debug.patch` -> `packages/modules/adb` (default Rooted debugging on for debuggable builds unless a saved preference overrides it)
 - `touch-kbuild.patch` -> `kernel/motorola/sm6435-modules` (panel firmware selection, Chipone/Ilitek gesture flags, and DT2W input/wakeup fixes)
-- `wifi-no-bridged-softap.patch` -> `device/motorola/mumba` (disable bridged/dual-AP SoftAP; the second AP vdev fails to create on this device, so hotspot uses the single-AP path)
+- `wifi-no-bridged-softap.patch` -> `device/motorola/mumba` (fix SoftAP: disable bridged/dual-AP mode whose second AP vdev fails to create, and turn off the unsupported 6 GHz band plus HE-SAP flags; hostapd failed to set beacon parameters otherwise)
 - `vendor-lineage-kernel-out.patch` -> `vendor/lineage` (resolve the kernel `O=` output path against the tree root for any relative `OUT_DIR`, so kernel headers are generated in the right place with variant-specific out trees)
 - `display-refresh.patch` -> `kernel/motorola/sm6435-devicetrees` (24/25/30/40/48/50/60/80/90/96/100/120 Hz DFPS rates for all three mumba panels)
 
