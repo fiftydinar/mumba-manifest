@@ -93,6 +93,13 @@
            remote="mine"
            revision="1120b49b7f24e7ef04213db14a6f2e5e52b4f11c" />
 
+  <!-- Mumba Twelve fork: constant-bitrate AMR seeking. -->
+  <remove-project name="LineageOS/android_packages_apps_Twelve" />
+  <project name="android_packages_apps_Twelve"
+           path="packages/apps/Twelve"
+           remote="mine"
+           revision="8a519ffe81d722d4f6bc1c26a393e0af13dc3cd7" />
+
   <remove-project name="LineageOS/android_hardware_qcom-caf_common" />
   <project name="android_hardware_qcom-caf_common"
            path="hardware/qcom-caf/common"

@@ -192,6 +192,7 @@ The device patch chain can be checked against the pinned tree with
 | `packages/apps/OpenEUICC` | [fiftydinar/OpenEUICC](https://github.com/fiftydinar/OpenEUICC) | GitHub mirror of PeterCxy OpenEUICC; eSIM LPA (system `EuiccService`) |
 | `prebuilts/openeuicc-deps` | [fiftydinar/android_prebuilts_openeuicc-deps](https://github.com/fiftydinar/android_prebuilts_openeuicc-deps) | GitHub mirror of OpenEUICC prebuilt libraries |
 | `packages/apps/Aperture` | [fiftydinar/android_packages_apps_Aperture](https://github.com/fiftydinar/android_packages_apps_Aperture) | mumba Camera2/GL preview, recording, and lens-switching fork |
+| `packages/apps/Twelve` | [fiftydinar/android_packages_apps_Twelve](https://github.com/fiftydinar/android_packages_apps_Twelve) | fork with constant-bitrate AMR seeking |
 | `packages/apps/Messaging` | [fiftydinar/android_packages_apps_Messaging](https://github.com/fiftydinar/android_packages_apps_Messaging) | fork with notification read and verification-code copy actions |
 | `hardware/qcom-caf/common/libqti-perfd-client` | [fiftydinar/android_hardware_qcom-caf_common](https://github.com/fiftydinar/android_hardware_qcom-caf_common) | forked LineageOS CAF stub; QTI perf API compatibility |
 
@@ -235,6 +236,16 @@ path remains main-camera-only. Motorola identifies the additional rear module as
 a 2-in-1 ambient-light/flicker sensor, not an imaging/depth camera
 ([device specifications](https://en-us.support.motorola.com/app/answers/detail/a_id/190335/~/specifications---moto-g57-power)).
 
+## Twelve music player on mumba
+
+The LineageOS Twelve music player is pinned to a mumba fork that enables
+constant-bitrate seeking for AMR files. AMR recordings are constant bitrate in
+practice, but Media3's AMR extractor is unseekable by default, so dragging the
+progress bar restarted playback from the beginning. The fork enables
+`AmrExtractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING` in both playback paths
+(`PlaybackService` and `LocalPlayerViewModel`), which gives the player a known
+duration and working seek.
+
 ## Source revisions
 
 The following revisions are pinned in `mumba.xml`:
@@ -250,6 +261,7 @@ The following revisions are pinned in `mumba.xml`:
 | `packages/apps/OpenEUICC` | [`fiftydinar/OpenEUICC`](https://github.com/fiftydinar/OpenEUICC) | `gitea.angry.im/PeterCxy/OpenEUICC` | `2a85b8dad6000eea9dd622a468b7558e79933b2a` | `4130828243a2fb07aa1c07fc5813aa218ea912bf` |
 | `prebuilts/openeuicc-deps` | [`fiftydinar/android_prebuilts_openeuicc-deps`](https://github.com/fiftydinar/android_prebuilts_openeuicc-deps) | `gitea.angry.im/PeterCxy/android_prebuilts_openeuicc-deps` | `540216793010cabc49782bd01844cd8dd28a4c7c` | `540216793010cabc49782bd01844cd8dd28a4c7c` |
 | `packages/apps/Aperture` | [`fiftydinar/android_packages_apps_Aperture`](https://github.com/fiftydinar/android_packages_apps_Aperture) | `LineageOS/android_packages_apps_Aperture` | `1120b49b7f24e7ef04213db14a6f2e5e52b4f11c` | `1120b49b7f24e7ef04213db14a6f2e5e52b4f11c` |
+| `packages/apps/Twelve` | [`fiftydinar/android_packages_apps_Twelve`](https://github.com/fiftydinar/android_packages_apps_Twelve) | `LineageOS/android_packages_apps_Twelve` | `a2cff20dbf3f8e765b39971245de6f2e03e29a80` | `8a519ffe81d722d4f6bc1c26a393e0af13dc3cd7` |
 | `hardware/qcom-caf/sm8450/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `9f4dec53710a32af11cfffd89256daf7de2a9dee` | `9f4dec53710a32af11cfffd89256daf7de2a9dee` |
 | `hardware/qcom-caf/sm8550/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `aa1495561e9ca90e80c5a2b898a67f75406dc874` | `aa1495561e9ca90e80c5a2b898a67f75406dc874` |
 | `hardware/qcom-caf/sm8650/audio/primary-hal` | [`fiftydinar/android_hardware_qcom_audio-ar`](https://github.com/fiftydinar/android_hardware_qcom_audio-ar) | `LineageOS/android_hardware_qcom_audio-ar` | `2aa541f626ecc029fce24f3882aaee84c11fb161` | `2aa541f626ecc029fce24f3882aaee84c11fb161` |
