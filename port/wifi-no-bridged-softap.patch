@@ -1,0 +1,28 @@
+diff --git a/overlay/WifiResMumba/res/values/config.xml b/overlay/WifiResMumba/res/values/config.xml
+index 7a917cb..f199e67 100644
+--- a/overlay/WifiResMumba/res/values/config.xml
++++ b/overlay/WifiResMumba/res/values/config.xml
+@@ -63,8 +63,10 @@
+     <!-- Indicate the device support request channel on Wi-Fi Aware data-path. -->
+     <bool translatable="false" name="config_wifiSupportChannelOnDataPath">true</bool>
+ 
+-    <!-- Enable concurrent Bridged access point (AP) support -->
+-    <bool translatable="false" name="config_wifiBridgedSoftApSupported">true</bool>
++    <!-- Bridged (dual-AP) SoftAP does not work on this device: the second AP
++         vdev (wlan3) fails to be created and the whole hotspot is torn down.
++         Use plain single-AP SoftAP instead (the AOSP default). -->
++    <bool translatable="false" name="config_wifiBridgedSoftApSupported">false</bool>
+ 
+     <!-- Enable concurrent STA + STA peer to peer + internet connectivity -->
+     <bool translatable="false" name="config_wifiMultiStaLocalOnlyConcurrencyEnabled">true</bool>
+@@ -75,8 +77,8 @@
+     <!-- Wifi driver supports 5GHz band for softap when chip support 5GHz -->
+     <bool translatable="false" name="config_wifiSoftap5ghzSupported">true</bool>
+ 
+-    <!-- Indicates that STA + bridged AP concurrency mode is supported on this device -->
+-    <bool translatable="false" name="config_wifiStaWithBridgedSoftApConcurrencySupported">true</bool>
++    <!-- Disabled together with bridged SoftAP above. -->
++    <bool translatable="false" name="config_wifiStaWithBridgedSoftApConcurrencySupported">false</bool>
+ 
+     <!-- Wifi driver supports Automatic channel selection (ACS) for softap -->
+     <bool translatable="false" name="config_wifi_softap_acs_supported">true</bool>
