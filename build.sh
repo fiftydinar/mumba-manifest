@@ -106,7 +106,7 @@ bash "$SELF_DIR/apply_port.sh"
 if [[ "$TARGET" == lineage_mumba_gapps-* ]]; then
   # Pin an exact MindTheGapps release so GApps builds are reproducible.
   if [[ -z "${MINDTHEGAPPS_TAG:-}" ]]; then
-    MINDTHEGAPPS_TAG="MindTheGapps-16.0.0-arm64-20260915_222150"
+    MINDTHEGAPPS_TAG="MindTheGapps-16.0.0-arm64-20261023_034858"
     echo "### MINDTHEGAPPS_TAG not set, using pinned default: $MINDTHEGAPPS_TAG"
   fi
   echo "### stage MindTheGapps (vendor/partner_gms)"
