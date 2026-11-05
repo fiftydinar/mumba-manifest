@@ -15,7 +15,7 @@ This repository contains:
   signed target-files/OTA release.
 - `publish_release.sh` + `ota/` - publish a signed A/B OTA to GitHub Releases
   and update the LineageOS Updater feed on `main`.
-- `apply_port.sh` + `port/` - twenty-eight local patches for device fixes, audio,
+- `apply_port.sh` + `port/` - twenty-nine local patches for device fixes, audio,
   debug tooling, touchscreen compatibility, adaptive refresh rates, OpenEUICC/eSIM,
   Dialer auto call recording, updater changelog/issues links, and the OTA feed URL,
   applied on top of a fresh `repo sync`; it also installs the required QCOM CAF

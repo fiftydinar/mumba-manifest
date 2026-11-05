@@ -1,6 +1,6 @@
 # Ported changes: A17 (moto-elysia) -> A16 (ZaraKinYu device tree)
 
-`port/` contains twenty-eight patches:
+`port/` contains twenty-nine patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
 - `device-mumba-gapps.patch` -> `device/motorola/mumba` (GApps product `lineage_mumba_gapps`: `WITH_GMS` with MindTheGapps staged by `tools/fetch_mindthegapps.py`, separate `updates-gapps.json` feed, and no OpenEUICC)
 - `mumba-ota-updater.patch` -> `device/motorola/mumba` (LineageOS Updater feed URL for signed GitHub OTA releases)
@@ -27,6 +27,7 @@
 - `adb-root-debug.patch` -> `packages/modules/adb` (default Rooted debugging on for debuggable builds unless a saved preference overrides it)
 - `touch-kbuild.patch` -> `kernel/motorola/sm6435-modules` (panel firmware selection, Chipone/Ilitek gesture flags, and DT2W input/wakeup fixes)
 - `wifi-no-bridged-softap.patch` -> `device/motorola/mumba` (fix SoftAP: disable bridged/dual-AP mode whose second AP vdev fails to create, and turn off the unsupported 6 GHz band plus HE-SAP flags; hostapd failed to set beacon parameters otherwise)
+- `wifi-scc-indoor.patch` -> `vendor/motorola/mumba` (allow STA + SAP SCC on indoor channels; without it hostapd fails to set beacon parameters when the STA is connected to a 5 GHz indoor channel)
 - `vendor-lineage-kernel-out.patch` -> `vendor/lineage` (resolve the kernel `O=` output path against the tree root for any relative `OUT_DIR`, so kernel headers are generated in the right place with variant-specific out trees)
 - `display-refresh.patch` -> `kernel/motorola/sm6435-devicetrees` (24/25/30/40/48/50/60/80/90/96/100/120 Hz DFPS rates for all three mumba panels)
 

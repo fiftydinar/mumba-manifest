@@ -16,6 +16,7 @@ declare -A PATCH_TREE=(
   [settings-provider-refresh-defaults]="frameworks/base"
   [dt2s-motion-wake]="frameworks/base"
   [wifi-no-bridged-softap]="device/motorola/mumba"
+  [wifi-scc-indoor]="vendor/motorola/mumba"
   [vendor-mumba]="vendor/motorola/mumba"
   [speaker-eq-vendor]="vendor/motorola/mumba"
   [openeuicc-deps]="prebuilts/openeuicc-deps"
@@ -39,7 +40,7 @@ declare -A PATCH_TREE=(
 PORT_STATE_DIR="$PWD/.repo/local_manifests/mumba-port-state"
 mkdir -p "$PORT_STATE_DIR"
 
-for name in device-mumba device-mumba-gapps mumba-ota-updater updater-links mumba-refresh-defaults speaker-eq-device display-srgb-device settings-provider-refresh-defaults dt2s-motion-wake wifi-no-bridged-softap vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection display-srgb-settings uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh vendor-lineage-kernel-out; do
+for name in device-mumba device-mumba-gapps mumba-ota-updater updater-links mumba-refresh-defaults speaker-eq-device display-srgb-device settings-provider-refresh-defaults dt2s-motion-wake wifi-no-bridged-softap wifi-scc-indoor vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection display-srgb-settings uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh vendor-lineage-kernel-out; do
   patch="$SELF_DIR/port/$name.patch"
   tree="${PATCH_TREE[$name]}"
   if [ ! -f "$patch" ]; then

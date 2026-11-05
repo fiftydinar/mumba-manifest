@@ -1,0 +1,14 @@
+diff --git a/proprietary/vendor/etc/wifi/adrastea/WCNSS_qcom_cfg.ini b/proprietary/vendor/etc/wifi/adrastea/WCNSS_qcom_cfg.ini
+--- a/proprietary/vendor/etc/wifi/adrastea/WCNSS_qcom_cfg.ini
++++ b/proprietary/vendor/etc/wifi/adrastea/WCNSS_qcom_cfg.ini
+@@ -518,7 +518,9 @@
+ #disallow DUT create softap on indoor channel although STA on indoor
+ # All 5G channale is indoor channel when country code is JP
+ # we find it will create 5G AP when country code is JP via special steps
+-sta_sap_scc_on_indoor_chan=0
++# mumba: allow STA + SAP SCC on indoor channels so the hotspot works while
++# connected to a 5 GHz indoor channel (hostapd otherwise fails to set beacon).
++sta_sap_scc_on_indoor_chan=1
+ 
+ #wlm_latency_flags_ultralow - WLM flags setting for ultralow level
+ #bit 0: Avoid scan request from HLOS if setting
