@@ -1,7 +1,8 @@
 # Ported changes: A17 (moto-elysia) -> A16 (ZaraKinYu device tree)
 
-`port/` contains twenty-nine patches:
+`port/` contains thirty-four patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
+- `device-mumba-statusbar-vintf.patch` -> `device/motorola/mumba` (size the status bar to the front camera cutout and drop the declared-but-unregistered `ISecureElement/eSE1` entry that made `com.android.se` ANR in `waitForDeclaredService`)
 - `device-mumba-gapps.patch` -> `device/motorola/mumba` (GApps product `lineage_mumba_gapps`: `WITH_GMS` with MindTheGapps staged by `tools/fetch_mindthegapps.py`, separate `updates-gapps.json` feed, and no OpenEUICC)
 - `mumba-ota-updater.patch` -> `device/motorola/mumba` (LineageOS Updater feed URL for signed GitHub OTA releases)
 - `updater-links.patch` -> `packages/apps/Updater` (open this ROM's XDA changelog and GitHub issue tracker)
@@ -10,6 +11,9 @@
 - `display-srgb-device.patch` -> `device/motorola/mumba` (default to sRGB color management and initialize fresh installs in sRGB mode)
 - `settings-provider-refresh-defaults.patch` -> `frameworks/base` (seed optional refresh settings on initial settings database creation)
 - `dt2s-motion-wake.patch` -> `frameworks/base` (ignore motion and the double-tap-to-wake key for a short grace period after the device starts going to sleep, so double-tap-to-sleep and power-off are not undone by residual touches/gestures)
+- `edge-long-swipe-sdk.patch` -> `lineage-sdk` (new `NOTIFICATION_PANEL` edge long-swipe action and validation range covering it)
+- `edge-long-swipe-pwm.patch` -> `frameworks/base` (perform the `NOTIFICATION_PANEL` action by expanding the notification panel)
+- `edge-long-swipe-parts.patch` -> `packages/apps/LineageParts` (expose the `NOTIFICATION_PANEL` choice in the Edge long swipe action list)
 - `vendor-mumba.patch` -> `vendor/motorola/mumba` (build fixes in generated vendor files)
 - `speaker-eq-vendor.patch` -> `vendor/motorola/mumba` (attach the speaker EQ, remove stale Dolby effects, and select the source QTI effect factory)
 - `openeuicc-deps.patch` -> `prebuilts/openeuicc-deps` (SDK 37 -> 36 for the A16 tree)
@@ -19,6 +23,7 @@
 - `display-srgb-settings.patch` -> `packages/apps/Settings` (show a Native/sRGB color-mode selector in Display settings)
 - `uiccslot-physical-removable.patch` -> `frameworks/opt/telephony` (don't mark a physical SIM non-removable just because its slot is listed as an eUICC)
 - `dialer-autorecord.patch` -> `packages/apps/Dialer` (automatic call recording)
+- `dialer-clear-calllog.patch` -> `packages/apps/Dialer` (attach the clear-call-log task fragment to the parent FragmentManager so its success callback still runs after the dialog auto-dismisses, instead of leaving the progress dialog stuck)
 - `perfd-client.patch` -> `hardware/qcom-caf/common/libqti-perfd-client` (missing QTI perf API stubs)
 - `audio-kernel.patch` -> `kernel/motorola/sm6435-modules` (enable the mumba FS1815 amplifier modules)
 - `audiomanifest.patch` -> `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` (drop unregistered `IModule/usb`/`r_submix` from the audio VINTF manifest)

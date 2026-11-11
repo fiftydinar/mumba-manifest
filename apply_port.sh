@@ -7,6 +7,7 @@ SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # patch file : tree path
 declare -A PATCH_TREE=(
   [device-mumba]="device/motorola/mumba"
+  [device-mumba-statusbar-vintf]="device/motorola/mumba"
   [device-mumba-gapps]="device/motorola/mumba"
   [mumba-ota-updater]="device/motorola/mumba"
   [updater-links]="packages/apps/Updater"
@@ -15,6 +16,9 @@ declare -A PATCH_TREE=(
   [display-srgb-device]="device/motorola/mumba"
   [settings-provider-refresh-defaults]="frameworks/base"
   [dt2s-motion-wake]="frameworks/base"
+  [edge-long-swipe-sdk]="lineage-sdk"
+  [edge-long-swipe-pwm]="frameworks/base"
+  [edge-long-swipe-parts]="packages/apps/LineageParts"
   [wifi-no-bridged-softap]="device/motorola/mumba"
   [wifi-scc-indoor]="vendor/motorola/mumba"
   [vendor-mumba]="vendor/motorola/mumba"
@@ -26,6 +30,7 @@ declare -A PATCH_TREE=(
   [display-srgb-settings]="packages/apps/Settings"
   [uiccslot-physical-removable]="frameworks/opt/telephony"
   [dialer-autorecord]="packages/apps/Dialer"
+  [dialer-clear-calllog]="packages/apps/Dialer"
   [perfd-client]="hardware/qcom-caf/common/libqti-perfd-client"
   [audio-kernel]="kernel/motorola/sm6435-modules"
   [audiomanifest]="hardware/qcom-caf/sm8450-6.6/audio/primary-hal"
@@ -40,7 +45,7 @@ declare -A PATCH_TREE=(
 PORT_STATE_DIR="$PWD/.repo/local_manifests/mumba-port-state"
 mkdir -p "$PORT_STATE_DIR"
 
-for name in device-mumba device-mumba-gapps mumba-ota-updater updater-links mumba-refresh-defaults speaker-eq-device display-srgb-device settings-provider-refresh-defaults dt2s-motion-wake wifi-no-bridged-softap wifi-scc-indoor vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection display-srgb-settings uiccslot-physical-removable dialer-autorecord perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh vendor-lineage-kernel-out; do
+for name in device-mumba device-mumba-statusbar-vintf device-mumba-gapps mumba-ota-updater updater-links mumba-refresh-defaults speaker-eq-device display-srgb-device settings-provider-refresh-defaults dt2s-motion-wake edge-long-swipe-sdk edge-long-swipe-pwm edge-long-swipe-parts wifi-no-bridged-softap wifi-scc-indoor vendor-mumba speaker-eq-vendor openeuicc-deps openeuicc-app openeuicc-hide-launcher settings-euicc-hardware-detection display-srgb-settings uiccslot-physical-removable dialer-autorecord dialer-clear-calllog perfd-client audio-kernel audiomanifest speaker-eq-audio speaker-eq-audioflinger adb-root-debug touch-kbuild display-refresh vendor-lineage-kernel-out; do
   patch="$SELF_DIR/port/$name.patch"
   tree="${PATCH_TREE[$name]}"
   if [ ! -f "$patch" ]; then

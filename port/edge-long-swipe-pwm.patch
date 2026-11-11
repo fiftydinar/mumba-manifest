@@ -1,0 +1,16 @@
+--- a/services/core/java/com/android/server/policy/PhoneWindowManager.java
++++ b/services/core/java/com/android/server/policy/PhoneWindowManager.java
+@@ -2331,6 +2331,13 @@
+                 takeScreenshot(TAKE_SCREENSHOT_SELECTED_REGION, SCREENSHOT_KEY_OTHER);
+                 notifyKeyGestureCompleted(event, KeyGestureEvent.KEY_GESTURE_TYPE_TAKE_SCREENSHOT);
+                 break;
++            case NOTIFICATION_PANEL:
++                try {
++                    getStatusBarService().expandNotificationsPanel();
++                } catch (RemoteException e) {
++                    Slog.w(TAG, "Failed to expand notification panel", e);
++                }
++                break;
+             default:
+                 break;
+         }

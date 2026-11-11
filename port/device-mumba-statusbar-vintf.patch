@@ -1,0 +1,38 @@
+diff --git a/configs/vintf/manifest.xml b/configs/vintf/manifest.xml
+index 740df7c..0cdc734 100644
+--- a/configs/vintf/manifest.xml
++++ b/configs/vintf/manifest.xml
+@@ -7,10 +7,10 @@
+         <name>android.hardware.gatekeeper</name>
+         <fqname>IGatekeeper/default</fqname>
+     </hal>
+-    <hal format="aidl">
+-        <name>android.hardware.secure_element</name>
+-        <fqname>ISecureElement/eSE1</fqname>
+-    </hal>
++    <!-- Do not declare ISecureElement/eSE1 here: the eSE (st54spi) is not
++         present on this platform, and a declared-but-unregistered instance
++         makes com.android.se block in ServiceManager.waitForDeclaredService()
++         during SecureElementService.onCreate() (20s service ANR). -->
+     <hal format="aidl">
+         <name>vendor.nxp.nxpnfc_aidl</name>
+         <fqname>INxpNfc/default</fqname>
+diff --git a/overlay/FrameworksResMumba/res/values/dimens.xml b/overlay/FrameworksResMumba/res/values/dimens.xml
+index 816a7c4..f89a0fd 100644
+--- a/overlay/FrameworksResMumba/res/values/dimens.xml
++++ b/overlay/FrameworksResMumba/res/values/dimens.xml
+@@ -6,12 +6,12 @@
+ <resources>
+     <!-- The default height of the status bar used in {@link SystemBarUtils#getStatusBarHeight} to
+          calculate the status bar height. -->
+-    <dimen name="status_bar_height_default">28dp</dimen>
++    <dimen name="status_bar_height_default">41dp</dimen>
+ 
+     <!-- Height of the status bar in portrait.
+          Do not read this dimen directly. Use {@link SystemBarUtils#getStatusBarHeight} instead.
+          -->
+-    <dimen name="status_bar_height_portrait">94.0px</dimen>
++    <dimen name="status_bar_height_portrait">101.0px</dimen>
+ 
+     <!-- Height of the status bar in landscape.
+          Do not read this dimen directly. Use {@link SystemBarUtils#getStatusBarHeight} instead.

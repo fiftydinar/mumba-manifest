@@ -1,0 +1,19 @@
+diff --git a/java/com/android/dialer/app/calllog/ClearCallLogDialog.java b/java/com/android/dialer/app/calllog/ClearCallLogDialog.java
+index 0b4e5dbb9..b48437df9 100644
+--- a/java/com/android/dialer/app/calllog/ClearCallLogDialog.java
++++ b/java/com/android/dialer/app/calllog/ClearCallLogDialog.java
+@@ -58,7 +58,13 @@ public class ClearCallLogDialog extends DialogFragment {
+         DialerExecutorComponent.get(getContext())
+             .dialerExecutorFactory()
+             .createUiTaskBuilder(
+-                getChildFragmentManager(),
++                // Attach the headless task fragment to the activity's
++                // FragmentManager, not this dialog's child manager: the dialog
++                // is auto-dismissed as soon as OK is tapped, which would
++                // destroy the child manager and null the success listener
++                // ("task succeeded but UI is dead") before the progress
++                // dialog could be dismissed.
++                getParentFragmentManager(),
+                 "clearCallLogTask",
+                 new ClearCallLogWorker(getActivity().getApplicationContext()))
+             .onSuccess(this::onSuccess)

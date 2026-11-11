@@ -1,0 +1,27 @@
+diff --git a/sdk/src/java/lineageos/providers/LineageSettings.java b/sdk/src/java/lineageos/providers/LineageSettings.java
+index f52b4220..fc9d14e5 100644
+--- a/sdk/src/java/lineageos/providers/LineageSettings.java
++++ b/sdk/src/java/lineageos/providers/LineageSettings.java
+@@ -374,7 +374,7 @@ public final class LineageSettings {
+             new InclusiveIntegerRangeValidator(0, 86400);
+ 
+     private static final Validator sHardwareKeyActionvalidator =
+-            new InclusiveIntegerRangeValidator(0, 13);
++            new InclusiveIntegerRangeValidator(0, 14);
+ 
+     private static final Validator sAlwaysTrueValidator = new Validator() {
+         @Override
+diff --git a/sdk/src/java/org/lineageos/internal/util/DeviceKeysConstants.java b/sdk/src/java/org/lineageos/internal/util/DeviceKeysConstants.java
+index aa2ae336..b2dbe66a 100644
+--- a/sdk/src/java/org/lineageos/internal/util/DeviceKeysConstants.java
++++ b/sdk/src/java/org/lineageos/internal/util/DeviceKeysConstants.java
+@@ -28,7 +28,8 @@ public class DeviceKeysConstants {
+         KILL_APP,
+         PLAY_PAUSE_MUSIC,
+         SCREENSHOT,
+-        PARTIAL_SCREENSHOT;
++        PARTIAL_SCREENSHOT,
++        NOTIFICATION_PANEL;
+ 
+         public static Action fromIntSafe(int id) {
+             if (id < NOTHING.ordinal() || id > Action.values().length) {
