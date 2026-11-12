@@ -1,8 +1,9 @@
 # Ported changes: A17 (moto-elysia) -> A16 (ZaraKinYu device tree)
 
-`port/` contains thirty-five patches:
+`port/` contains thirty-six patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
 - `device-mumba-statusbar-vintf.patch` -> `device/motorola/mumba` (size the status bar to the front camera cutout and drop the declared-but-unregistered `ISecureElement/eSE1` entry from the base VINTF manifest that made `com.android.se` ANR in `waitForDeclaredService`)
+- `device-mumba-ese-init.patch` -> `device/motorola/mumba` (set `ro.vendor.hw.nfc=ese_st` for the `dne`/`ne` SKUs whose ST54J eSE is present, and fix the missing `on` on the eSE service trigger so the Thales SE HAL actually starts)
 - `device-mumba-gapps.patch` -> `device/motorola/mumba` (GApps product `lineage_mumba_gapps`: `WITH_GMS` with MindTheGapps staged by `tools/fetch_mindthegapps.py`, separate `updates-gapps.json` feed, and no OpenEUICC)
 - `mumba-ota-updater.patch` -> `device/motorola/mumba` (LineageOS Updater feed URL for signed GitHub OTA releases)
 - `updater-links.patch` -> `packages/apps/Updater` (open this ROM's XDA changelog and GitHub issue tracker)

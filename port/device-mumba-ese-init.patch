@@ -1,0 +1,22 @@
+diff --git a/init/init.vendor.st21nfc.rc b/init/init.vendor.st21nfc.rc
+index ee41eb8..1a1aa2e 100644
+--- a/init/init.vendor.st21nfc.rc
++++ b/init/init.vendor.st21nfc.rc
+@@ -20,7 +20,16 @@ on property:ro.boot.revision=dvt1 && property:ro.boot.device=mona
+ on property:ro.boot.revision=dvt1 && property:ro.boot.device=monai
+    setprop persist.vendor.nfc.config_hal_name "libnfc-hal-st-dvt1.conf"
+ 
+-property:ro.vendor.hw.nfc=ese_st
++# mumba: the ST54J embedded SE is present on the dne/ne SKUs but the stock
++# image does not set ro.vendor.hw.nfc there, so the Thales SE HAL never starts
++# and com.android.se blocks waiting for ISecureElement/eSE1.
++on property:ro.boot.product.hardware.sku=dne
++    setprop ro.vendor.hw.nfc ese_st
++
++on property:ro.boot.product.hardware.sku=ne
++    setprop ro.vendor.hw.nfc ese_st
++
++on property:ro.vendor.hw.nfc=ese_st
+     start gto_secure_element_aidl_service
+ 
+ service gto_secure_element_aidl_service /vendor/bin/hw/android.hardware.secure_element-service.thales
