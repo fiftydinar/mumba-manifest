@@ -1,8 +1,8 @@
 # Ported changes: A17 (moto-elysia) -> A16 (ZaraKinYu device tree)
 
-`port/` contains thirty-four patches:
+`port/` contains thirty-five patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
-- `device-mumba-statusbar-vintf.patch` -> `device/motorola/mumba` (size the status bar to the front camera cutout and drop the declared-but-unregistered `ISecureElement/eSE1` entry that made `com.android.se` ANR in `waitForDeclaredService`)
+- `device-mumba-statusbar-vintf.patch` -> `device/motorola/mumba` (size the status bar to the front camera cutout and drop the declared-but-unregistered `ISecureElement/eSE1` entries from the base and SKU VINTF manifests that made `com.android.se` ANR in `waitForDeclaredService`)
 - `device-mumba-gapps.patch` -> `device/motorola/mumba` (GApps product `lineage_mumba_gapps`: `WITH_GMS` with MindTheGapps staged by `tools/fetch_mindthegapps.py`, separate `updates-gapps.json` feed, and no OpenEUICC)
 - `mumba-ota-updater.patch` -> `device/motorola/mumba` (LineageOS Updater feed URL for signed GitHub OTA releases)
 - `updater-links.patch` -> `packages/apps/Updater` (open this ROM's XDA changelog and GitHub issue tracker)
@@ -24,6 +24,7 @@
 - `uiccslot-physical-removable.patch` -> `frameworks/opt/telephony` (don't mark a physical SIM non-removable just because its slot is listed as an eUICC)
 - `dialer-autorecord.patch` -> `packages/apps/Dialer` (automatic call recording)
 - `dialer-clear-calllog.patch` -> `packages/apps/Dialer` (attach the clear-call-log task fragment to the parent FragmentManager so its success callback still runs after the dialog auto-dismisses, instead of leaving the progress dialog stuck)
+- `secure-element-bounded-wait.patch` -> `packages/apps/SecureElement` (wait at most 5s for a declared SE HAL instead of blocking forever in `ServiceManager.waitForDeclaredService`, which ANR'd `com.android.se` on devices where a declared instance such as an absent eSE or SIM slot is never registered)
 - `perfd-client.patch` -> `hardware/qcom-caf/common/libqti-perfd-client` (missing QTI perf API stubs)
 - `audio-kernel.patch` -> `kernel/motorola/sm6435-modules` (enable the mumba FS1815 amplifier modules)
 - `audiomanifest.patch` -> `hardware/qcom-caf/sm8450-6.6/audio/primary-hal` (drop unregistered `IModule/usb`/`r_submix` from the audio VINTF manifest)

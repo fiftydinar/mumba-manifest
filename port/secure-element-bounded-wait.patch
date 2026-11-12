@@ -1,0 +1,35 @@
+diff --git a/src/com/android/se/Terminal.java b/src/com/android/se/Terminal.java
+index c90ff53..e1b4071 100644
+--- a/src/com/android/se/Terminal.java
++++ b/src/com/android/se/Terminal.java
+@@ -41,6 +41,7 @@ import android.os.Message;
+ import android.os.RemoteException;
+ import android.os.ServiceManager;
+ import android.os.ServiceSpecificException;
++import android.os.SystemClock;
+ import android.os.UserHandle;
+ import android.se.omapi.ISecureElementListener;
+ import android.se.omapi.ISecureElementReader;
+@@ -279,11 +280,17 @@ public class Terminal {
+             try {
+                 String name = "android.hardware.secure_element.ISecureElement/" + mName;
+                 IBinder binder = null;
+-                if (retryOnFail) {
+-                    binder = ServiceManager.waitForDeclaredService(name);
+-                } else {
+-                    if (ServiceManager.isDeclared(name)) {
+-                        binder = ServiceManager.getService(name);
++                if (ServiceManager.isDeclared(name)) {
++                    binder = ServiceManager.getService(name);
++                    if (binder == null && retryOnFail) {
++                        // Never block forever on a declared-but-unregistered HAL:
++                        // waitForDeclaredService() would hang the main thread until
++                        // the service ANR timeout (e.g. a missing eSE or SIM slot).
++                        final long deadline = SystemClock.uptimeMillis() + 5000;
++                        while (binder == null && SystemClock.uptimeMillis() < deadline) {
++                            SystemClock.sleep(100);
++                            binder = ServiceManager.getService(name);
++                        }
+                     }
+                 }
+                 mAidlHal = android.hardware.secure_element.ISecureElement.Stub.asInterface(binder);

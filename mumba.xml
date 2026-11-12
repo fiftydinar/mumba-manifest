@@ -136,6 +136,12 @@
            remote="lineage"
            revision="ca37c450e98fefb0cd53b864c469c1a7d024c53f" />
 
+  <remove-project name="LineageOS/android_packages_apps_SecureElement" />
+  <project name="android_packages_apps_SecureElement"
+           path="packages/apps/SecureElement"
+           remote="lineage"
+           revision="bef9e6f1cc13956bf4718db1e303cf942f5b0e04" />
+
   <!-- Keep the other CAF audio trees from the resolved LineageOS manifest. -->
   <remove-project name="LineageOS/android_hardware_qcom_audio-ar" />
   <project name="android_hardware_qcom_audio-ar"
