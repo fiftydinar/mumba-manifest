@@ -2,7 +2,7 @@
 
 `port/` contains thirty-five patches:
 - `device-mumba.patch` -> `device/motorola/mumba` (device tree changes)
-- `device-mumba-statusbar-vintf.patch` -> `device/motorola/mumba` (size the status bar to the front camera cutout and drop the declared-but-unregistered `ISecureElement/eSE1` entries from the base and SKU VINTF manifests that made `com.android.se` ANR in `waitForDeclaredService`)
+- `device-mumba-statusbar-vintf.patch` -> `device/motorola/mumba` (size the status bar to the front camera cutout and drop the declared-but-unregistered `ISecureElement/eSE1` entry from the base VINTF manifest that made `com.android.se` ANR in `waitForDeclaredService`)
 - `device-mumba-gapps.patch` -> `device/motorola/mumba` (GApps product `lineage_mumba_gapps`: `WITH_GMS` with MindTheGapps staged by `tools/fetch_mindthegapps.py`, separate `updates-gapps.json` feed, and no OpenEUICC)
 - `mumba-ota-updater.patch` -> `device/motorola/mumba` (LineageOS Updater feed URL for signed GitHub OTA releases)
 - `updater-links.patch` -> `packages/apps/Updater` (open this ROM's XDA changelog and GitHub issue tracker)

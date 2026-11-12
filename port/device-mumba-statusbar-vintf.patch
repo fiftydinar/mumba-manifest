@@ -17,30 +17,6 @@ index 740df7c..0cdc734 100644
      <hal format="aidl">
          <name>vendor.nxp.nxpnfc_aidl</name>
          <fqname>INxpNfc/default</fqname>
-diff --git a/configs/vintf/sku/manifest_dne.xml b/configs/vintf/sku/manifest_dne.xml
-index 0e1b6b3..2a79912 100644
---- a/configs/vintf/sku/manifest_dne.xml
-+++ b/configs/vintf/sku/manifest_dne.xml
-@@ -7,7 +7,6 @@
-         <name>android.hardware.secure_element</name>
-         <fqname>ISecureElement/SIM1</fqname>
-         <fqname>ISecureElement/SIM2</fqname>
--        <fqname>ISecureElement/eSE1</fqname>
-     </hal>
-     <hal format="aidl" override="true">
-         <name>vendor.nxp.nxpnfc_aidl</name>
-diff --git a/configs/vintf/sku/manifest_ne.xml b/configs/vintf/sku/manifest_ne.xml
-index 4201fc4..f54c8a7 100644
---- a/configs/vintf/sku/manifest_ne.xml
-+++ b/configs/vintf/sku/manifest_ne.xml
-@@ -36,7 +36,6 @@
-     <hal format="aidl" override="true">
-         <name>android.hardware.secure_element</name>
-         <fqname>ISecureElement/SIM1</fqname>
--        <fqname>ISecureElement/eSE1</fqname>
-     </hal>
-     <hal format="aidl" override="true">
-         <name>vendor.nxp.nxpnfc_aidl</name>
 diff --git a/overlay/FrameworksResMumba/res/values/dimens.xml b/overlay/FrameworksResMumba/res/values/dimens.xml
 index 816a7c4..f89a0fd 100644
 --- a/overlay/FrameworksResMumba/res/values/dimens.xml
