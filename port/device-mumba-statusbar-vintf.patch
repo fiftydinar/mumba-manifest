@@ -17,6 +17,33 @@ index 740df7c..0cdc734 100644
      <hal format="aidl">
          <name>vendor.nxp.nxpnfc_aidl</name>
          <fqname>INxpNfc/default</fqname>
+diff --git a/overlay/FrameworksResMumba/res/values/config.xml b/overlay/FrameworksResMumba/res/values/config.xml
+index 9486cb0..28a6763 100644
+--- a/overlay/FrameworksResMumba/res/values/config.xml
++++ b/overlay/FrameworksResMumba/res/values/config.xml
+@@ -400,8 +400,8 @@
+          -->
+     <string name="config_mainBuiltInDisplayCutoutRectApproximation" translatable="false">
+         M -36.5 0
+-        L -36.5 94
+-        L 36.5 94
++        L -36.5 101
++        L 36.5 101
+         L 36.5 0
+         Z
+     </string>
+@@ -430,4 +430,11 @@
+     <!-- Specifies the maximum burn-in offset vertically. -->
+     <integer name="config_burnInProtectionMaxVerticalOffset">40</integer>
+ 
++    <!-- Expose the panel's full adaptive range (30/60/90/120 Hz) to the
++         default refresh-rate policy and Smooth Display. -->
++    <!-- Use sRGB as the initial color mode on fresh user data. -->
++    <integer name="config_defaultDisplayDefaultColorMode">7</integer>
++    <integer name="config_defaultRefreshRate">120</integer>
++    <integer name="config_defaultPeakRefreshRate">120</integer>
++
+ </resources>
 diff --git a/overlay/FrameworksResMumba/res/values/dimens.xml b/overlay/FrameworksResMumba/res/values/dimens.xml
 index 816a7c4..f89a0fd 100644
 --- a/overlay/FrameworksResMumba/res/values/dimens.xml
