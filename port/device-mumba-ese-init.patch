@@ -1,8 +1,8 @@
 diff --git a/init/init.vendor.st21nfc.rc b/init/init.vendor.st21nfc.rc
-index ee41eb8..1a1aa2e 100644
+index ee41eb8..f9fa39e 100644
 --- a/init/init.vendor.st21nfc.rc
 +++ b/init/init.vendor.st21nfc.rc
-@@ -20,7 +20,16 @@ on property:ro.boot.revision=dvt1 && property:ro.boot.device=mona
+@@ -20,7 +20,20 @@ on property:ro.boot.revision=dvt1 && property:ro.boot.device=mona
  on property:ro.boot.revision=dvt1 && property:ro.boot.device=monai
     setprop persist.vendor.nfc.config_hal_name "libnfc-hal-st-dvt1.conf"
  
@@ -12,9 +12,13 @@ index ee41eb8..1a1aa2e 100644
 +# and com.android.se blocks waiting for ISecureElement/eSE1.
 +on property:ro.boot.product.hardware.sku=dne
 +    setprop ro.vendor.hw.nfc ese_st
++    setprop persist.vendor.nfc.config_file_name libnfc-hal-st54j.conf
++    start gto_secure_element_aidl_service
 +
 +on property:ro.boot.product.hardware.sku=ne
 +    setprop ro.vendor.hw.nfc ese_st
++    setprop persist.vendor.nfc.config_file_name libnfc-hal-st54j.conf
++    start gto_secure_element_aidl_service
 +
 +on property:ro.vendor.hw.nfc=ese_st
      start gto_secure_element_aidl_service
