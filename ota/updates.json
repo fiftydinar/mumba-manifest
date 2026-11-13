@@ -1,18 +1,18 @@
 [
   {
-    "datetime": 1794415394,
+    "datetime": 1794518401,
     "files": [
       {
         "filename": "lineage_mumba-signed-ota.zip",
         "os_patch_level": "2026-10-01",
         "os_sdk_level": 36,
-        "ota_property_files": "payload.bin:4532:1169326020,payload_properties.txt:1169330610:156,apex_info.pb:2054:1345,care_map.pb:3446:1039,metadata:69:675,metadata.pb:812:1194",
-        "sha256": "ce8ed13b361197591bee5162d03991decd7e36f2a0b56050adba1c2e33f9f8c6",
-        "size": 1169333410,
-        "url": "https://github.com/fiftydinar/mumba-manifest/releases/download/mumba-23.2-20261111/lineage_mumba-signed-ota.zip"
+        "ota_property_files": "payload.bin:4532:1169323950,payload_properties.txt:1169328540:156,apex_info.pb:2054:1345,care_map.pb:3446:1039,metadata:69:675,metadata.pb:812:1194",
+        "sha256": "64eeaa9ff076c2cbd79107f7869f2e9988bf632b60fc5f52971a0aa2a93c68b2",
+        "size": 1169331340,
+        "url": "https://github.com/fiftydinar/mumba-manifest/releases/download/mumba-23.2-20261113/lineage_mumba-signed-ota.zip"
       }
     ],
     "type": "UNOFFICIAL",
-    "version": "23.2-20261111-UNOFFICIAL-mumba"
+    "version": "23.2-20261112-UNOFFICIAL-mumba"
   }
 ]
