@@ -1,18 +1,18 @@
 [
   {
-    "datetime": 1794419514,
+    "datetime": 1794526384,
     "files": [
       {
         "filename": "lineage_mumba-signed-ota.zip",
         "os_patch_level": "2026-10-01",
         "os_sdk_level": 36,
-        "ota_property_files": "payload.bin:4251:1584644686,payload_properties.txt:1584648995:156,apex_info.pb:2050:1345,care_map.pb:3442:762,metadata:69:673,metadata.pb:810:1192",
-        "sha256": "27e30996db8ce464f76bfa90bd25b3c4fae701cb11d37ecda3bb5fb8026cc0b5",
-        "size": 1584651795,
-        "url": "https://github.com/fiftydinar/mumba-manifest/releases/download/mumba-23.2-gapps-20261111/lineage_mumba-signed-ota.zip"
+        "ota_property_files": "payload.bin:4251:1584677991,payload_properties.txt:1584682300:156,apex_info.pb:2050:1345,care_map.pb:3442:762,metadata:69:673,metadata.pb:810:1192",
+        "sha256": "dfdb79dcfc8d6b54de673b0388157bd168c5ac45c8bf6dfad8a9a5625dbb2714",
+        "size": 1584685100,
+        "url": "https://github.com/fiftydinar/mumba-manifest/releases/download/mumba-23.2-gapps-20261113/lineage_mumba-signed-ota.zip"
       }
     ],
     "type": "UNOFFICIAL",
-    "version": "23.2-20261111-UNOFFICIAL-mumba_gapps"
+    "version": "23.2-20261112-UNOFFICIAL-mumba_gapps"
   }
 ]
